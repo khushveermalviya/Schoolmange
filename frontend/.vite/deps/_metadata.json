@@ -1,0 +1,55 @@
+{
+  "hash": "b8930353",
+  "configHash": "7119ad61",
+  "lockfileHash": "e3b0c442",
+  "browserHash": "5dc58dbf",
+  "optimized": {
+    "react": {
+      "src": "../../node_modules/react/index.js",
+      "file": "react.js",
+      "fileHash": "750ba02e",
+      "needsInterop": true
+    },
+    "react-calendar": {
+      "src": "../../node_modules/react-calendar/dist/esm/index.js",
+      "file": "react-calendar.js",
+      "fileHash": "52d7d422",
+      "needsInterop": false
+    },
+    "react-circular-progressbar": {
+      "src": "../../node_modules/react-circular-progressbar/dist/index.esm.js",
+      "file": "react-circular-progressbar.js",
+      "fileHash": "fe073b05",
+      "needsInterop": false
+    },
+    "react-dom/client": {
+      "src": "../../node_modules/react-dom/client.js",
+      "file": "react-dom_client.js",
+      "fileHash": "7463c8be",
+      "needsInterop": true
+    },
+    "react-router-dom": {
+      "src": "../../node_modules/react-router-dom/dist/index.js",
+      "file": "react-router-dom.js",
+      "fileHash": "046809f1",
+      "needsInterop": false
+    },
+    "recharts": {
+      "src": "../../node_modules/recharts/es6/index.js",
+      "file": "recharts.js",
+      "fileHash": "6d70970e",
+      "needsInterop": false
+    }
+  },
+  "chunks": {
+    "chunk-2KHBIA62": {
+      "file": "chunk-2KHBIA62.js"
+    },
+    "chunk-YBFRUR3B": {
+      "file": "chunk-YBFRUR3B.js"
+    },
+    "chunk-JRE55LYH": {
+      "file": "chunk-JRE55LYH.js"
+    }
+  }
+}
