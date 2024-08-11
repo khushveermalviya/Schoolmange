@@ -12,6 +12,10 @@ import Layout from './Routes/Layout.jsx';
 import Faculty from './Component/admin/Faculty.jsx';
 import S1 from './Component/admin/Students/S1.jsx';
 import Adminlayout from './Routes/Adminlayout.jsx';
+import Classes from './Component/admin/Students/Classes.jsx';
+import ClassesLayout from './Routes/ClassesLayout.jsx';
+import Form from './Component/admin/Students/Form.jsx';
+import Classaddlayout from './Routes/Classaddlayout.jsx';
 const router = createBrowserRouter([
   { 
     path: '/',
@@ -31,7 +35,28 @@ const router = createBrowserRouter([
       },
       {
         path:"classes",
-        element:<S1/>
+        element:<ClassesLayout/>,
+        children:[
+          {
+            path:"",
+            element:<S1/>
+          },
+          {
+            path:"classes/:userid",
+            element:<Classaddlayout/>,
+            children:[
+              {
+                path:'',
+                element:<Classes/>
+              },
+              {
+                path:"add",
+                element:<Form/>
+                
+              }
+            ]
+          }
+        ]
       }
     ]
   },
