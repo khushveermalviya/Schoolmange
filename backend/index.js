@@ -1,23 +1,32 @@
-import express from 'express';
-import pool from './db/Database.js';
+import app from './App/App.js';
+import dotenv from 'dotenv';
+import Pool from "./db/Database.js";
+import express from "express";
+import cors from "cors";
 
-const app = express();
+dotenv.config();
+
+// Use the cors middleware
+app.use(cors());
+app.use(express.json());
 
 app.get('/', (req, res) => {
-  res.send('Server is ready');
+    res.send('Hello, world!');
 });
 
-// Example route using Pool to query the database
-app.get('/data', async (req, res) => {
+app.post('/admin', async (req, res) => {
   try {
-    const result = await pool.query('SELECT * FROM your_table');
-    res.json(result.rows);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Internal Server Error' });
+    const { father_name } = req.body;
+  
+    const result = await Pool.query("INSERT INTO students (father_name) VALUES($1, $2)", [father_name]);
+    res.send('Student added successfully');
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('An error occurred');
   }
 });
 
-app.listen(5098, () => {
-  console.log('Server at http://localhost:5000');
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
 });
