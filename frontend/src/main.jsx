@@ -9,6 +9,9 @@ import Result from './Component/student/Result.jsx';
 import Complain from './Component/student/Complain.jsx';
 import Attendence from './Component/student/Attendence.jsx';
 import Layout from './Routes/Layout.jsx';
+import Faculty from './Component/admin/Faculty.jsx';
+import S1 from './Component/admin/Students/S1.jsx';
+import Adminlayout from './Routes/Adminlayout.jsx';
 const router = createBrowserRouter([
   { 
     path: '/',
@@ -16,7 +19,21 @@ const router = createBrowserRouter([
   },
   {
     path: '/admin',
-    element: <Admin />,
+    element: <Adminlayout/>,
+    children:[
+      {
+        path:"",
+        element:<Admin />
+      },
+      {
+        path:"facility",
+        element:<Faculty/>
+      },
+      {
+        path:"classes",
+        element:<S1/>
+      }
+    ]
   },
   {
     path: '/Student',  // Removed the trailing space here

@@ -16,10 +16,12 @@ app.get('/', (req, res) => {
 
 app.post('/admin', async (req, res) => {
   try {
-    const { father_name } = req.body;
-  
-    const result = await Pool.query("INSERT INTO students (father_name) VALUES($1, $2)", [father_name]);
-    res.send('Student added successfully');
+    const { father_name, std_id, std_name } = req.body;
+    const result = await Pool.query(
+        "INSERT INTO student (std_id, std_name, father_name) VALUES ($1, $2, $3)", 
+        [std_id, std_name, father_name]
+    );
+    res.status(200).send('hogaya hai tension mat le');
   } catch (error) {
     console.error(error);
     res.status(500).send('An error occurred');
