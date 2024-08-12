@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-
+import axios from "axios"
 export default function Form() {
   const [formData, setFormData] = useState({
     std_name: '',
@@ -21,24 +21,51 @@ export default function Form() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    // try {
+    //   const response = await fetch('http://localhost:3334/admin', {
+    //     method: 'POST',
+    //     headers: {
+    //       'Content-Type': 'application/json',
+    //     },
+    //     body: JSON.stringify(formData),
+    //   });
+    //   if (response.ok) {
+    //     // Handle successful submission
+    //     console.log('Form submitted successfully');
+    //   } else {
+    //     // Handle errors
+    //     console.log('Failed to submit form');
+    //   }
+    // } catch (error) {
+    //   console.error('Error:', error);
+    // }
     try {
-      const response = await fetch('http://localhost:3334/admin', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      });
-      if (response.ok) {
-        // Handle successful submission
-        console.log('Form submitted successfully');
-      } else {
-        // Handle errors
-        console.log('Failed to submit form');
+      const checkResponse = await axios.get(`http://localhost:3334/check-student-id/${formData.std_id}`);
+      if (checkResponse.data.exists) {
+        alert('Student ID already exists.');
+        return;
       }
+  
+      const response = await axios.post('http://localhost:3334/admin', formData);
+      console.log(response.data);
     } catch (error) {
       console.error('Error:', error);
     }
+    axios({
+      method: 'post',
+      url: 'http://localhost:3334/admin',
+      data: {
+        std_name: `${formData.std_name}`,
+        father_name: `${formData.father_name}`,
+        std_id:`${formData.std_id}`
+      }
+    }).then((response) => {
+      console.log(response);
+    }, (error) => {
+      console.log(error);
+      alert('Student ID already exists.');
+    });
+
   };
 
   return (
@@ -48,7 +75,7 @@ export default function Form() {
           <form onSubmit={handleSubmit}>
             <div className="mb-5">
               <label className="mb-3 block text-base font-medium text-[#07074D]">
-                Full Name
+                Full N
               </label>
               <input
                 type="text"

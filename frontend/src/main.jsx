@@ -16,6 +16,8 @@ import Classes from './Component/admin/Students/Classes.jsx';
 import ClassesLayout from './Routes/ClassesLayout.jsx';
 import Form from './Component/admin/Students/Form.jsx';
 import Classaddlayout from './Routes/Classaddlayout.jsx';
+import Login from './Component/admin/Login.jsx';
+import LoginLayout from './Routes/LoginLayout.jsx';
 const router = createBrowserRouter([
   { 
     path: '/',
@@ -27,11 +29,46 @@ const router = createBrowserRouter([
     children:[
       {
         path:"",
-        element:<Admin />
+        element:<Login/>
       },
       {
-        path:"facility",
-        element:<Faculty/>
+        path:"adminPanel",
+        element:<LoginLayout/>,
+        children:[
+          {
+            path:'',
+            element:<Admin/>
+          },
+          {
+            path:'',
+            element:<Faculty/>
+          },
+          {
+            path:"classes",
+            element:<ClassesLayout/>,
+            children:[
+              {
+                path:"",
+                element:<S1/>
+              },
+              {
+                path:"classes/:userid",
+                element:<Classaddlayout/>,
+                children:[
+                  {
+                    path:'',
+                    element:<Classes/>
+                  },
+                  {
+                    path:"add",
+                    element:<Form/>
+                    
+                  }
+                ]
+              }
+            ]
+          }
+        ]
       },
       {
         path:"classes",
