@@ -22,7 +22,7 @@ console.log(isAuthenticated);
     const submit = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.post("http://localhost:3334/admin", {
+            const response = await axios.post("http://localhost:3334/login", {
                 username: data.username,
                 password: data.password
             });
