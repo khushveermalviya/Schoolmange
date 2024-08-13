@@ -17,8 +17,10 @@ const app=express();
        
       }
     } catch (error) {
-      console.error('Error querying database:', error);
+    
       res.status(500).json({ success: false, error: 'Internal server error' });
+      console.log("lose");
+       
     }
   });
   export default Login;

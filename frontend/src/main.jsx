@@ -18,6 +18,7 @@ import Form from './Component/admin/Students/Form.jsx';
 import Classaddlayout from './Routes/Classaddlayout.jsx';
 import Login from './Component/admin/Login.jsx';
 import LoginLayout from './Routes/LoginLayout.jsx';
+import Protected from './Routes/Protected.jsx';
 const router = createBrowserRouter([
   { 
     path: '/',
@@ -37,10 +38,10 @@ const router = createBrowserRouter([
         children:[
           {
             path:'',
-            element:<Admin/>
+            element:  <Protected><Admin/></Protected>  
           },
           {
-            path:'',
+            path:'faculty',
             element:<Faculty/>
           },
           {
