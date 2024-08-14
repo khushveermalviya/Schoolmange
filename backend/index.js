@@ -7,6 +7,7 @@ import axios from 'axios';
 import Login from "./admin/Login.js"
 import Studentadd from './admin/Studentadd.js';
 import Studentlist from './admin/Studentlist.js';
+import Studentdetails from './admin/Studentdetails.js';
 dotenv.config();
 const app= express();
 // Use the cors middleware
@@ -81,6 +82,7 @@ app.get('/admin', (req, res) => {
 app.use(Login)
 app.use(Studentadd)
 app.use(Studentlist);
+app.use(Studentdetails)
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);

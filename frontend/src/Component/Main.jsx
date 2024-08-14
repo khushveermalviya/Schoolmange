@@ -1,7 +1,8 @@
 import React from 'react'
 import { NavLink } from 'react-router-dom'
-
+import loading from "react-top-loading-bar"
 export default function Main() {
+  
   return (
     <div>
 <div className="w-full items-center flex  justify-between">

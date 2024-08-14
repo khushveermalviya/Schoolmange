@@ -19,6 +19,7 @@ import Classaddlayout from './Routes/Classaddlayout.jsx';
 import Login from './Component/admin/Login.jsx';
 import LoginLayout from './Routes/LoginLayout.jsx';
 import Protected from './Routes/Protected.jsx';
+import Details from './Component/admin/Students/Details.jsx';
 const router = createBrowserRouter([
   { 
     path: '/',
@@ -61,6 +62,10 @@ const router = createBrowserRouter([
                     element:<Classes/>
                   },
                   {
+                    path: "details/:studentId",
+                    element: <Details />
+                  },
+                  {
                     path:"add",
                     element:<Form/>
                     
@@ -71,31 +76,7 @@ const router = createBrowserRouter([
           }
         ]
       },
-      {
-        path:"classes",
-        element:<ClassesLayout/>,
-        children:[
-          {
-            path:"",
-            element:<S1/>
-          },
-          {
-            path:"classes/:userid",
-            element:<Classaddlayout/>,
-            children:[
-              {
-                path:'',
-                element:<Classes/>
-              },
-              {
-                path:"add",
-                element:<Form/>
-                
-              }
-            ]
-          }
-        ]
-      }
+      
     ]
   },
   {

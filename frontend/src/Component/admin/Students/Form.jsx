@@ -63,6 +63,7 @@ export default function Form() {
       }
     }).then((response) => {
       console.log(response);
+      alert('Student add succesfully');
     }, (error) => {
       console.log(error);
       alert('Student ID already exists.');
