@@ -38,10 +38,16 @@ export default function Details() {
           <p className="text-lg"><strong>Name:</strong> {student.std_name}</p>
           <p className="text-lg"><strong>Father's Name:</strong> {student.father_name
           }</p>
-          <p className="text-lg"><strong>Class:</strong> {student.classs}</p>
-          <p className="text-lg"><strong>Admission Date:</strong> {student.admissionDate}</p>
+          <p className="text-lg"><strong>Class:</strong> {student.classs }</p>
+          <p className="text-lg"><strong>Admission Date:</strong> {student. admission_date}</p>
           <p className="text-lg"><strong>Attendance:</strong> {student.attendance}</p>
           <p className="text-lg"><strong>Address:</strong> {student.address}</p>
+          <p className="text-lg"><strong>Address:</strong> {student.result}</p>
+          <p className="text-lg"><strong>Address:</strong> {student.mobile_number}</p>
+          <p className="text-lg"><strong>Address:</strong> {student.previous_school}</p>
+          <p className="text-lg"><strong>Address:</strong> {student.mobile_number}</p>
+          <p className="text-lg"><strong>Address:</strong> {student.class_teacher}</p>
+          <p className="text-lg"><strong>Address:</strong> {student.parent_number}</p>
         </div>
       </div>
       <div className="bg-white shadow-md rounded-lg p-4 mt-4">

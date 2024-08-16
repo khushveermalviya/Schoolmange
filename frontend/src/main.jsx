@@ -20,6 +20,9 @@ import Login from './Component/admin/Login.jsx';
 import LoginLayout from './Routes/LoginLayout.jsx';
 import Protected from './Routes/Protected.jsx';
 import Details from './Component/admin/Students/Details.jsx';
+import Delete from './Component/admin/Students/Delete.jsx';
+import Annunosment from './Component/admin/Students/Annunosment.jsx';
+import Update from './Component/admin/Students/Update.jsx';
 const router = createBrowserRouter([
   { 
     path: '/',
@@ -69,6 +72,20 @@ const router = createBrowserRouter([
                     path:"add",
                     element:<Form/>
                     
+                  },
+                  {
+                    path:"delete",
+                    element:<Delete/>
+
+                  },{
+                    path:"annunosment",
+                    element:<Annunosment/>
+
+                  },
+                  {
+                    path:"update",
+                    element:<Update/>
+
                   }
                 ]
               }
