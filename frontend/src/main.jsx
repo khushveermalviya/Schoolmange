@@ -23,6 +23,7 @@ import Details from './Component/admin/Students/Details.jsx';
 import Delete from './Component/admin/Students/Delete.jsx';
 import Annunosment from './Component/admin/Students/Annunosment.jsx';
 import Update from './Component/admin/Students/Update.jsx';
+import Studentlog from './Component/student/Studentlog.jsx';
 const router = createBrowserRouter([
   { 
     path: '/',
@@ -102,8 +103,12 @@ const router = createBrowserRouter([
     children: [
       {
         path: '',  // Changed to a relative path
-        element: <Student />,
+        element: <Student/>,
       },
+      // {
+      //   path: 'Students',  // Changed to a relative path
+      //   element: <Student/>,
+      // },
       {
         path: 'result',  // Changed to a relative path
         element: <Result />,
