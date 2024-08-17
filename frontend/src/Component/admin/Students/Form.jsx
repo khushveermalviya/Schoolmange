@@ -1,16 +1,26 @@
 import React, { useState } from 'react';
-import axios from "axios"
+import axios from "axios";
 import Classes from './Classes';
+
 export default function Form() {
   const [formData, setFormData] = useState({
     std_name: '',
     father_name: '',
+    mother_name: '',
     std_id: '',
     dob: '',
     classs: '',
     city: '',
     state: '',
-    post_code: ''
+    post_code: '',
+    mobile_number: '',
+    parent_number: '',
+    address: '',
+    previous_school: '',
+    class_teacher: '',
+    admission_date: '',
+    photo: '',
+    result: ''
   });
 
   const handleChange = (e) => {
@@ -22,53 +32,17 @@ export default function Form() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // try {
-    //   const response = await fetch('http://localhost:3334/admin', {
-    //     method: 'POST',
-    //     headers: {
-    //       'Content-Type': 'application/json',
-    //     },
-    //     body: JSON.stringify(formData),
-    //   });
-    //   if (response.ok) {
-    //     // Handle successful submission
-    //     console.log('Form submitted successfully');
-    //   } else {
-    //     // Handle errors
-    //     console.log('Failed to submit form');
-    //   }
-    // } catch (error) {
-    //   console.error('Error:', error);
-    // }
-    // try {
-    //   const checkResponse = await axios.get(`http://localhost:3334/check-student-id/${formData.std_id}`);
-    //   if (checkResponse.data.exists) {
-    //     alert('Student ID already exists.');
-    //     return;
-    //   }
-  
-    //   const response = await axios.post('http://localhost:3334/admin', formData);
-    //   console.log(response.data);
-    // } catch (error) {
-    //   console.error('Error:', error);
-    // }
     axios({
       method: 'post',
       url: 'https://backend-mauve-ten.vercel.app/admin',
-      data: {
-        std_name: `${formData.std_name}`,
-        father_name: `${formData.father_name}`,
-        std_id:`${formData.std_id}`,
-        classs:`${formData.classs}`
-      }
+      data: formData
     }).then((response) => {
       console.log(response);
-      alert('Student add succesfully');
+      alert('Student added successfully');
     }, (error) => {
       console.log(error);
-      alert('Student ID already exists.');
+      alert('An error occurred while adding the student.');
     });
-
   };
 
   return (
@@ -78,7 +52,7 @@ export default function Form() {
           <form onSubmit={handleSubmit}>
             <div className="mb-5">
               <label className="mb-3 block text-base font-medium text-[#07074D]">
-                Full N
+                Full Name <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
@@ -87,11 +61,12 @@ export default function Form() {
                 onChange={handleChange}
                 placeholder="Full Name"
                 className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
+                required
               />
             </div>
             <div className="mb-5">
               <label className="mb-3 block text-base font-medium text-[#07074D]">
-                Father Name
+                Father Name <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
@@ -100,11 +75,26 @@ export default function Form() {
                 onChange={handleChange}
                 placeholder="Father Name"
                 className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
+                required
               />
             </div>
             <div className="mb-5">
               <label className="mb-3 block text-base font-medium text-[#07074D]">
-                Roll no.
+                Mother Name <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                name="mother_name"
+                value={formData.mother_name}
+                onChange={handleChange}
+                placeholder="Mother Name"
+                className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
+                required
+              />
+            </div>
+            <div className="mb-5">
+              <label className="mb-3 block text-base font-medium text-[#07074D]">
+                Roll no. <span className="text-red-500">*</span>
               </label>
               <input
                 type="number"
@@ -113,22 +103,133 @@ export default function Form() {
                 onChange={handleChange}
                 placeholder="Roll Number"
                 className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
+                required
               />
             </div>
             <div className="mb-5">
               <label className="mb-3 block text-base font-medium text-[#07074D]">
-                class
+                Class <span className="text-red-500">*</span>
               </label>
               <input
                 type='number'
                 name="classs"
                 value={formData.classs}
                 onChange={handleChange}
-                placeholder="class"
+                placeholder="Class"
+                className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
+                required
+              />
+            </div>
+            <div className="mb-5">
+              <label className="mb-3 block text-base font-medium text-[#07074D]">
+                Mobile Number <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="tel"
+                name="mobile_number"
+                value={formData.mobile_number}
+                onChange={handleChange}
+                placeholder="Mobile Number"
+                className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
+                required
+              />
+            </div>
+            <div className="mb-5">
+              <label className="mb-3 block text-base font-medium text-[#07074D]">
+                Parent Number
+              </label>
+              <input
+                type="tel"
+                name="parent_number"
+                value={formData.parent_number}
+                onChange={handleChange}
+                placeholder="Parent Number"
                 className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
               />
             </div>
-            {/* Additional Fields (like DOB, Address) */}
+            <div className="mb-5">
+              <label className="mb-3 block text-base font-medium text-[#07074D]">
+                Address <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                name="address"
+                value={formData.address}
+                onChange={handleChange}
+                placeholder="Address"
+                className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
+                required
+              />
+            </div>
+            <div className="mb-5">
+              <label className="mb-3 block text-base font-medium text-[#07074D]">
+                Previous School
+              </label>
+              <input
+                type="text"
+                name="previous_school"
+                value={formData.previous_school}
+                onChange={handleChange}
+                placeholder="Previous School"
+                className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
+              />
+            </div>
+            <div className="mb-5">
+              <label className="mb-3 block text-base font-medium text-[#07074D]">
+                Class Teacher <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                name="class_teacher"
+                value={formData.class_teacher}
+                onChange={handleChange}
+                placeholder="Class Teacher"
+                className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
+                required
+              />
+            </div>
+            <div className="mb-5">
+              <label className="mb-3 block text-base font-medium text-[#07074D]">
+                Admission Date <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="date"
+                name="admission_date"
+                value={formData.admission_date}
+                onChange={handleChange}
+                placeholder="Admission Date"
+                className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
+                required
+              />
+            </div>
+            <div className="mb-5">
+              <label className="mb-3 block text-base font-medium text-[#07074D]">
+                Photo URL <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                name="photo"
+                value={formData.photo}
+                onChange={handleChange}
+                placeholder="Photo URL"
+                className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
+                required
+              />
+            </div>
+            <div className="mb-5">
+              <label className="mb-3 block text-base font-medium text-[#07074D]">
+                Result <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                name="result"
+                value={formData.result}
+                onChange={handleChange}
+                placeholder="Result"
+                className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
+                required
+              />
+            </div>
             <div>
               <button
                 type="submit"

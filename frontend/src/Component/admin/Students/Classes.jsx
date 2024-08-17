@@ -69,10 +69,10 @@ useEffect(() => {
           Generate Excel
         </button>
       </div>
-      <div className='flex flex-row justify-center items-center w-full h-full'>
+      <div className='flex flex-col  md:flex-row md:min-h-80 justify-center items-center w-full min-h-full'>
         {filtered.length > 0 ? (
           filtered.map((student, index) => (
-            <div className='flex w-56' key={index}>
+            <div className='flex flex-col min-w-32 flex-nowrap border-4 border-black' key={index}>
               <NavLink to={`details/${student.std_id}`}>
                 <img
                   className='bg-slate-400 border-2 w-1/2 hover:scale-90 transition-transform'
