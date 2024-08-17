@@ -13,6 +13,8 @@ setInfo(e.target.value)
 <div className="flex justify-between  items-center h-screen ">
   <div className='bg-white w-1/2 h-full justify-center flex items-center flex-col'>
 <NavLink to="/Student" className="text-blue-900 font-bold text-2xl ">Student</NavLink>
+<NavLink to="/admin" className="text-blue-900 font-bold text-2xl ">Admin</NavLink>
+
 <label for="rollno"></label>
 <input 
 type='number'
