@@ -54,7 +54,7 @@ export default function Form() {
     // }
     axios({
       method: 'post',
-      url: 'https://backend-one-beige-47.vercel.app/admin',
+      url: 'https://backend-mauve-ten.vercel.app/admin',
       data: {
         std_name: `${formData.std_name}`,
         father_name: `${formData.father_name}`,

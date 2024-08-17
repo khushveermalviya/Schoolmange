@@ -12,7 +12,7 @@ export default function Delete() {
     e.preventDefault();
     try {
       // Ensure this is correctly set
-      const response = await axios.delete(`http://localhost:3334/delete/${studentId}`, {
+      const response = await axios.delete(`https://backend-mauve-ten.vercel.app/delete/${studentId}`, {
           data: { reason: reason === 'Other' ? otherReason : reason }
       });
       

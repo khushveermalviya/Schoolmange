@@ -9,7 +9,7 @@ export default function Classes() {
   const [filtered, setFiltered] = useState([]);
 
   useEffect(() => {
-    axios.get("https://backend-one-beige-47.vercel.app/list")
+    axios.get("https://backend-mauve-ten.vercel.app/list")
       .then(response => {
         const studentsWithClass = response.data.map(student => ({
           ...student,
