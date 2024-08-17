@@ -7,6 +7,7 @@ const Studentlist =App.get("/list", async(req,res)=>{
 try {
     const list=await Pool.query("SELECT * FROM student")
     res.json(list.rows);    
+    console.log(list.rows);
     
     
 } catch (error) {

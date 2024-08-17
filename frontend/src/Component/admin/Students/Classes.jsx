@@ -9,28 +9,42 @@ export default function Classes() {
   const [filtered, setFiltered] = useState([]);
 
   useEffect(() => {
-    axios.get("http://localhost:3334/list")
+    axios.get("https://backend-one-beige-47.vercel.app/list")
       .then(response => {
-        setStudents(response.data); // Set the student data
+        const studentsWithClass = response.data.map(student => ({
+          ...student,
+          classs: student.classs || student.class // Adjust according to actual field name
+        }));
+        setStudents(studentsWithClass);
+        console.log("Mapped Students:", studentsWithClass);
       })
       .catch(error => {
         console.error("Error fetching students:", error);
       });
   }, []);
 
-  useEffect(() => {
-    const useridString = userid.toString();
-    const filteredData = students.filter(student => {
-      return student.classs.toString() === useridString;
-    });
-    setFiltered(filteredData);
-  }, [students, userid]);
+  
+
+useEffect(() => {
+  const filteredData = students.filter(student => {
+    if (student.classs === undefined) {
+      console.warn(`Student ${student.std_name} is missing the 'classs' field`);
+      return false;
+    }
+    return student.classs.toString() === userid.toString();
+  });
+
+  console.log("Filtered Data:", filteredData);
+  
+  setFiltered(filteredData);
+}, [students, userid]);
+
 
   const handleGenerateExcel = () => {
     const dataToExport = filtered.map(student => ({
       'Student Name': student.std_name,
       'Father\'s Name': student.father_name,
-      'Class': student.classs,
+      'Class': student.class,
       'Student ID': student.std_id,
       'Address': student.address,
       'Mobile Number': student.mobile_number,
@@ -68,7 +82,7 @@ export default function Classes() {
                 <div className='flex flex-col items-center'>
                   <p className='text-2xl text-center'>Student Name: {student.std_name}</p>
                   <p className='text-center'>Father's Name: {student.father_name}</p>
-                  <p>Class: {student.classs}</p>
+                  <p>Class: {student.class}</p>
                   <p>Student ID: {student.std_id}</p>
                 </div>
               </NavLink>

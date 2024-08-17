@@ -52,7 +52,7 @@ const Studentadd= App.post('/admin', async (req, res) => {
   try {
     const { std_name, father_name, std_id,classs } = req.body;
     const result = await Pool.query(
-        "INSERT INTO student (std_id, std_name, father_name,classs) VALUES ($1, $2, $3,$4) ", 
+        "INSERT INTO student (std_id, std_name, father_name,class) VALUES ($1, $2, $3,$4) ", 
         [std_id, std_name, father_name, classs]
     );
     res.json(result.rows[0]);

@@ -22,7 +22,7 @@ console.log(isAuthenticated);
     const submit = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.post("http://localhost:3334/login", {
+            const response = await axios.post("https://backend-one-beige-47.vercel.app/login", {
                 username: data.username,
                 password: data.password
             });

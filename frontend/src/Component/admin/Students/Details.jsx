@@ -7,7 +7,7 @@ export default function Details() {
   const [student, setStudent] = useState(null);
 
   useEffect(() => {
-    axios.get(`http://localhost:3334/details/${studentId}`) // Pass studentId in the URL
+    axios.get(`https://backend-one-beige-47.vercel.app/details/${studentId}`) // Pass studentId in the URL
       .then(response => {
         setStudent(response.data);
         console.log(response.data);

@@ -15,9 +15,7 @@ const app= express();
 app.use(cors());
 app.use(express.json());
 
-app.get('/admin', (req, res) => {
-    res.send('Hello, world!');
-});
+
 
 // app.post('/admin', async (req, res) => {
 //   try {
@@ -85,7 +83,7 @@ app.use(Studentadd)
 app.use(Studentlist);
 app.use(Studentdetails);
 app.use(Studentdelete);
-const PORT = process.env.PORT || 3000;
+const PORT = 3334;
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });
