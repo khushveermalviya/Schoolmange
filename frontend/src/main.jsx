@@ -58,18 +58,6 @@ const router = createBrowserRouter([
                 element:<S1/>
               },
               {
-                path:"classes/:userid",
-                element:<Classaddlayout/>,
-                children:[
-                  {
-                    path:'',
-                    element:<Classes/>
-                  },
-                  {
-                    path: "details/:studentId",
-                    element: <Details />
-                  },
-                  {
                     path:"add",
                     element:<Form/>
                     
@@ -83,6 +71,19 @@ const router = createBrowserRouter([
                     element:<Annunosment/>
 
                   },
+              {
+                path:"classes/:userid",
+                element:<Classaddlayout/>,
+                children:[
+                  {
+                    path:'',
+                    element:<Classes/>
+                  },
+                  {
+                    path: "details/:studentId",
+                    element: <Details />
+                  },
+                  
                   {
                     path:"update",
                     element:<Update/>
