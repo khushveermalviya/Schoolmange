@@ -15,7 +15,7 @@ export default function Main() {
 
   async function handleClick() {
     try {
-      const response = await axios.post('http://localhost:3334/studentLogin', info);
+      const response = await axios.post('https://backend-mauve-ten.vercel.app/studentLogin', info);
       setCheck(response.data);
       if (response.data) {
         setNavigate(true);

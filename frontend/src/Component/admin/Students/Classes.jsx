@@ -60,27 +60,31 @@ useEffect(() => {
 
   return (
     <>
-      <div className='flex '>
-        <h2 className='text-center w-full text-4xl mb-8'>Students Details</h2>
-        <button 
-          className='text-xl bg-slate-300 mr-7 mt-6 border-4' 
+    <div className='flex w-full justify-center'>
+      <button 
+          className='text-xl bg-green-500 mr-7  border-4 w-62 text-center' 
           onClick={handleGenerateExcel}
         >
           Generate Excel
         </button>
+        </div>
+      <div className='flex '>
+        <h2 className='text-center w-full text-4xl mb-3'>Students Details</h2>
+      
       </div>
-      <div className='flex flex-col  md:flex-row md:min-h-80 justify-center items-center w-full min-h-full'>
+    
+      <div className='flex flex-col md:flex-wrap  md:flex-row md:min-h-full justify-center gap-10 items-center w-full min-full-screen'>
         {filtered.length > 0 ? (
           filtered.map((student, index) => (
-            <div className='flex flex-col min-w-32 flex-nowrap border-4 border-black' key={index}>
+            <div className='items-center flex   min-w-1/2 h-full text-center'key={index}>
               <NavLink to={`details/${student.std_id}`}>
-                <img
+                {/* <img
                   className='bg-slate-400 border-2 w-1/2 hover:scale-90 transition-transform'
                   src={student.photo_url}
                   alt={`${student.std_name}'s photo`}
-                />
-                <div className='flex flex-col items-center'>
-                  <p className='text-2xl text-center'>Student Name: {student.std_name}</p>
+                /> */}
+                <div className='flex flex-col items-center text-center w-full bg-slate-200'>
+                  <p className='text-2xl text-center '>{student.std_name}</p>
                   <p className='text-center'>Father's Name: {student.father_name}</p>
                   <p>Class: {student.class}</p>
                   <p>Student ID: {student.std_id}</p>
