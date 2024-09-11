@@ -1,17 +1,17 @@
-import React from 'react'
-import { LineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip } from 'recharts';
+import Chart from 'chart.js/auto';
+import { getRelativePosition } from 'chart.js/helpers';
 
-export default function Chart() {
-    const data = [{name: 'Page A', uv: 400, pv: 20, amt: 2600}]
-  return (
-    <div className='w-full h-full mt-8'>
-        <LineChart width={600} height={300} data={data} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
-    <Line type="monotone" dataKey="uv" stroke="#8884d8" />
-    <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
-    <XAxis dataKey="name" />
-    <YAxis />
-    <Tooltip />
-  </LineChart>
-    </div>
-  )
-}
+// const chart = new Chart( {
+//   type: 'line',
+//   data: data,
+//   options: {
+//     onClick: (e) => {
+//       const canvasPosition = getRelativePosition(e, chart);
+
+//       // Substitute the appropriate scale IDs
+//       const dataX = chart.scales.x.getValueForPixel(canvasPosition.x);
+//       const dataY = chart.scales.y.getValueForPixel(canvasPosition.y);
+//     }
+//   }
+// });
+export default chart;

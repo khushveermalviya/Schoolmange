@@ -9,7 +9,7 @@ export default function Delete() {
   const [otherReason, setOtherReason] = useState('');
 
   const handleDelete = async (e) => {
-    e.preventDefault();
+    e.preventDefault();     
     try {
       // Ensure this is correctly set
       const response = await axios.delete(`https://backend-mauve-ten.vercel.app/delete/${studentId}`, {

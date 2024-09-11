@@ -62,7 +62,18 @@ const router = createBrowserRouter([
                 path:"",
                 element:<S1/>
               },
-              
+              {
+                path:"classes/:userid",
+                element:<Classaddlayout/>,
+                children:[
+                  {
+                    path:'',
+                    element:<Classes/>
+                  },
+                  {
+                    path: "details/:studentId",
+                    element: <Details />
+                  },
                   {
                     path:"add",
                     element:<Form/>
@@ -76,15 +87,6 @@ const router = createBrowserRouter([
                     path:"annunosment",
                     element:<Annunosment/>
 
-                  },
-                
-              {
-                path:"classes/:userid",
-                element:<Classaddlayout/>,
-                children:[
-                  {
-                    path:'',
-                    element:<Classes/>
                   },
                   {
                     path: "details/:studentId",

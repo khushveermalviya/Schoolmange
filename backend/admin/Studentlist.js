@@ -2,7 +2,7 @@ import express from "express"
 import Pool from "../db/Database.js"
 const App = express.Router();
 
-const Studentlist =App.get("/list", async(req,res)=>{
+const Studentlist =App.get("/graphql", async(req,res)=>{
 
 try {
     const list=await Pool.query("SELECT * FROM student")
