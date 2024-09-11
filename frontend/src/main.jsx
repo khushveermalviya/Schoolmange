@@ -1,6 +1,7 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import './index.css';
+import { ApolloClient, InMemoryCache, ApolloProvider, gql } from '@apollo/client';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import Main from './Component/Main.jsx';
 import Admin from './pages/Admin.jsx';
@@ -24,6 +25,10 @@ import Delete from './Component/admin/Students/Delete.jsx';
 import Annunosment from './Component/admin/Students/Annunosment.jsx';
 import Update from './Component/admin/Students/Update.jsx';
 import Studentlog from './Component/student/Studentlog.jsx';
+const client = new ApolloClient({
+  uri: 'https://flyby-router-demo.herokuapp.com/',
+  cache: new InMemoryCache(),
+});
 const router = createBrowserRouter([
   { 
     path: '/',
@@ -57,18 +62,7 @@ const router = createBrowserRouter([
                 path:"",
                 element:<S1/>
               },
-              {
-                path:"classes/:userid",
-                element:<Classaddlayout/>,
-                children:[
-                  {
-                    path:'',
-                    element:<Classes/>
-                  },
-                  {
-                    path: "details/:studentId",
-                    element: <Details />
-                  },
+              
                   {
                     path:"add",
                     element:<Form/>
@@ -83,10 +77,18 @@ const router = createBrowserRouter([
                     element:<Annunosment/>
 
                   },
+                
+              {
+                path:"classes/:userid",
+                element:<Classaddlayout/>,
+                children:[
                   {
-                    path:"update",
-                    element:<Update/>
-
+                    path:'',
+                    element:<Classes/>
+                  },
+                  {
+                    path: "details/:studentId",
+                    element: <Details />
                   }
                 ]
               }
