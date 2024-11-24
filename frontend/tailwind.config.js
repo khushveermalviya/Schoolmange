@@ -5,7 +5,13 @@ export default {
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
-    extend: {},
+    extend: {
+      backgroundImage: {
+        'school': "url('/school.jpg')",
+        "admin" : "url('/admin.jpg')"
+      },
+
+    },
   },
   plugins: [],
 }

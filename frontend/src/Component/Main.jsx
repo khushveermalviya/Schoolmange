@@ -30,18 +30,18 @@ export default function Main() {
   }
 
   return (
-    <div className='min-h-screen'>
+    <div className="min-h-screen bg-school bg-cover bg-center">
       <MainNav />
       <div className="flex justify-between items-center h-screen">
-        <div className='bg-white w-full min-w-50 h-full justify-center flex items-center flex-col'>
-          <NavLink to="/Student" className="text-blue-900 font-bold text-2xl">Student</NavLink>
+        <div className='w-full min-w-50 h-full justify-center flex items-center flex-col p-4'>
+          <NavLink to="/Student" className="text-blue-900 font-bold text-2xl mb-4">Student</NavLink>
 
-          <label htmlFor="std_name" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Student Name</label>
+        
           <input
             type="text"
             id="std_name"
             name="std_name"
-            className="max-w-60 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            className="max-w-60 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 mt-10"
             placeholder="Student Name"
             value={info.std_name}
             onChange={onHandle}
