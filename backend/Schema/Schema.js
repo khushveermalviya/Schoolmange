@@ -1,73 +1,71 @@
-import { GraphQLObjectType, GraphQLSchema, GraphQLString, GraphQLInt } from 'graphql';
-import Axios from 'axios';
+import { GraphQLObjectType, GraphQLSchema, GraphQLString, GraphQLInt, GraphQLList, GraphQLNonNull } from 'graphql';
+import pool from '../db/Database.js';  // Import your database connection
 
-// Define SchoolType (for Company data)
-const SchoolType = new GraphQLObjectType({
-  name: "School",
-  fields: {
-    id: { type: GraphQLString },
-    name: { type: GraphQLString },
-    user:{
-      type : new GraphQLList (UserType),
-      resolve(parentValue,args){
-        return Axios.get(`http://localhost:3000/companies/${parentValue.id}/User`)
-      }
-    }
-  }
+// Define StudentType to match your table structure
+const StudentType = new GraphQLObjectType({
+  name: 'Student',
+  fields: () => ({
+    std_id: { type: GraphQLInt },
+    std_name: { type: GraphQLString },
+    father_name: { type: GraphQLString },
+    mother_name: { type: GraphQLString },
+    mobile_number: { type: GraphQLString },
+    parent_number: { type: GraphQLString },
+    address: { type: GraphQLString },
+    previous_school: { type: GraphQLString },
+    class_teacher: { type: GraphQLString },
+    class: { type: GraphQLInt },
+    admission_date: { type: GraphQLString },  // You can change this to GraphQLDate if using a date library
+    photo: { type: GraphQLString },
+    result: { type: GraphQLString },
+  }),
 });
 
-// Define UserType
-const UserType = new GraphQLObjectType({
-  name: 'User',
-  fields: {
-    id: { type: GraphQLString },
-    firstname: { type: GraphQLString },
-    age: { type: GraphQLInt },
-    company: {
-      type: SchoolType,
-      resolve(parentValue, args) {
-        return Axios.get(`http://localhost:3000/companies/${parentValue.companyId}`)
-          .then(res => res.data)
-          .catch(error => {
-            throw new Error('An error occurred while fetching the company data');
-          });
-      }
-    }
-  }
-});
-
-// Define RootQuery
+// Define RootQuery to fetch students
 const RootQuery = new GraphQLObjectType({
   name: 'RootQueryType',
   fields: {
-    user: {
-      type: UserType,
-      args: { id: { type: GraphQLString } },
-      resolve(parentValue, args) {
-        return Axios.get(`http://localhost:3000/User/${args.id}`)
-          .then(response => response.data)
-          .catch(error => {
-            throw new Error('An error occurred while fetching the user data');
-          });
-      }
+    students: {
+      type: new GraphQLList(StudentType),  // Fetch multiple students
+      resolve: async () => {
+        try {
+          const result = await pool.query('SELECT * FROM student');  // Adjust SQL query as needed
+          return result.rows;
+        } catch (error) {
+          console.error('Error fetching students:', error);
+          throw new Error('Failed to fetch students');
+        }
+      },
     },
-    company :{
-      type: SchoolType,
-      args:{id:{type: GraphQLString}},
-      resolve(parentValue,args){
-        return Axios.get(`http://localhost:3000/companies/${args.id}`)
-        .then(res=>res.data)
-        .catch(error=>{
-          throw new error("a problem a hey bhau")
-        })
-      }
-    }
-  }
+    student: {
+      type: StudentType,  // Fetch a specific student
+      args: { std_id: { type: GraphQLInt } },
+      resolve: async (parent, args) => {
+        try {
+          const result = await pool.query('SELECT * FROM student WHERE std_id = $1', [args.std_id]);
+          return result.rows[0];  // Return the first matching student
+        } catch (error) {
+          console.error('Error fetching student:', error);
+          throw new Error('Failed to fetch the student');
+        }
+      },
+    },
+  },
 });
+
+// const Teacher = new GraphQLObjectType()
+// {
+//   name:"teacher",
+// fields : ()=>({
+//   teacher:{type : GraphQLString},
+//   Class_Teacher :{type: GraphQLString}
+  
+// })
+// }
 
 // Define Schema
 const schema = new GraphQLSchema({
-  query: RootQuery
+  query: RootQuery,
 });
 
 export default schema;
