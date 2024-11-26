@@ -25,6 +25,7 @@ import Delete from './Component/admin/Students/Delete.jsx';
 import Annunosment from './Component/admin/Students/Annunosment.jsx';
 import Update from './Component/admin/Students/Update.jsx';
 import Studentlog from './Component/student/Studentlog.jsx';
+import Chart from "./Component/student/Chart.jsx"
 const client = new ApolloClient({
   uri: 'https://flyby-router-demo.herokuapp.com/',
   cache: new InMemoryCache(),
@@ -107,12 +108,9 @@ const router = createBrowserRouter([
     children: [
       {
         path: '',  // Changed to a relative path
-        element: <Student/>,
+        element: <Chart/>,
       },
-      // {
-      //   path: 'Students',  // Changed to a relative path
-      //   element: <Student/>,
-      // },
+  
       {
         path: 'result',  // Changed to a relative path
         element: <Result />,

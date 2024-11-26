@@ -8,7 +8,7 @@ export default function Nav() {
         2634723434
         <ul className='flex justify-around w-1/2
 '>
-          <li><NavLink to=''
+          <li><NavLink to='Chart'
        
           >Home</NavLink></li>
           <li> <NavLink to='attendence'    className={({ isActive }) => 
