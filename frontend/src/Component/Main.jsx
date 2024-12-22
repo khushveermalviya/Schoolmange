@@ -1,70 +1,91 @@
-import React, { useState } from 'react';
-import { Navigate, NavLink } from 'react-router-dom';
-import MainNav from './MainNav';
-import axios from 'axios';
+import React, { useState, useEffect } from 'react';
+import { useLazyQuery, gql } from '@apollo/client';
+import { useNavigate } from 'react-router-dom';
+import MainNav from "./MainNav.jsx";
+import useUserStore from '../app/useUserStore.js'; // Import the Zustand store
 
-export default function Main() {
-  const [info, setInfo] = useState({ std_name: '', mobile_number: '' });
-  const [navigate, setNavigate] = useState(false);
-  const [check, setCheck] = useState(false);
-
-  function onHandle(e) {
-    const { name, value } = e.target;
-    setInfo(prevInfo => ({ ...prevInfo, [name]: value }));
-  }
-
-  async function handleClick() {
-    try {
-      const response = await axios.post('https://backend-mauve-ten.vercel.app/studentLogin', info);
-      setCheck(response.data);
-      if (response.data) {
-        setNavigate(true);
-      }
-    } catch (error) {
-      console.error("An error occurred while logging in", error);
+const LOGIN_QUERY = gql`
+  query StudentLogin($StudentID: String!, $Password: String!) {
+    studentLogin(StudentID: $StudentID, Password: $Password) {
+      StudentID
+      FirstName
+      LastName
+      WeeklyPerformance
+      Attendance
+      token
     }
   }
+`;
 
-  if (navigate) {
-    return <Navigate to='/student' />;
-  }
+export default function Main() {
+  const [data, setData] = useState({
+    username: "",
+    password: ""
+  });
+
+  const [loginFailed, setLoginFailed] = useState(false);
+  const [login, { data: queryData }] = useLazyQuery(LOGIN_QUERY);
+  const navigate = useNavigate();
+  const setUser = useUserStore((state) => state.setUser);
+  const setPerformanceData = useUserStore((state) => state.setPerformanceData);
+  const setAttendanceData = useUserStore((state) => state.setAttendanceData); // Get the setUser function from the Zustand store
+
+  useEffect(() => {
+    if (queryData?.studentLogin?.token) {
+      const { token, ...userDetails } = queryData.studentLogin;
+
+      // Store token and user data
+      localStorage.setItem("token", token);
+      localStorage.setItem("userData", JSON.stringify(userDetails));
+
+      // Update the Zustand store with the new user data
+      setUser(userDetails);
+      setPerformanceData(WeeklyPerformance);
+      setAttendanceData(Attendance);
+      // Navigate to dashboard
+      navigate("/student");
+    } else if (queryData && !queryData.studentLogin?.token) {
+      setLoginFailed(true);
+    }
+  }, [queryData, navigate, setUser, setPerformanceData, setAttendanceData]);
+
+  const onHandle = (e) => {
+    setData({
+      ...data,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  const handleClick = (e) => {
+    e.preventDefault();
+    setLoginFailed(false);
+    login({ variables: { StudentID: data.username, Password: data.password } });
+  };
 
   return (
     <div className="min-h-screen bg-school bg-cover bg-center">
       <MainNav />
       <div className="flex justify-between items-center h-screen">
-        <div className='w-full min-w-50 h-full justify-center flex items-center flex-col p-4'>
-          <NavLink to="/Student" className="text-blue-900 font-bold text-2xl mb-4">Student</NavLink>
-
-        
+        <div className="w-full flex items-center flex-col p-4">
           <input
             type="text"
-            id="std_name"
-            name="std_name"
-            className="max-w-60 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 mt-10"
+            name="username"
             placeholder="Student Name"
-            value={info.std_name}
+            value={data.username}
             onChange={onHandle}
-            required
+            className="p-2 border"
           />
-
-          <label htmlFor="mobile_number" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Phone number</label>
           <input
-            type="tel"
-            id="mobile_number"
-            name="mobile_number"
-            className="max-w-60 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-            placeholder="123-45-678"
-            pattern="[0-9]{3}-[0-9]{2}-[0-9]{3}"
-            value={info.mobile_number}
+            type="password"
+            name="password"
+            placeholder="Password"
+            value={data.password}
             onChange={onHandle}
-            required
+            className="p-2 border mt-4"
           />
-
-          <button className='bg-blue-500 w-20 mt-7 text-xl rounded-xl border-2 border-black hover:scale-75' onClick={handleClick}>Submit</button>
+          <button onClick={handleClick} className="bg-blue-500 text-white px-4 py-2 mt-4">Login</button>
+          {loginFailed && <p className="text-red-500 mt-2">Login failed. Please try again.</p>}
         </div>
-        <div className='bg-slate-50 hidden'>df</div>
-        <div className='hidden'></div>
       </div>
     </div>
   );

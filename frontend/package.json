@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@apollo/client": "^3.11.4",
+    "@reduxjs/toolkit": "^2.5.0",
     "axios": "^1.7.3",
     "chart.js": "^4.4.6",
     "chartjs": "^0.3.24",
@@ -25,10 +26,12 @@
     "react-icon": "^1.0.0",
     "react-otp-input": "^3.1.1",
     "react-phone-input-2": "^2.15.1",
+    "react-redux": "^9.2.0",
     "react-top-loading-bar": "^2.3.1",
     "recharts": "^2.12.7",
     "scripts": "^0.1.0",
-    "xlsx": "^0.18.5"
+    "xlsx": "^0.18.5",
+    "zustand": "^5.0.2"
   },
   "devDependencies": {
     "@eslint/js": "^9.8.0",

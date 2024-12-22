@@ -1,7 +1,7 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import './index.css';
-import { ApolloClient, InMemoryCache, ApolloProvider, gql } from '@apollo/client';
+import { ApolloClient, InMemoryCache, ApolloProvider, HttpLink } from '@apollo/client';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import Main from './Component/Main.jsx';
 import Admin from './pages/Admin.jsx';
@@ -25,11 +25,10 @@ import Delete from './Component/admin/Students/Delete.jsx';
 import Annunosment from './Component/admin/Students/Annunosment.jsx';
 import Update from './Component/admin/Students/Update.jsx';
 import Studentlog from './Component/student/Studentlog.jsx';
-import Chart from "./Component/student/Chart.jsx"
-const client = new ApolloClient({
-  uri: 'https://flyby-router-demo.herokuapp.com/',
-  cache: new InMemoryCache(),
-});
+import Chart from "./Component/student/Chart/Pie.jsx";
+import First from './Component/student/Chart/first.jsx';
+import { UserProvider } from './Component/student/UserContext.jsx';
+
 const router = createBrowserRouter([
   { 
     path: '/',
@@ -37,57 +36,55 @@ const router = createBrowserRouter([
   },
   {
     path: '/admin',
-    element: <Adminlayout/>,
-    children:[
+    element: <Adminlayout />,
+    children: [
       {
-        path:"",
-        element:<Login/>
+        path: "",
+        element: <Login />
       },
       {
-        path:"adminPanel",
-        element:<LoginLayout/>,
-        children:[
+        path: "adminPanel",
+        element: <Protected><LoginLayout /></Protected>,
+        children: [
           {
-            path:'',
-            element:  <Protected><Admin/></Protected>  
+            path: '',
+            element: <Protected><Admin /></Protected>
           },
           {
-            path:'faculty',
-            element:<Faculty/>
+            path: 'faculty',
+            element: <Protected><Faculty /></Protected>
           },
           {
-            path:"classes",
-            element:<ClassesLayout/>,
-            children:[
+            path: "classes",
+            element: <ClassesLayout />,
+            children: [
               {
-                path:"",
-                element:<S1/>
+                path: "",
+                element: <Protected><S1 /></Protected>
               },
               {
-                path:"classes/:userid",
-                element:<Classaddlayout/>,
-                children:[
+                path: "",
+                element: <Protected><Classes /></Protected>,
+                children: [
                   {
-                    path:'',
-                    element:<Classes/>
+                    path: '',
+                    element: <Classes />
                   },
                   {
                     path: "details/:studentId",
-                    element: <Details />
+                    element: <Protected><Details /></Protected>
                   },
                   {
-                    path:"add",
-                    element:<Form/>
-                    
+                    path: "add",
+                    element: <Form />
                   },
                   {
-                    path:"delete",
-                    element:<Delete/>
-
-                  },{
-                    path:"annunosment",
-                    element:<Annunosment/>
-
+                    path: "delete",
+                    element: <Delete />
+                  },
+                  {
+                    path: "annunosment",
+                    element: <Annunosment />
                   },
                   {
                     path: "details/:studentId",
@@ -98,37 +95,53 @@ const router = createBrowserRouter([
             ]
           }
         ]
-      },
-      
+      }
     ]
   },
   {
-    path: '/Student',  // Removed the trailing space here
-    element: <Layout/>,
+    path: '/Student',
+    element: <Protected><Layout /></Protected>,
     children: [
       {
-        path: '',  // Changed to a relative path
-        element: <Chart/>,
-      },
-  
-      {
-        path: 'result',  // Changed to a relative path
-        element: <Result />,
+        path: '',
+        element: <First />
       },
       {
-        path: 'attendence',  // Changed to a relative path
-        element: <Attendence />,
+        path: 'result',
+        element: <Result />
       },
       {
-        path: 'complain',  // Changed to a relative path and corrected spelling
-        element: <Complain />,
+        path: 'Home',
+        element: <First />
       },
+      {
+        path: 'attendence',
+        element: <Attendence />
+      },
+      {
+        path: 'complain',
+        element: <Complain />
+      }
     ]
-  },
+  }
 ]);
+
+const cnt = new ApolloClient({
+  link: new HttpLink({
+    uri: 'http://localhost:5000/graphql',
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem('token')}`,
+    },
+  }),
+  cache: new InMemoryCache(),
+});
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <RouterProvider router={router} />
-  </StrictMode>,
+    <ApolloProvider client={cnt}>
+      <UserProvider>
+        <RouterProvider router={router} />
+      </UserProvider>
+    </ApolloProvider>
+  </StrictMode>
 );

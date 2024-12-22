@@ -1,71 +1,102 @@
-import { GraphQLObjectType, GraphQLSchema, GraphQLString, GraphQLInt, GraphQLList, GraphQLNonNull } from 'graphql';
-import pool from '../db/Database.js';  // Import your database connection
+import { GraphQLObjectType, GraphQLSchema, GraphQLString, GraphQLNonNull } from 'graphql';
+import jwt from 'jsonwebtoken';
+import sql from 'mssql';
+import dotenv from 'dotenv';
+import crypto from 'crypto';
 
-// Define StudentType to match your table structure
-const StudentType = new GraphQLObjectType({
-  name: 'Student',
+dotenv.config();
+
+const generateSecretKey = () => {
+  return crypto.randomBytes(32).toString('hex');
+};
+
+const SECRET_KEY = process.env.SECRET_KEY || generateSecretKey(); // Ensure SECRET_KEY is defined
+
+// Student Login Type
+const StudentLoginType = new GraphQLObjectType({
+  name: 'StudentLogin',
   fields: () => ({
-    std_id: { type: GraphQLInt },
-    std_name: { type: GraphQLString },
-    father_name: { type: GraphQLString },
-    mother_name: { type: GraphQLString },
-    mobile_number: { type: GraphQLString },
-    parent_number: { type: GraphQLString },
-    address: { type: GraphQLString },
-    previous_school: { type: GraphQLString },
-    class_teacher: { type: GraphQLString },
-    class: { type: GraphQLInt },
-    admission_date: { type: GraphQLString },  // You can change this to GraphQLDate if using a date library
-    photo: { type: GraphQLString },
-    result: { type: GraphQLString },
-  }),
+    StudentID: { type: GraphQLString },
+    FirstName: { type: GraphQLString },
+    LastName: { type: GraphQLString },
+    token: { type: GraphQLString }
+  })
 });
 
-// Define RootQuery to fetch students
+// Faculty Login Type
+const FacultyLoginType = new GraphQLObjectType({
+  name: 'FacultyLogin',
+  fields: () => ({
+    Username: { type: GraphQLString },
+    token: { type: GraphQLString }
+  })
+});
+
+// Root Query
 const RootQuery = new GraphQLObjectType({
   name: 'RootQueryType',
   fields: {
-    students: {
-      type: new GraphQLList(StudentType),  // Fetch multiple students
-      resolve: async () => {
-        try {
-          const result = await pool.query('SELECT * FROM student');  // Adjust SQL query as needed
-          return result.rows;
-        } catch (error) {
-          console.error('Error fetching students:', error);
-          throw new Error('Failed to fetch students');
-        }
+    studentLogin: {
+      type: StudentLoginType,
+      args: {
+        StudentID: { type: new GraphQLNonNull(GraphQLString) },
+        Password: { type: new GraphQLNonNull(GraphQLString) }
       },
+      resolve(parent, args) {
+        return sql.query`SELECT StudentID, Password, FirstName, LastName FROM Students WHERE StudentID = ${args.StudentID} AND Password = ${args.Password}`
+          .then(async result => {
+            const stud = result.recordset[0];
+            if (!stud) {
+              throw new Error("Invalid credentials");
+            }
+            const token = jwt.sign({ StudentID: stud.StudentID }, SECRET_KEY, { expiresIn: '1h' });
+            console.log("Generated Token:", token);
+            return {
+              token,
+              StudentID: stud.StudentID,
+              FirstName: stud.FirstName,
+              LastName: stud.LastName,
+              WeeklyPerformance: stud.WeeklyPerformance,
+              Attendance: stud.Attendance
+            };
+          });
+      }
     },
-    student: {
-      type: StudentType,  // Fetch a specific student
-      args: { std_id: { type: GraphQLInt } },
-      resolve: async (parent, args) => {
-        try {
-          const result = await pool.query('SELECT * FROM student WHERE std_id = $1', [args.std_id]);
-          return result.rows[0];  // Return the first matching student
-        } catch (error) {
-          console.error('Error fetching student:', error);
-          throw new Error('Failed to fetch the student');
-        }
+    FacultyLogin: {
+      type: FacultyLoginType,
+      args: {
+        Username: { type: new GraphQLNonNull(GraphQLString) },
+        Password: { type: new GraphQLNonNull(GraphQLString) }
       },
+      resolve(parent, args) {
+        return sql.query`SELECT Username, Password FROM Faculty WHERE Username = ${args.Username} AND Password = ${args.Password}`
+          .then(async result => {
+            const faculty = result.recordset[0];
+            if (!faculty) {
+              throw new Error("Invalid credentials");
+            }
+            const token = jwt.sign({ Username: faculty.Username }, SECRET_KEY, { expiresIn: '1h' });
+            console.log("Generated Token:", token);
+            return {
+              token,
+              Username: faculty.Username
+            };
+          });
+      }
     },
-  },
+    getStudentData: {
+      type: StudentLoginType,
+      resolve(parent, args, context) {
+        if (!context.user) {
+          throw new Error("Unauthorized"); // Ensure user is authenticated
+        }
+        return sql.query`SELECT * FROM Students WHERE StudentID = ${context.user.id}`
+          .then(result => result.recordset[0]);
+      }
+    }
+  }
 });
 
-// const Teacher = new GraphQLObjectType()
-// {
-//   name:"teacher",
-// fields : ()=>({
-//   teacher:{type : GraphQLString},
-//   Class_Teacher :{type: GraphQLString}
-  
-// })
-// }
-
-// Define Schema
-const schema = new GraphQLSchema({
-  query: RootQuery,
+export default new GraphQLSchema({
+  query: RootQuery
 });
-
-export default schema;
