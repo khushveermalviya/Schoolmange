@@ -8,7 +8,7 @@ const LOGIN_QUERY = gql`
     FacultyLogin(Username: $Username, Password: $Password) {
       Username
       token
-      School_Id
+    
     }
   }
 `;

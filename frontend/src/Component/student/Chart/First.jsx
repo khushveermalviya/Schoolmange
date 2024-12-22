@@ -2,19 +2,20 @@
 import LineChart from './LineChart.jsx'
 
 import React from 'react'
+import PieChart from './Pie.jsx'
 
 
 export default function First() {
   return (
-    <div>
-    <h1 className="text-2xl">Student Dashboard</h1>
-    <div>
-      <h2>Weekly Performance</h2>
+    <div className='flex w-full h-full bg-red justify-center align-middle' >
+
+    <div className='flex justify-center w-screen h-screen items-center bg-green-50'>
+      
       <LineChart />
     </div>
     <div>
-      <h2>Attendance</h2>
-      {/* <PieChart /> */}
+      
+
     </div>
   </div>
   )

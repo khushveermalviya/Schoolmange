@@ -10,12 +10,13 @@ const LOGIN_QUERY = gql`
       StudentID
       FirstName
       LastName
-      WeeklyPerformance
-      Attendance
       token
+      WeeklyPerformance
+
     }
   }
 `;
+
 
 export default function Main() {
   const [data, setData] = useState({
@@ -27,8 +28,6 @@ export default function Main() {
   const [login, { data: queryData }] = useLazyQuery(LOGIN_QUERY);
   const navigate = useNavigate();
   const setUser = useUserStore((state) => state.setUser);
-  const setPerformanceData = useUserStore((state) => state.setPerformanceData);
-  const setAttendanceData = useUserStore((state) => state.setAttendanceData); // Get the setUser function from the Zustand store
 
   useEffect(() => {
     if (queryData?.studentLogin?.token) {
@@ -40,15 +39,18 @@ export default function Main() {
 
       // Update the Zustand store with the new user data
       setUser(userDetails);
-      setPerformanceData(WeeklyPerformance);
-      setAttendanceData(Attendance);
+
+      // Fetch performance and attendance data after login
+    
+
       // Navigate to dashboard
       navigate("/student");
     } else if (queryData && !queryData.studentLogin?.token) {
       setLoginFailed(true);
     }
-  }, [queryData, navigate, setUser, setPerformanceData, setAttendanceData]);
+  }, [queryData, navigate, setUser]);
 
+ 
   const onHandle = (e) => {
     setData({
       ...data,
@@ -90,3 +92,8 @@ export default function Main() {
     </div>
   );
 }
+
+
+
+  
+

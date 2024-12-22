@@ -1,4 +1,4 @@
-import { GraphQLObjectType, GraphQLSchema, GraphQLString, GraphQLNonNull } from 'graphql';
+import { GraphQLObjectType, GraphQLSchema, GraphQLString, GraphQLNonNull, GraphQLList } from 'graphql';
 import jwt from 'jsonwebtoken';
 import sql from 'mssql';
 import dotenv from 'dotenv';
@@ -19,7 +19,9 @@ const StudentLoginType = new GraphQLObjectType({
     StudentID: { type: GraphQLString },
     FirstName: { type: GraphQLString },
     LastName: { type: GraphQLString },
-    token: { type: GraphQLString }
+    WeeklyPerformance: { type: new GraphQLList(GraphQLString) }, // Assuming WeeklyPerformance is a list of strings
+    token: { type: GraphQLString },
+    
   })
 });
 
@@ -43,21 +45,21 @@ const RootQuery = new GraphQLObjectType({
         Password: { type: new GraphQLNonNull(GraphQLString) }
       },
       resolve(parent, args) {
-        return sql.query`SELECT StudentID, Password, FirstName, LastName FROM Students WHERE StudentID = ${args.StudentID} AND Password = ${args.Password}`
+        return sql.query`SELECT StudentID, Password, FirstName, LastName, WeeklyPerformance FROM Students WHERE StudentID = ${args.StudentID} AND Password = ${args.Password}`
           .then(async result => {
             const stud = result.recordset[0];
             if (!stud) {
               throw new Error("Invalid credentials");
             }
-            const token = jwt.sign({ StudentID: stud.StudentID }, SECRET_KEY, { expiresIn: '1h' });
+            const token = jwt.sign({ StudentID: stud.StudentID, role: 'student' }, SECRET_KEY, { expiresIn: '1h' });
             console.log("Generated Token:", token);
             return {
               token,
               StudentID: stud.StudentID,
               FirstName: stud.FirstName,
               LastName: stud.LastName,
-              WeeklyPerformance: stud.WeeklyPerformance,
-              Attendance: stud.Attendance
+              WeeklyPerformance: JSON.parse(stud.WeeklyPerformance || '[]'), // Parse WeeklyPerformance as an array
+        
             };
           });
       }
@@ -75,7 +77,7 @@ const RootQuery = new GraphQLObjectType({
             if (!faculty) {
               throw new Error("Invalid credentials");
             }
-            const token = jwt.sign({ Username: faculty.Username }, SECRET_KEY, { expiresIn: '1h' });
+            const token = jwt.sign({ Username: faculty.Username, role: 'faculty' }, SECRET_KEY, { expiresIn: '1h' });
             console.log("Generated Token:", token);
             return {
               token,
@@ -84,6 +86,8 @@ const RootQuery = new GraphQLObjectType({
           });
       }
     },
+    
+  
     getStudentData: {
       type: StudentLoginType,
       resolve(parent, args, context) {
