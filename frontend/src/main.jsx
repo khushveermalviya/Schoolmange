@@ -26,7 +26,7 @@ import Annunosment from './Component/admin/Students/Annunosment.jsx';
 import Update from './Component/admin/Students/Update.jsx';
 import Studentlog from './Component/student/Studentlog.jsx';
 import Chart from "./Component/student/Chart/Pie.jsx";
-import First from './Component/student/Chart/first.jsx';
+import First from './Component/student/Chart/First.jsx';
 import { UserProvider } from './Component/student/UserContext.jsx';
 
 const router = createBrowserRouter([

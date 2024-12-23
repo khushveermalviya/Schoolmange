@@ -5,7 +5,7 @@ import React from 'react'
 
 
 
-export default function first() {
+export default function First() {
   return (
     <div className='flex w-full h-full bg-red justify-center align-middle' >
 
