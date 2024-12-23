@@ -128,7 +128,7 @@ const router = createBrowserRouter([
 
 const cnt = new ApolloClient({
   link: new HttpLink({
-    uri: 'http://localhost:5000/graphql',
+    uri: 'https://backend-kz3r.onrender.com/graphql',
     headers: {
       Authorization: `Bearer ${localStorage.getItem('token')}`,
     },

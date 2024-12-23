@@ -2,7 +2,7 @@
 import LineChart from './LineChart.jsx'
 
 import React from 'react'
-import PieChart from './Pie.jsx'
+
 
 
 export default function First() {
