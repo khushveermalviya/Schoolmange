@@ -12,11 +12,9 @@ const LOGIN_QUERY = gql`
       LastName
       token
       WeeklyPerformance
-
     }
   }
 `;
-
 
 export default function Main() {
   const [data, setData] = useState({
@@ -40,9 +38,6 @@ export default function Main() {
       // Update the Zustand store with the new user data
       setUser(userDetails);
 
-      // Fetch performance and attendance data after login
-    
-
       // Navigate to dashboard
       navigate("/student");
     } else if (queryData && !queryData.studentLogin?.token) {
@@ -50,7 +45,6 @@ export default function Main() {
     }
   }, [queryData, navigate, setUser]);
 
- 
   const onHandle = (e) => {
     setData({
       ...data,
@@ -64,10 +58,16 @@ export default function Main() {
     login({ variables: { StudentID: data.username, Password: data.password } });
   };
 
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      handleClick(e);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-school bg-cover bg-center">
-      <MainNav />
       <div className="flex justify-between items-center h-screen">
+        <MainNav />
         <div className="w-full flex items-center flex-col p-4">
           <input
             type="text"
@@ -75,6 +75,7 @@ export default function Main() {
             placeholder="Student Name"
             value={data.username}
             onChange={onHandle}
+            onKeyPress={handleKeyPress}
             className="p-2 border"
           />
           <input
@@ -83,6 +84,7 @@ export default function Main() {
             placeholder="Password"
             value={data.password}
             onChange={onHandle}
+            onKeyPress={handleKeyPress}
             className="p-2 border mt-4"
           />
           <button onClick={handleClick} className="bg-blue-500 text-white px-4 py-2 mt-4">Login</button>
@@ -92,8 +94,3 @@ export default function Main() {
     </div>
   );
 }
-
-
-
-  
-

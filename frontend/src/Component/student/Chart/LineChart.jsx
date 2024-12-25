@@ -13,7 +13,7 @@ export default function LineChart() {
       console.error('No performance data available for chart.');
       return;
     }
-    console.log("Attendance Data from Store: ", attendanceData);
+    console.log("Attendance Data from Store: ", performanceData);
     const ctx = chartRef.current.getContext('2d');
 
     // Destroy existing chart instance before re-rendering

@@ -1,106 +1,67 @@
-import { GraphQLObjectType, GraphQLSchema, GraphQLString, GraphQLNonNull, GraphQLList } from 'graphql';
-import jwt from 'jsonwebtoken';
-import sql from 'mssql';
-import dotenv from 'dotenv';
-import crypto from 'crypto';
-
-dotenv.config();
-
-const generateSecretKey = () => {
-  return crypto.randomBytes(32).toString('hex');
-};
-
-const SECRET_KEY = process.env.SECRET_KEY || generateSecretKey(); // Ensure SECRET_KEY is defined
-
-// Student Login Type
-const StudentLoginType = new GraphQLObjectType({
-  name: 'StudentLogin',
+import { GraphQLSchema, GraphQLObjectType,GraphQLList,GraphQLString } from 'graphql';
+import sql from "mssql"
+import studentLogin from './StudentResolver.js';
+import facultyLogin from './FacultyResolver.js';
+const ChatType = new GraphQLObjectType({
+  name: 'Chat',
   fields: () => ({
+    chat_id: { type: GraphQLString },
     StudentID: { type: GraphQLString },
-    FirstName: { type: GraphQLString },
-    LastName: { type: GraphQLString },
-    WeeklyPerformance: { type: new GraphQLList(GraphQLString) }, // Assuming WeeklyPerformance is a list of strings
-    token: { type: GraphQLString },
-    
-  })
+    user_type: { type: GraphQLString },
+    prompt: { type: GraphQLString },
+    response: { type: GraphQLString },
+    created_at: { type: GraphQLString },
+  }),
 });
-
-// Faculty Login Type
-const FacultyLoginType = new GraphQLObjectType({
-  name: 'FacultyLogin',
-  fields: () => ({
-    Username: { type: GraphQLString },
-    token: { type: GraphQLString }
-  })
-});
-
-// Root Query
 const RootQuery = new GraphQLObjectType({
   name: 'RootQueryType',
   fields: {
-    studentLogin: {
-      type: StudentLoginType,
-      args: {
-        StudentID: { type: new GraphQLNonNull(GraphQLString) },
-        Password: { type: new GraphQLNonNull(GraphQLString) }
-      },
+    studentLogin,
+    facultyLogin,
+    getStudentChats: {
+      type: new GraphQLList(ChatType),
+      args: { StudentID: { type: GraphQLString } },
       resolve(parent, args) {
-        return sql.query`SELECT StudentID, Password, FirstName, LastName, WeeklyPerformance FROM Students WHERE StudentID = ${args.StudentID} AND Password = ${args.Password}`
-          .then(async result => {
-            const stud = result.recordset[0];
-            if (!stud) {
-              throw new Error("Invalid credentials");
-            }
-            const token = jwt.sign({ StudentID: stud.StudentID, role: 'student' }, SECRET_KEY, { expiresIn: '1h' });
-            console.log("Generated Token:", token);
-            return {
-              token,
-              StudentID: stud.StudentID,
-              FirstName: stud.FirstName,
-              LastName: stud.LastName,
-              WeeklyPerformance: JSON.parse(stud.WeeklyPerformance || '[]'), // Parse WeeklyPerformance as an array
-        
-            };
-          });
-      }
-    },
-    FacultyLogin: {
-      type: FacultyLoginType,
-      args: {
-        Username: { type: new GraphQLNonNull(GraphQLString) },
-        Password: { type: new GraphQLNonNull(GraphQLString) }
+        return sql.query`SELECT * FROM StudentChat WHERE StudentID = ${args.StudentID}`
+          .then(result => result.recordset);
       },
-      resolve(parent, args) {
-        return sql.query`SELECT Username, Password FROM Faculty WHERE Username = ${args.Username} AND Password = ${args.Password}`
-          .then(async result => {
-            const faculty = result.recordset[0];
-            if (!faculty) {
-              throw new Error("Invalid credentials");
-            }
-            const token = jwt.sign({ Username: faculty.Username, role: 'faculty' }, SECRET_KEY, { expiresIn: '1h' });
-            console.log("Generated Token:", token);
-            return {
-              token,
-              Username: faculty.Username
-            };
-          });
-      }
     },
-    
-  
-    getStudentData: {
-      type: StudentLoginType,
-      resolve(parent, args, context) {
-        if (!context.user) {
-          throw new Error("Unauthorized"); // Ensure user is authenticated
-        }
-        return sql.query`SELECT * FROM Students WHERE StudentID = ${context.user.id}`
-          .then(result => result.recordset[0]);
-      }
-    }
-  }
+  },
 });
-
+const Mutation = new GraphQLObjectType({
+  name: 'Mutation',
+  fields: {
+    addChat: {
+      type: ChatType,
+      args: {
+        StudentID: { type: GraphQLString },
+        user_type: { type: GraphQLString },
+        prompt: { type: GraphQLString },
+        response: { type: GraphQLString },
+      },
+      resolve(parent, args) {
+        return sql.query`
+          INSERT INTO StudentChat (StudentID, user_type, prompt, response)
+          VALUES (${args.StudentID}, ${args.user_type}, ${args.prompt}, ${args.response})
+          SELECT SCOPE_IDENTITY() AS chat_id
+        `
+          .then(result => ({
+            chat_id: result.recordset[0].chat_id,
+            StudentID: args.StudentID,
+            user_type: args.user_type,
+            prompt: args.prompt,
+            response: args.response,
+            created_at: new Date().toISOString(),
+          }))
+          .catch(err => {
+            console.error('Error adding chat', err);
+            throw new Error('Error adding chat');
+          });
+      },
+    },
+  },
+});
 export default new GraphQLSchema({
-  query: RootQuery
+  query: RootQuery,
+  mutation: Mutation,
 });

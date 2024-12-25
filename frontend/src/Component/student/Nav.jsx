@@ -48,6 +48,20 @@ export default function Nav({ userData }) {
             isMenuOpen ? "block" : "hidden"
           } absolute lg:static top-16 left-0 w-full lg:w-auto bg-gray-800 lg:bg-transparent z-10`}
         >
+         <li>
+  <NavLink
+    to="Aiguru"
+    className={ 
+        "bg-gradient-to-r from-violet-600 to-indigo-600 bg-clip-text text-transparent block py-2 px-4"  
+    }
+  >
+    <span className="relative">
+      <span className="inline-block bg-gradient-to-r from-violet-600 to-indigo-600 bg-clip-text text-transparent ">AI Guru</span>
+      <span className="absolute top-0 right-0 text-yellow-400 text-xs ml-1">*</span>
+    </span>
+  </NavLink>
+</li>
+
           <li>
             <NavLink
               to="Home"

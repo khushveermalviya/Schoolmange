@@ -1,8 +1,8 @@
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
-
+import {SECRET_KEY} from "../Config/secret.js"
 dotenv.config();
-const SECRET_KEY = process.env.SECRET_KEY || 'your-secret-key'; // Ensure SECRET_KEY is defined
+
 
 // General Authentication Middleware
 const authMiddleware = (req, res, next) => {
@@ -16,9 +16,13 @@ const authMiddleware = (req, res, next) => {
     const decoded = jwt.verify(token, SECRET_KEY);
     req.user = decoded; // Attach decoded user info to the request
     console.log('Token decoded:', decoded);
+   
+
   } catch (error) {
     req.user = null; // Invalid token
     console.log('Invalid token');
+    console.log(SECRET_KEY)
+    console.log(jwt.verify)
   }
   next();
 };

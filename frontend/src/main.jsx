@@ -28,6 +28,8 @@ import Studentlog from './Component/student/Studentlog.jsx';
 import Chart from "./Component/student/Chart/Pie.jsx";
 import First from './Component/student/Chart/First.jsx';
 import { UserProvider } from './Component/student/UserContext.jsx';
+import Protect from './Component/admin/Protect.jsx';
+import Smart from './Component/student/AiGURU/Smart.jsx';
 
 const router = createBrowserRouter([
   { 
@@ -100,7 +102,7 @@ const router = createBrowserRouter([
   },
   {
     path: '/Student',
-    element: <Protected><Layout /></Protected>,
+    element: <Protect><Layout/></Protect>,
     children: [
       {
         path: '',
@@ -121,14 +123,19 @@ const router = createBrowserRouter([
       {
         path: 'complain',
         element: <Complain />
-      }
+      },
+      {
+        path: 'Aiguru',
+        element: <Smart/>
+      },
+
     ]
   }
 ]);
 
 const cnt = new ApolloClient({
   link: new HttpLink({
-    uri: 'https://backend-kz3r.onrender.com/graphql',
+    uri: 'http://localhost:5000/graphql',
     headers: {
       Authorization: `Bearer ${localStorage.getItem('token')}`,
     },
