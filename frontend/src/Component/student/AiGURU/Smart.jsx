@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { fetch } from './Logic.js';
 import useUserStore from "../../../app/useUserStore.js";
 import { useQuery, gql, useMutation } from '@apollo/client';
+import { format, isValid } from 'date-fns';
 
 const GET_STUDENT_CHATS = gql`
   query GetStudentChats($StudentID: String!) {
@@ -32,7 +33,6 @@ export default function Smart() {
   const [req, SetReq] = useState([]);
   const StudentID = useUserStore((state) => state.user.StudentID);
   const chatContainerRef = useRef(null);
-
   const { loading, error, data, refetch } = useQuery(GET_STUDENT_CHATS, {
     variables: { StudentID },
   });
@@ -45,18 +45,17 @@ export default function Smart() {
   useEffect(() => {
     if (data) {
       SetReq(data.getStudentChats);
-      scrollToBottom();
     }
   }, [data]);
-useEffect(()=>{
-  scrollToBottom();
-},[req])
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [req]);
 
   const handleClick = async () => {
     const user = 'user'; // Define the user appropriately
     const currentPrompt = Prompt; // Store the current prompt value
     const textResponse = await fetch(currentPrompt);
-
     // Add new chat to the database
     await addChat({
       variables: {
@@ -66,25 +65,22 @@ useEffect(()=>{
         response: textResponse,
       },
     });
-
     // Clear the prompt input
     SetPrompt('');
 
-    // Update the request state
     SetReq((prevRequest) => [
       ...prevRequest,
       {
-        user_type: 
-        `${StudentID}`,
+        user_type: `${StudentID}`,
         prompt: currentPrompt,
         response: textResponse,
         created_at: new Date().toISOString(),
       },
     ]);
-
     // Refetch the chat history
     refetch();
   };
+
   const handleKeyPress = (e) => {
     if (e.key === 'Enter') {
       handleClick();
@@ -115,13 +111,12 @@ useEffect(()=>{
                 <span className="font-bold">AI:</span> {item.response}
               </p>
               <p className="text-xs text-gray-400">
-                <em>{new Date(item.created_at).toLocaleString()}</em>
+                <em>{isValid(new Date(item.created_at)) ? format(new Date(item.created_at), 'PPpp') : 'Invalid Date'}</em>
               </p>
             </div>
           ))}
         </div>
       </div>
-
       {/* Input for new chat */}
       <div className="w-full fixed bottom-0 left-0 p-4 bg-gray-800">
         <label htmlFor="aiPromt" className="sr-only">

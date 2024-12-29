@@ -15,7 +15,6 @@ const fetch = async (prompt) => {
     });
 
     const textResponse = response.data.candidates[0].content.parts[0].text;
-    console.log(textResponse)
     return textResponse;
   } catch (err) {
     console.error("Something went wrong", err);
