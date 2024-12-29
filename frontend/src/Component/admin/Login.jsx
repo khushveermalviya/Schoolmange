@@ -7,7 +7,7 @@ const LOGIN_QUERY = gql`
   query FacultyLogin($Username: String!, $Password: String!) {
     FacultyLogin(Username: $Username, Password: $Password) {
       Username
-      token
+      tokenss
     
     }
   }
@@ -27,7 +27,7 @@ export default function Login() {
   useEffect(() => {
     try {
       if (queryData && queryData.FacultyLogin) {
-        localStorage.setItem('token', queryData.FacultyLogin.token);
+        localStorage.setItem('tokenss', queryData.FacultyLogin.tokenss);
         navigate('/admin/adminPanel');
       }
     } catch (err) {

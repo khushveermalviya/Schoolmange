@@ -31,9 +31,7 @@ export default function Layout() {
       <Nav userData={userData} /> {/* Pass userData as props to Nav */}
     
       <Outlet />
-      <div className='h-screen place-content-end relative'>
-        <Footer />
-      </div>
+   
     </>
   );
 }

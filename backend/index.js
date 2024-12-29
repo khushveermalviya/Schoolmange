@@ -4,7 +4,7 @@ import cors from "cors";
 import { graphqlHTTP } from 'express-graphql';
 import schema from "./Schema/Schema.js";
 import AzureDb from './db/SecondDb.js';
-import { authMiddleware, authenticate } from './middleware/Auth.js'; // Import both middlewares
+import authMiddleware from './middleware/Auth.js'; // Import both middlewares
 
 dotenv.config();
 
@@ -23,8 +23,6 @@ app.use('/graphql', graphqlHTTP({
     return { message: err.message, locations: err.locations, stack: err.stack ? err.stack.split('\n') : [], path: err.path };
   },
 }));
-
-
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

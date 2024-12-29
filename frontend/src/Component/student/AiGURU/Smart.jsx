@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { fetch } from './Logic.js';
 import useUserStore from "../../../app/useUserStore.js";
 import { useQuery, gql, useMutation } from '@apollo/client';
@@ -31,6 +31,7 @@ export default function Smart() {
   const [Prompt, SetPrompt] = useState('');
   const [req, SetReq] = useState([]);
   const StudentID = useUserStore((state) => state.user.StudentID);
+  const chatContainerRef = useRef(null);
 
   const { loading, error, data, refetch } = useQuery(GET_STUDENT_CHATS, {
     variables: { StudentID },
@@ -44,8 +45,12 @@ export default function Smart() {
   useEffect(() => {
     if (data) {
       SetReq(data.getStudentChats);
+      scrollToBottom();
     }
   }, [data]);
+useEffect(()=>{
+  scrollToBottom();
+},[req])
 
   const handleClick = async () => {
     const user = 'user'; // Define the user appropriately
@@ -69,7 +74,8 @@ export default function Smart() {
     SetReq((prevRequest) => [
       ...prevRequest,
       {
-        user_type: user,
+        user_type: 
+        `${StudentID}`,
         prompt: currentPrompt,
         response: textResponse,
         created_at: new Date().toISOString(),
@@ -79,15 +85,26 @@ export default function Smart() {
     // Refetch the chat history
     refetch();
   };
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      handleClick();
+    }
+  };
+
+  const scrollToBottom = () => {
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+    }
+  };
 
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error: {error.message}</p>;
 
   return (
     <div className="flex flex-col h-screen w-screen bg-gradient-to-b from-gray-700 to-gray-900">
-      <div className="flex-grow bg-gray-800 w-full p-6 rounded-lg shadow-xl text-white">
+      <div className="flex-grow bg-gray-800 w-full p-6 rounded-lg shadow-xl text-white overflow-y-auto" ref={chatContainerRef}>
         {/* Previous Conversations */}
-        <div className="mb-6 max-h-80 overflow-y-auto">
+        <div className="mb-6">
           <h2 className="text-xl font-bold mb-4">Previous Conversations</h2>
           {req.map((item, index) => (
             <div className="border-b border-gray-600 pb-3 mb-3" key={index}>
@@ -103,12 +120,14 @@ export default function Smart() {
             </div>
           ))}
         </div>
+      </div>
 
-        {/* Input for new chat */}
+      {/* Input for new chat */}
+      <div className="w-full fixed bottom-0 left-0 p-4 bg-gray-800">
+        <label htmlFor="aiPromt" className="sr-only">
+          ai prompt
+        </label>
         <div className="relative w-full">
-          <label htmlFor="aiPromt" className="sr-only">
-            ai prompt
-          </label>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 16 16"
@@ -124,6 +143,7 @@ export default function Smart() {
           <input
             id="aiPromt"
             onChange={onhandle}
+            onKeyPress={handleKeyPress} // Add key press handler
             value={Prompt} // Bind the input value to the Prompt state
             type="text"
             className="w-full border-outline bg-neutral-50 border border-neutral-300 rounded-md px-2 py-2 pl-10 pr-24 text-sm text-neutral-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black disabled:cursor-not-allowed disabled:opacity-75 dark:border-neutral-700 dark:bg-neutral-900/50 dark:text-neutral-300 dark:focus-visible:outline-white"

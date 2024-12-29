@@ -30,15 +30,19 @@ import First from './Component/student/Chart/First.jsx';
 import { UserProvider } from './Component/student/UserContext.jsx';
 import Protect from './Component/admin/Protect.jsx';
 import Smart from './Component/student/AiGURU/Smart.jsx';
+import Complaint from './Component/admin/Students/Complaint.jsx';
+// Import ErrorBoundary
 
 const router = createBrowserRouter([
   { 
     path: '/',
     element: <Main />,
+
   },
   {
     path: '/admin',
     element: <Adminlayout />,
+
     children: [
       {
         path: "",
@@ -57,41 +61,42 @@ const router = createBrowserRouter([
             element: <Protected><Faculty /></Protected>
           },
           {
-            path: "classes",
+            path: "class",
             element: <ClassesLayout />,
             children: [
               {
                 path: "",
                 element: <Protected><S1 /></Protected>
+              },  {
+                path: "add",
+                element: <Form />
               },
               {
-                path: "",
-                element: <Protected><Classes /></Protected>,
-                children: [
-                  {
-                    path: '',
-                    element: <Classes />
-                  },
+                path: "delete",
+                element: <Delete />
+              },
+              {
+                path: "annunosment",
+                element: <Annunosment />
+              },
+              {
+                path: "Complaint",
+                element: <Complaint/>
+              },
+              
+                {
+                  path: ":classId",
+                  element: <Classaddlayout />,
+                  children: [
+                    {
+                      path: "",
+                      element: <Protected><Classes /></Protected>, // Main Classes Page
+                    },
                   {
                     path: "details/:studentId",
                     element: <Protected><Details /></Protected>
                   },
-                  {
-                    path: "add",
-                    element: <Form />
-                  },
-                  {
-                    path: "delete",
-                    element: <Delete />
-                  },
-                  {
-                    path: "annunosment",
-                    element: <Annunosment />
-                  },
-                  {
-                    path: "details/:studentId",
-                    element: <Details />
-                  }
+                
                 ]
               }
             ]
@@ -103,6 +108,7 @@ const router = createBrowserRouter([
   {
     path: '/Student',
     element: <Protect><Layout/></Protect>,
+
     children: [
       {
         path: '',
@@ -127,8 +133,7 @@ const router = createBrowserRouter([
       {
         path: 'Aiguru',
         element: <Smart/>
-      },
-
+      }
     ]
   }
 ]);

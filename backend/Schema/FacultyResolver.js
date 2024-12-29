@@ -4,7 +4,7 @@ import FacultyLoginType from './FacultyLogin.js';
 import { GraphQLNonNull, GraphQLString } from 'graphql';
 import { SECRET_KEY } from '../Config/secret.js';
 
-const facultyLogin = {
+const FacultyLogin = {
   type: FacultyLoginType,
   args: {
     Username: { type: new GraphQLNonNull(GraphQLString) },
@@ -20,17 +20,17 @@ const facultyLogin = {
     const faculty = result.recordset[0];
     if (!faculty) throw new Error('Invalid credentials');
 
-    const token = jwt.sign(
+    const tokenss = jwt.sign(
       { Username: faculty.Username, role: 'faculty' },
       SECRET_KEY,
       { expiresIn: '1h' }
     );
 
     return {
-      token,
+      tokenss,
       Username: faculty.Username,
     };
   },
 };
 
-export default facultyLogin;
+export default FacultyLogin;

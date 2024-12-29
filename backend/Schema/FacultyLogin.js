@@ -4,7 +4,7 @@ const FacultyLoginType = new GraphQLObjectType({
   name: 'FacultyLogin',
   fields: () => ({
     Username: { type: GraphQLString },
-    token: { type: GraphQLString },
+    tokenss: { type: GraphQLString },
   }),
 });
 
