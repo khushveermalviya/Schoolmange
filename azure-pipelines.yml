@@ -21,6 +21,6 @@ steps:
 # Step 3: Archive the build output as an artifact (Optional)
 - task: PublishBuildArtifacts@1
   inputs:
-    pathToPublish: 'frontend/build' # Adjust this if your output is in a different directory
-    artifactName: 'frontend-build'
+    pathToPublish: 'frontend/dist' # Adjust this if your output is in a different directory
+    artifactName: 'frontend-dist'
   displayName: 'Publish frontend build artifact'
