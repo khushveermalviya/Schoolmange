@@ -11,16 +11,26 @@ steps:
     versionSpec: '20.x'
   displayName: 'Install Node.js'
 
-# Step 2: Navigate to the frontend directory
+# Step 2: Navigate to the frontend directory, install dependencies, and build the frontend
 - script: |
     cd frontend
     npm install
     npm run build
   displayName: 'Install dependencies and build the frontend'
 
-# Step 3: Archive the build output as an artifact (Optional)
+# Step 3: Archive the frontend build output as an artifact (Optional)
 - task: PublishBuildArtifacts@1
   inputs:
-    pathToPublish: 'frontend/dist' # Adjust this if your output is in a different directory
+    pathToPublish: 'frontend/dist'  # Adjust this if your build output is located in a different directory
     artifactName: 'frontend-dist'
   displayName: 'Publish frontend build artifact'
+
+# Step 4: Build and Push Docker Image for frontend
+- task: Docker@2
+  inputs:
+    containerRegistry: 'khuhshveer'  # Ensure this is your Docker registry connection
+    repository: 'soch'
+    command: 'buildAndPush'
+    Dockerfile: 'Dockerfile'  # Adjust if your Dockerfile is inside the frontend folder
+    tags: '$(Build.BuildId)'  # You can use build id or any custom tag
+  displayName: 'Build and Push Docker Image for frontend'
