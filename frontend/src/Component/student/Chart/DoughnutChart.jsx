@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import Chart from 'chart.js/auto';
 import useUserStore from '../../../app/useUserStore';
 
-export default function BarChart() {
+export default function DoughnutChart() {
   const chartRef = useRef(null);
   const chartInstanceRef = useRef(null);
   const performanceData = useUserStore((state) => state.performanceData);
@@ -22,24 +22,24 @@ export default function BarChart() {
     const numericData = performanceData.map((value) => parseFloat(value));
 
     chartInstanceRef.current = new Chart(ctx, {
-      type: 'bar',
+      type: 'doughnut',
       data: {
         labels: Array.from({ length: numericData.length }, (_, i) => `Week ${i + 1}`),
         datasets: [{
           label: 'Performance',
           data: numericData,
-          backgroundColor: 'rgba(153, 102, 255, 0.2)',
-          borderColor: 'rgba(153, 102, 255, 1)',
+          backgroundColor: [
+            'rgba(255, 99, 132, 0.5)',
+            'rgba(54, 162, 235, 0.5)',
+            'rgba(255, 206, 86, 0.5)',
+            'rgba(75, 192, 192, 0.5)',
+            'rgba(153, 102, 255, 0.5)',
+          ],
           borderWidth: 1
         }],
       },
       options: {
         responsive: true,
-        scales: {
-          y: {
-            beginAtZero: true,
-          },
-        },
       },
     });
 

@@ -22,5 +22,5 @@ const StudentComplaint = {
     return result.recordset;
   }
 };
-
+    
 export { StudentComplaint };

@@ -1,0 +1,60 @@
+config:
+  target: 'https://backend-kz3r.onrender.com/graphql' # Replace with your GraphQL endpoint
+  phases:
+    - duration: 60
+      arrivalRate: 2 # Number of requests per second
+  payload:
+    path: users.csv
+    fields:
+      - StudentID
+      - Password
+scenarios:
+  - flow:
+      - post:
+          url: "/"
+          json:
+            query: |
+              query studentLogin($StudentID: String!, $Password: String!) {
+                studentLogin(StudentID: $StudentID, Password: $Password) {
+                  token
+                  StudentID
+                  FirstName
+                  LastName
+                  WeeklyPerformance
+                }
+              }
+            variables:
+              StudentID: "{{ StudentID }}"
+              Password: "{{ Password }}"
+      - post:
+          url: "/"
+          json:
+            query: |
+              query Studentdata($Class: String!) {
+                Studentdata(Class: $Class) {
+                  StudentID
+                  FirstName
+                  LastName
+                  Class
+                }
+              }
+            variables:
+              Class: "10" # Replace with the class you want to test
+      - post:
+          url: "/"
+          json:
+            query: |
+              query StudentDetail($StudentID: String!) {
+                StudentDetail(StudentID: $StudentID) {
+                  StudentID
+                  FirstName
+                  LastName
+                  Class
+                  Email
+                  FatherName
+                  MotherName
+               
+                }
+              }
+            variables:
+              StudentID: "{{ StudentID }}" # Replace with the student ID you want to test

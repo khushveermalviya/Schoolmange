@@ -11,21 +11,28 @@ const sqlConfig = {
   options: {
     encrypt: true, // Required for Azure
     trustServerCertificate: false, // Set to true for self-signed certs
+    enableArithAbort: true,
+    connectTimeout: 30000, // 30 seconds
+    requestTimeout: 30000, // 30 seconds
   },
 };
 
-// Function to establish the connection
-const AzureDb = async()=>{
-try{
-  await sql.connect(sqlConfig);
- 
-  console.log("connected suceesfully");
-
-}catch(err){
-  console.error("database as some issue",err)
-}
+// Function to establish the connection with retry mechanism
+const AzureDb = async (retries = 5) => {
+  while (retries) {
+    try {
+      await sql.connect(sqlConfig);
+      console.log("connected successfully");
+      break;
+    } catch (err) {
+      console.error("database has some issue", err);
+      retries -= 1;
+      console.log(`Retries left: ${retries}`);
+      if (!retries) throw err;
+      await new Promise(res => setTimeout(res, 5000)); // Wait for 5 seconds before retrying
+    }
+  }
 };
-
 
 // Export the connection function
 export default AzureDb;

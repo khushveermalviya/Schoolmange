@@ -59,15 +59,10 @@ export default function Classes() {
 
   return (
     <>
-      <div className='flex w-full justify-center'>
-        <button 
-          className='text-xl bg-green-500 mr-7 border-4 w-62 text-center' 
-          onClick={handleGenerateExcel}
-        >
-          Generate Excel
-        </button>
+      <div className='flex w-full '>
+    
       </div>
-      <div className='flex'>
+      <div className='flex justify-start'>
         <h2 className='text-center w-full text-4xl mb-3'>Students Details</h2>
       </div>
       <div className='flex flex-col md:flex-wrap md:flex-row md:min-h-full justify-center gap-10 items-center w-full min-full-screen'>
@@ -87,7 +82,14 @@ export default function Classes() {
         ) : (
           <p>No students found for this class.</p>
         )}
+         
       </div>
+      <button 
+          className='text-xl bg-green-500 mr-7 border-4 w-62 text-center' 
+          onClick={handleGenerateExcel}
+        >
+          Generate Excel
+        </button>
     </>
   );
 }
