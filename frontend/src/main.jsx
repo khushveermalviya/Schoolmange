@@ -123,7 +123,7 @@ const router = createBrowserRouter([
         element: <First />
       },
       {
-        path: 'attendence',
+        path: 'Attendence',
         element: <Attendence />
       },
       {

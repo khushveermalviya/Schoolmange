@@ -1,107 +1,108 @@
 import React, { useState } from 'react';
-import { NavLink } from 'react-router-dom';
-import { Menu, X } from 'lucide-react';
+import useUserStore from '../../app/useUserStore';
+import { NavLink, useLocation } from 'react-router-dom';
+import { Home, BookOpen, ClipboardList, AlertCircle, Brain } from 'lucide-react';
 
-export default function Nav({ userData }) {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+const items = [
+  { title: 'Guru', to: 'Aiguru', icon: <Brain className="w-full h-full" /> },
+  { title: 'Home', to: 'Home', icon: <Home className="w-full h-full" /> },
+  { title: 'Attendance', to: 'Attendence', icon: <ClipboardList className="w-full h-full" /> },
+  { title: 'Result', to: 'result', icon: <BookOpen className="w-full h-full" /> },
+  { title: 'Complain', to: 'complain', icon: <AlertCircle className="w-full h-full" /> }
+];
 
-  // Function to close mobile menu
-  const handleNavClick = () => {
-    setIsMenuOpen(false);
-  };
+export default function Nav() {
+  const [isActive, setActiveItem] = useState('Home');
+  const student = useUserStore((state) => state.user.StudentID);
+  const location = useLocation();
+  const isAiGuruRoute = location.pathname.toLowerCase().includes('aiguru');
 
-  return (
-    <nav className="bg-gradient-to-r from-slate-900 to-slate-800 shadow-lg">
-      <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-16">
-          {/* Logo/StudentID Section */}
-          <div className="flex-shrink-0">
-            <span className="text-xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-              {userData.StudentID}
-            </span>
-          </div>
+  // Desktop Navigation
+  const DesktopNav = () => (
+    <nav className="hidden md:block fixed top-0 left-0 right-0 z-50">
+      <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between h-16">
+            {/* Logo Section */}
+            <div className="flex items-center">
+              <span className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-blue-500 bg-clip-text text-transparent">
+                {student}
+              </span>
+            </div>
 
-          {/* Desktop Navigation */}
-          <div className="hidden md:block">
-            <div className="flex space-x-8">
-              <NavLink
-                to="Aiguru"
-                className="group relative px-3 py-2 transition-all duration-300 ease-in-out"
-              >
-                <span className="relative z-10 bg-gradient-to-r from-violet-400 to-indigo-400 bg-clip-text text-transparent font-medium">
-                  AI Guru
-                  <span className="absolute -top-1 -right-2 text-yellow-400 text-xs">✧</span>
-                </span>
-                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-violet-400 group-hover:w-full transition-all duration-300"></span>
-              </NavLink>
-
-              {['Home', 'Attendence', 'Result', 'Complain'].map((item) => (
+            {/* Navigation Links */}
+            <div className="flex items-center space-x-1">
+              {items.map((item) => (
                 <NavLink
-                  key={item}
-                  to={item.toLowerCase()}
-                  className={({ isActive }) =>
-                    `group relative px-3 py-2 transition-all duration-300 ease-in-out ${
-                      isActive ? 'text-pink-400' : 'text-gray-300'
-                    }`
-                  }
+                  key={item.title}
+                  to={item.to}
+                  className={({ isActive }) => `
+                    relative group px-4 py-2 flex items-center space-x-2
+                    ${isActive ? 'text-purple-600 dark:text-purple-400' : 'text-gray-600 dark:text-gray-300'}
+                  `}
                 >
-                  <span className="relative z-10">{item}</span>
-                  <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-pink-400 group-hover:w-full transition-all duration-300"></span>
+                  <div className="w-5 h-5">{item.icon}</div>
+                  <span className="font-medium">{item.title}</span>
+
+                  {/* Hover and Active Indicator */}
+                  <div className={`
+                    absolute bottom-0 left-0 w-full h-0.5 bg-purple-600 dark:bg-purple-400
+                    transition-transform duration-200 
+                    ${isActive ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'}
+                  `} />
                 </NavLink>
               ))}
             </div>
           </div>
-
-          {/* Mobile menu button */}
-          <div className="md:hidden">
-            <button
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="inline-flex items-center justify-center p-2 rounded-md text-gray-300 hover:text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white transition-all duration-300"
-            >
-              {isMenuOpen ? (
-                <X className="h-6 w-6" />
-              ) : (
-                <Menu className="h-6 w-6" />
-              )}
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Mobile menu */}
-      <div
-        className={`md:hidden transition-all duration-300 ease-in-out ${
-          isMenuOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
-        } overflow-hidden`}
-      >
-        <div className="px-2 pt-2 pb-3 space-y-1">
-          <NavLink
-            to="Aiguru"
-            className="block px-3 py-2 rounded-md text-base font-medium bg-gradient-to-r from-violet-400 to-indigo-400 bg-clip-text text-transparent"
-            onClick={handleNavClick}
-          >
-            AI Guru
-            <span className="text-yellow-400 text-xs ml-1">✧</span>
-          </NavLink>
-
-          {['Home', 'Attendence', 'Result', 'Complain'].map((item) => (
-            <NavLink
-              key={item}
-              to={item.toLowerCase()}
-              onClick={handleNavClick}
-              className={({ isActive }) =>
-                `block px-3 py-2 rounded-md text-base font-medium transition-all duration-300 ${
-                  isActive
-                    ? 'text-pink-400 bg-gray-800'
-                    : 'text-gray-300 hover:text-white hover:bg-gray-700'
-                }`
-              }
-            >
-              {item}
-            </NavLink>
-          ))}
         </div>
       </div>
     </nav>
+  );
+
+  // Mobile Navigation
+  const MobileNav = () => (
+    <nav className={`
+      md:hidden fixed z-50 transition-all duration-300 left-0 right-0
+      ${isAiGuruRoute ? 'top-0' : 'bottom-4'}
+      ${isAiGuruRoute ? 'px-0' : 'px-4'}
+    `}>
+      <div className={`
+        flex justify-around items-center h-16 bg-white dark:bg-gray-800 shadow-lg backdrop-blur-sm bg-opacity-90
+        ${isAiGuruRoute ? '' : 'rounded-2xl mx-auto'}
+        ${isAiGuruRoute ? 'border-b border-gray-200 dark:border-gray-700' : ''}
+      `}>
+        {items.map((item) => (
+          <NavLink
+            key={item.title}
+            to={item.to}
+            className={({ isActive }) => `
+              flex flex-col items-center justify-center w-16 py-1 px-2
+              ${isActive ? 'text-purple-600 dark:text-purple-400' : 'text-gray-600 dark:text-gray-400'}
+            `}
+          >
+            <div className="w-6 h-6 mb-1 transition-colors duration-200">
+              {item.icon}
+            </div>
+            <span className="text-xs transition-colors duration-200">
+              {item.title}
+            </span>
+            <div className={`
+              absolute ${isAiGuruRoute ? 'bottom-0' : '-top-0.5'} w-1 h-1 
+              bg-purple-600 dark:bg-purple-400 rounded-full transition-opacity duration-200
+              ${isActive ? 'opacity-100' : 'opacity-0'}
+            `} />
+          </NavLink>
+        ))}
+      </div>
+    </nav>
+  );
+
+  return (
+    <>
+      <DesktopNav />
+      <MobileNav />
+      {/* Add padding for desktop nav */}
+      <div className="hidden md:block h-16" />
+    </>
   );
 }

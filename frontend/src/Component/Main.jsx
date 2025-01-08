@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useLazyQuery, gql } from '@apollo/client';
 import { useNavigate } from 'react-router-dom';
+import toast, { Toaster } from 'react-hot-toast';
+import { Loader2, UserCircle2, Key, AlertCircle } from 'lucide-react';
 import MainNav from "./MainNav.jsx";
-import useUserStore from '../app/useUserStore.js'; // Import the Zustand store
+import useUserStore from '../app/useUserStore.js';
 
 const LOGIN_QUERY = gql`
   query StudentLogin($StudentID: String!, $Password: String!) {
@@ -22,26 +24,62 @@ export default function Main() {
     password: ""
   });
 
-  const [loginFailed, setLoginFailed] = useState(false);
-  const [login, { data: queryData }] = useLazyQuery(LOGIN_QUERY);
+  const [isLoading, setIsLoading] = useState(false);
+  const [login, { data: queryData, error: queryError }] = useLazyQuery(LOGIN_QUERY);
   const navigate = useNavigate();
   const setUser = useUserStore((state) => state.setUser);
+
+  // Check for connection status
+  // useEffect(() => {
+  //   const checkConnection = async () => {
+  //     try {
+  //       await fetch(process.env.REACT_APP_API_URL || 'http://localhost:5000');
+  //     } catch (error) {
+  //       toast.error('Server connection failed. Please check your internet connection.', {
+  //         icon: '🔌',
+  //         duration: 5000,
+  //       });
+  //     }
+  //   };
+  //   checkConnection();
+  // }, []);
+
+  useEffect(() => {
+    if (queryError) {
+      const errorMessage = queryError.message.includes('Invalid credentials')
+        ? 'Invalid Student ID or Password'
+        : 'Server error. Please try again later.';
+      
+      toast.error(errorMessage, {
+        duration: 3000,
+        icon: <AlertCircle className="text-white" />,
+      });
+      setIsLoading(false);
+    }
+  }, [queryError]);
 
   useEffect(() => {
     if (queryData?.studentLogin?.token) {
       const { token, ...userDetails } = queryData.studentLogin;
-
+      
+      const loadingToast = toast.loading('Logging in...', {
+        icon: '🔐'
+      });
+      
       // Store token and user data
       localStorage.setItem("token", token);
       localStorage.setItem("userData", JSON.stringify(userDetails));
-
-      // Update the Zustand store with the new user data
       setUser(userDetails);
 
-      // Navigate to dashboard
-      navigate("/student");
-    } else if (queryData && !queryData.studentLogin?.token) {
-      setLoginFailed(true);
+      // Show success and redirect
+      setTimeout(() => {
+        toast.dismiss(loadingToast);
+        toast.success(`Welcome back, ${userDetails.FirstName}!`, {
+          icon: '👋',
+          duration: 3000
+        });
+        navigate("/student");
+      }, 1000);
     }
   }, [queryData, navigate, setUser]);
 
@@ -52,10 +90,31 @@ export default function Main() {
     });
   };
 
-  const handleClick = (e) => {
+  const handleClick = async (e) => {
     e.preventDefault();
-    setLoginFailed(false);
-    login({ variables: { StudentID: data.username, Password: data.password } });
+    if (!data.username || !data.password) {
+      toast.error('Please fill in all fields', {
+        icon: '⚠️',
+        duration: 2000
+      });
+      return;
+    }
+    
+    setIsLoading(true);
+    try {
+      await login({ 
+        variables: { 
+          StudentID: data.username, 
+          Password: data.password 
+        } 
+      });
+    } catch (error) {
+      setIsLoading(false);
+      toast.error('Connection failed. Please try again.', {
+        icon: '🔌',
+        duration: 3000
+      });
+    }
   };
 
   const handleKeyPress = (e) => {
@@ -65,30 +124,90 @@ export default function Main() {
   };
 
   return (
-    <div className="min-h-screen bg-school bg-cover bg-center">
-      <div className="flex justify-between items-center h-screen">
-        <MainNav />
-        <div className="w-full flex items-center flex-col p-4">
-          <input
-            type="text"
-            name="username"
-            placeholder="Student Name"
-            value={data.username}
-            onChange={onHandle}
-            onKeyPress={handleKeyPress}
-            className="p-2 border"
-          />
-          <input
-            type="password"
-            name="password"
-            placeholder="Password"
-            value={data.password}
-            onChange={onHandle}
-            onKeyPress={handleKeyPress}
-            className="p-2 border mt-4"
-          />
-          <button onClick={handleClick} className="bg-blue-500 text-white px-4 py-2 mt-4">Login</button>
-          {loginFailed && <p className="text-red-500 mt-2">Login failed. Please try again.</p>}
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+      <Toaster 
+        position="top-right"
+        toastOptions={{
+          className: 'text-sm font-medium',
+          style: {
+            borderRadius: '10px',
+            background: '#333',
+            color: '#fff',
+          },
+          success: {
+            style: {
+              background: '#059669',
+            },
+          },
+          error: {
+            style: {
+              background: '#DC2626',
+            },
+          },
+        }}
+      />
+      
+      <div className="absolute top-4 right-4 z-10">
+        <button 
+          onClick={() => navigate('/admin')}
+          className="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 transition-all duration-300 shadow-lg hover:shadow-xl"
+        >
+          Admin Portal
+        </button>
+      </div>
+      
+      <div className="flex justify-between items-center min-h-screen p-4">
+
+        <div className="w-full max-w-md mx-auto">
+          <div className="bg-white rounded-2xl shadow-2xl p-8 transform transition-all duration-300 hover:shadow-3xl">
+            <div className="text-center mb-8">
+              <h2 className="text-3xl font-bold text-gray-800 mb-2">Student Login</h2>
+              <p className="text-gray-600">Welcome back! Please enter your details.</p>
+            </div>
+            
+            <div className="space-y-6">
+              <div className="relative">
+                <UserCircle2 className="absolute left-3 top-3 text-gray-400" size={20} />
+                <input
+                  type="text"
+                  name="username"
+                  placeholder="Student ID"
+                  value={data.username}
+                  onChange={onHandle}
+                  onKeyPress={handleKeyPress}
+                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-300"
+                />
+              </div>
+              
+              <div className="relative">
+                <Key className="absolute left-3 top-3 text-gray-400" size={20} />
+                <input
+                  type="password"
+                  name="password"
+                  placeholder="Password"
+                  value={data.password}
+                  onChange={onHandle}
+                  onKeyPress={handleKeyPress}
+                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-300"
+                />
+              </div>
+
+              <button 
+                onClick={handleClick} 
+                disabled={isLoading}
+                className="w-full bg-indigo-600 text-white px-4 py-3 rounded-lg hover:bg-indigo-700 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center shadow-lg hover:shadow-xl"
+              >
+                {isLoading ? (
+                  <>
+                    <Loader2 className="w-5 h-5 animate-spin mr-2" />
+                    Verifying...
+                  </>
+                ) : 'Login to Dashboard'}
+              </button>
+
+             
+            </div>
+          </div>
         </div>
       </div>
     </div>
