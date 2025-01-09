@@ -10,7 +10,7 @@ import Result from './Component/student/Result.jsx';
 import Complain from './Component/student/Complain.jsx';
 import Attendence from './Component/student/Attendence.jsx';
 import Layout from './Routes/Layout.jsx';
-import Faculty from './Component/admin/Faculty.jsx';
+import Faculty from './Component/admin/Facuity/Faculty.jsx';
 import S1 from './Component/admin/Students/S1.jsx';
 import Adminlayout from './Routes/Adminlayout.jsx';
 import Classes from './Component/admin/Students/Classes.jsx';
@@ -31,6 +31,8 @@ import { UserProvider } from './Component/student/UserContext.jsx';
 import Protect from './Component/admin/Protect.jsx';
 import Smart from './Component/student/AiGURU/Smart.jsx';
 import Complaint from './Component/admin/Students/Complaint.jsx';
+import AdminRoutes from "./Routes/adminRoutes.jsx";
+import FacuiltyRoutes from "./Routes/FacuiltyRoutes.jsx" // Corrected import
 // Import ErrorBoundary
 
 const router = createBrowserRouter([
@@ -57,8 +59,12 @@ const router = createBrowserRouter([
             element: <Protected><Admin /></Protected>
           },
           {
-            path: 'faculty',
-            element: <Protected><Faculty /></Protected>
+            path: 'Facility/*',
+            element: <Protected><FacuiltyRoutes/></Protected>
+          },
+          {
+            path: 'Administrative/*',
+            element: <Protected><AdminRoutes /></Protected> // Corrected usage
           },
           {
             path: "class",
@@ -67,7 +73,8 @@ const router = createBrowserRouter([
               {
                 path: "",
                 element: <Protected><S1 /></Protected>
-              },  {
+              },  
+              {
                 path: "add",
                 element: <Form />
               },
@@ -83,20 +90,18 @@ const router = createBrowserRouter([
                 path: "Complaint",
                 element: <Complaint/>
               },
-              
-                {
-                  path: ":classId",
-                  element: <Classaddlayout />,
-                  children: [
-                    {
-                      path: "",
-                      element: <Protected><Classes /></Protected>, // Main Classes Page
-                    },
+              {
+                path: ":classId",
+                element: <Classaddlayout />,
+                children: [
+                  {
+                    path: "",
+                    element: <Protected><Classes /></Protected>, // Main Classes Page
+                  },
                   {
                     path: "details/:studentId",
                     element: <Protected><Details /></Protected>
                   },
-                
                 ]
               }
             ]

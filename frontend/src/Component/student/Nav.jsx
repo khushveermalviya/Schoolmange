@@ -13,7 +13,7 @@ const items = [
 
 export default function Nav() {
   const [isActive, setActiveItem] = useState('Home');
-  const student = useUserStore((state) => state.user.StudentID);
+  const student = useUserStore((state) => state.user);
   const location = useLocation();
   const isAiGuruRoute = location.pathname.toLowerCase().includes('aiguru');
 
@@ -21,12 +21,19 @@ export default function Nav() {
   const DesktopNav = () => (
     <nav className="hidden md:block fixed top-0 left-0 right-0 z-50">
       <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16">
+        <div className="max-w-7xl  px-4 sm:px-6 lg:px-8">
+          
+          <div className="flex justify-between gap-20 h-16">
             {/* Logo Section */}
-            <div className="flex items-center">
-              <span className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-blue-500 bg-clip-text text-transparent">
-                {student}
+            <div className="flex items-center gap-4 w-40">
+       
+            <div className="avatar">
+  <div className="w-10 rounded-full">
+    <img src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp" />
+  </div>
+</div>
+              <span className="text-xl font-bold ">
+                {student.StudentID}
               </span>
             </div>
 
@@ -45,11 +52,7 @@ export default function Nav() {
                   <span className="font-medium">{item.title}</span>
 
                   {/* Hover and Active Indicator */}
-                  <div className={`
-                    absolute bottom-0 left-0 w-full h-0.5 bg-purple-600 dark:bg-purple-400
-                    transition-transform duration-200 
-                    ${isActive ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'}
-                  `} />
+              
                 </NavLink>
               ))}
             </div>
