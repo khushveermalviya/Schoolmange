@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useLazyQuery, gql } from '@apollo/client';
-import useUserStore from '../../app/useUserStore.js'; // Import the Zustand store
+import useUserStore from '../../app/useUserStore.jsx'; // Import the Zustand store
 
 const GET_STUDENT_DATA = gql`
   query GetStudentDetails {

@@ -33,6 +33,7 @@ import Smart from './Component/student/AiGURU/Smart.jsx';
 import Complaint from './Component/admin/Students/Complaint.jsx';
 import AdminRoutes from "./Routes/adminRoutes.jsx";
 import FacuiltyRoutes from "./Routes/FacuiltyRoutes.jsx" // Corrected import
+import cnt from '../Apolloclient.jsx';
 // Import ErrorBoundary
 
 const router = createBrowserRouter([
@@ -143,16 +144,8 @@ const router = createBrowserRouter([
   }
 ]);
 
-const cnt = new ApolloClient({
-  link: new HttpLink({
-    uri: 'https://backend-kz3r.onrender.com/graphql',
-    headers: {
-      Authorization: `Bearer ${localStorage.getItem('token')}`,
-    },
-  }),
-  cache: new InMemoryCache(),
-});
 
+<cnt/>
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <ApolloProvider client={cnt}>

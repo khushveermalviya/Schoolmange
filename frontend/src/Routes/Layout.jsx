@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import Nav from '../Component/student/Nav.jsx';
 import Footer from '../Component/student/Footer';
 import { Outlet } from 'react-router-dom';
-import useUserStore from '../app/useUserStore.js'; // Import the Zustand store
+import useUserStore from '../app/useUserStore.jsx'; // Import the Zustand store
 
 export default function Layout() {
   const user = useUserStore((state) => state.user); // Get the user state from the Zustand store

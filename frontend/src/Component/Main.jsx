@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import toast, { Toaster } from 'react-hot-toast';
 import { Loader2, UserCircle2, Key, AlertCircle } from 'lucide-react';
 import MainNav from "./MainNav.jsx";
-import useUserStore from '../app/useUserStore.js';
+import useUserStore from '../app/useUserStore.jsx';
 
 const LOGIN_QUERY = gql`
   query StudentLogin($StudentID: String!, $Password: String!) {

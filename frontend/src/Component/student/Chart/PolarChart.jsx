@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import Chart from 'chart.js/auto';
-import useUserStore from '../../../app/useUserStore';
+import useUserStore from '../../../app/useUserStore.jsx';
 
 export default function PolarChart() {
   const chartRef = useRef(null);

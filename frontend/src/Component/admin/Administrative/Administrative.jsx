@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import { NavLink, Outlet } from "react-router-dom";
+
 import {
   BarChart3,
   BookOpen,
@@ -18,6 +19,9 @@ import {
 export default function Administrative() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isSidebarOpen, setSidebarOpen] = useState(false);
+
+
+ 
 
   const navItems = [
     { icon: <BarChart3 className="w-5 h-5" />, title: "Dashboard", path: "" },
@@ -123,7 +127,7 @@ export default function Administrative() {
 
         {/* Page Content */}
         <main className="p-6 mt-16 lg:mt-0">
-          <Outlet />
+          <Outlet  />
         </main>
       </div>
     </div>

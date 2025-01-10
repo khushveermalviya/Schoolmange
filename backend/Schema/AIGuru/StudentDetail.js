@@ -21,6 +21,7 @@ const StudentDetail = {
     type: StudentDetailType,
     args: {
       StudentID: { type: new GraphQLNonNull(GraphQLString) },
+      
     },
     async resolve(parent, args) {
       const result = await sql.query`

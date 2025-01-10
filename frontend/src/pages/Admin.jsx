@@ -1,9 +1,43 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
 import { Users, GraduationCap, Lock, Sun, Moon } from 'lucide-react';
+import { useLazyQuery, gql } from '@apollo/client';
+
+
+const DASHBOARD_QUERY = gql`
+  query DashBoard {
+    DashBoard {
+      StudentCount
+      Faculty
+      Department
+    }
+  }
+`;
 
 export default function Admin() {
+  const [loading, setLoading] = useState(true);
+  const [filtered, setFiltered] = useState([]);
   const [isDark, setIsDark] = useState(false);
+  const [error, setError] = useState(null);
+
+  const [fetchDashboardData, { data }] = useLazyQuery(DASHBOARD_QUERY, {
+    onCompleted: (data) => {
+      setFiltered(data.DashBoard || []);
+      setLoading(false);
+    },
+    onError: (error) => {
+      setError('An error occurred while fetching dashboard data.');
+      setLoading(false);
+      console.error(error);
+      
+    },
+    
+  });
+  useEffect(() => {
+    fetchDashboardData();
+  }, [fetchDashboardData]);
+
+  
 
   const toggleTheme = () => {
     setIsDark(!isDark);
@@ -94,11 +128,11 @@ export default function Admin() {
         <div className="mt-12 grid grid-cols-2 md:grid-cols-4 gap-4">
           <div className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-md">
             <p className="text-sm text-gray-500 dark:text-gray-400">Total Faculty</p>
-            <p className="text-2xl font-bold text-gray-800 dark:text-white">24</p>
+            <p className="text-2xl font-bold text-gray-800 dark:text-white">{filtered.Faculty}</p>
           </div>
           <div className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-md">
             <p className="text-sm text-gray-500 dark:text-gray-400">Total Students</p>
-            <p className="text-2xl font-bold text-gray-800 dark:text-white">512</p>
+            <p className="text-2xl font-bold text-gray-800 dark:text-white">{filtered.StudentCount}</p>
           </div>
           <div className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-md">
             <p className="text-sm text-gray-500 dark:text-gray-400">Active Classes</p>
@@ -106,7 +140,8 @@ export default function Admin() {
           </div>
           <div className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-md">
             <p className="text-sm text-gray-500 dark:text-gray-400">Departments</p>
-            <p className="text-2xl font-bold text-gray-800 dark:text-white">8</p>
+            <p className="text-2xl font-bold text-gray-800 dark:text-white">{filtered.Department
+            }</p>
           </div>
         </div>
       </div>

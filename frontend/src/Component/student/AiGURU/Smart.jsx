@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { fetch } from './Logic.js';
-import useUserStore from "../../../app/useUserStore.js";
+import useUserStore from "../../../app/useUserStore.jsx";
 import { useQuery, gql, useMutation } from '@apollo/client';
 import { format, isValid } from 'date-fns';
 

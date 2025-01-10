@@ -8,6 +8,9 @@ import AiMutation from './AIGuru/AiMutation.js';
 import { Studentdata } from './StudentDataResolver.js';
 import {StudentComplaint} from "./Complaint/Complaint.js"
 import  StudentDetail  from './AIGuru/StudentDetail.js';
+import { DashBoard } from './AdminDasboard/Dashboard.js';
+import GetAllStaff from './Administrative/Staff.js';
+
 // Define ChatType
 const ChatType = new GraphQLObjectType({
   name: 'Chat',
@@ -30,6 +33,8 @@ const RootQuery = new GraphQLObjectType({
     Studentdata,
     StudentComplaint,
     StudentDetail,
+    DashBoard,
+    GetAllStaff,
     getStudentChats: {
       type: new GraphQLList(ChatType),
       args: { StudentID: { type: GraphQLString } },

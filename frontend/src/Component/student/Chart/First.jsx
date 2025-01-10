@@ -4,7 +4,7 @@ import BarChart from './BarChart';
 import RadarChart from './RadarChart';
 import PolarChart from './PolarChart';
 import DoughnutChart from './DoughnutChart';
-import useUserStore from '../../../app/useUserStore';
+import useUserStore from '../../../app/useUserStore.jsx';
 
 export default function First() {
   const studentData = {

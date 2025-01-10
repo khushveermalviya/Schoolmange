@@ -1,34 +1,62 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { gql, useLazyQuery } from '@apollo/client';
 import DataTable from './componenet/DataTable';
-import FilterBar from './componenet/FilterBar';
-import { Mail, Phone, Building } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
+
+const STAFF_QUERY = gql`
+  query GetAllStaff {
+    GetAllStaff {
+      firstName
+      department
+      role
+      email
+      phone
+      status
+    }
+  }
+`;
 
 export default function StaffManagement() {
+  const [staffData, setStaffData] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
-  const [filters, setFilters] = useState([
-    { 
-      key: 'department',
-      label: 'Department',
-      type: 'select',
-      value: '',
-      options: [
-        { label: 'Science', value: 'science' },
-        { label: 'Arts', value: 'arts' },
-        { label: 'Commerce', value: 'commerce' },
-      ]
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  const [fetchStaff] = useLazyQuery(STAFF_QUERY, {
+    onCompleted: (data) => {
+      // Transform the data to match your table structure
+      const transformedData = data.GetAllStaff.map(staff => ({
+        name: staff.firstName, // Map firstName to name for table
+        department: staff.department,
+        role: staff.role,
+        email: staff.email,
+        phone: staff.phone,
+        status: staff.status
+      }));
+      setStaffData(transformedData);
+      setLoading(false);
     },
-    {
-      key: 'status',
-      label: 'Status',
-      type: 'select',
-      value: '',
-      options: [
-        { label: 'Active', value: 'active' },
-        { label: 'On Leave', value: 'on_leave' },
-        { label: 'Terminated', value: 'terminated' },
-      ]
-    }
-  ]);
+    onError: (error) => {
+      setError('An error occurred while fetching staff data.');
+      setLoading(false);
+      console.error(error);
+    },
+  });
+
+  useEffect(() => {
+    fetchStaff();
+  }, []); // Remove fetchStaff from dependencies to avoid infinite loop
+
+  // Filter function for search
+  const getFilteredData = () => {
+    if (!searchQuery) return staffData;
+    
+    return staffData.filter((staff) =>
+      staff.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      staff.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      staff.department.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  };
 
   const columns = [
     { key: 'name', label: 'Name' },
@@ -39,50 +67,48 @@ export default function StaffManagement() {
     { key: 'status', label: 'Status' },
   ];
 
-  const staffData = [
-    {
-      name: 'John Doe',
-      department: 'Science',
-      role: 'Senior Professor',
-      email: 'john@example.com',
-      phone: '+1234567890',
-      status: 'Active',
-    },
-    // Add more sample data as needed
-  ];
+  if (loading) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
+        <p className="mt-2 text-gray-600">Loading staff data...</p>
+      </div>
+    );
+  }
 
-  const handleFilterChange = (key, value) => {
-    setFilters(filters.map(filter => 
-      filter.key === key ? { ...filter, value } : filter
-    ));
-  };
-
-  const handleFilterSubmit = () => {
-    // Implement filter logic
-    console.log('Applying filters:', filters);
-  };
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-red-600">{error}</p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-gray-800 dark:text-white">Staff Management</h1>
+        <h1 className="text-2xl font-bold text-gray-800 dark:text-white">
+          Staff Management
+        </h1>
         <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
           Add New Staff
         </button>
       </div>
 
-      <FilterBar
-        filters={filters}
-        onFilterChange={handleFilterChange}
-        searchQuery={searchQuery}
-        onSearchChange={setSearchQuery}
-        onFilterSubmit={handleFilterSubmit}
-      />
+      <div className="relative mb-4">
+        <input
+          type="text"
+          placeholder="Search staff..."
+          className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+      </div>
 
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
         <DataTable
           columns={columns}
-          data={staffData}
+          data={getFilteredData()}
           onRowClick={(row) => console.log('Clicked row:', row)}
         />
       </div>
