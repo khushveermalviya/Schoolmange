@@ -1,48 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
 import { Users, GraduationCap, Lock, Sun, Moon } from 'lucide-react';
-import { useLazyQuery, gql } from '@apollo/client';
-
-
-const DASHBOARD_QUERY = gql`
-  query DashBoard {
-    DashBoard {
-      StudentCount
-      Faculty
-      Department
-    }
-  }
-`;
+import useUserStore from '../app/useUserStore';
 
 export default function Admin() {
-  const [loading, setLoading] = useState(true);
-  const [filtered, setFiltered] = useState([]);
-  const [isDark, setIsDark] = useState(false);
-  const [error, setError] = useState(null);
-
-  const [fetchDashboardData, { data }] = useLazyQuery(DASHBOARD_QUERY, {
-    onCompleted: (data) => {
-      setFiltered(data.DashBoard || []);
-      setLoading(false);
-    },
-    onError: (error) => {
-      setError('An error occurred while fetching dashboard data.');
-      setLoading(false);
-      console.error(error);
-      
-    },
-    
-  });
-  useEffect(() => {
-    fetchDashboardData();
-  }, [fetchDashboardData]);
-
   
+const dashh= useUserStore((state)=>state.Dash)
 
-  const toggleTheme = () => {
-    setIsDark(!isDark);
-    document.documentElement.classList.toggle('dark');
-  };
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 p-6">
@@ -51,15 +16,7 @@ export default function Admin() {
           <h1 className="text-4xl md:text-5xl font-bold text-center text-gray-800 dark:text-white">
             Admin Dashboard
           </h1>
-          <button
-            onClick={toggleTheme}
-            className="p-3 rounded-full bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl transition-all duration-300"
-          >
-            {isDark ? 
-              <Sun className="w-6 h-6 text-yellow-500" /> : 
-              <Moon className="w-6 h-6 text-gray-600" />
-            }
-          </button>
+    
         </div>
         
         <div className="grid md:grid-cols-3 gap-8 px-4">
@@ -128,11 +85,11 @@ export default function Admin() {
         <div className="mt-12 grid grid-cols-2 md:grid-cols-4 gap-4">
           <div className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-md">
             <p className="text-sm text-gray-500 dark:text-gray-400">Total Faculty</p>
-            <p className="text-2xl font-bold text-gray-800 dark:text-white">{filtered.Faculty}</p>
+            <p className="text-2xl font-bold text-gray-800 dark:text-white">{dashh.Faculty}</p>
           </div>
           <div className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-md">
             <p className="text-sm text-gray-500 dark:text-gray-400">Total Students</p>
-            <p className="text-2xl font-bold text-gray-800 dark:text-white">{filtered.StudentCount}</p>
+            <p className="text-2xl font-bold text-gray-800 dark:text-white">{dashh.StudentCount}</p>
           </div>
           <div className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-md">
             <p className="text-sm text-gray-500 dark:text-gray-400">Active Classes</p>
@@ -140,8 +97,7 @@ export default function Admin() {
           </div>
           <div className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-md">
             <p className="text-sm text-gray-500 dark:text-gray-400">Departments</p>
-            <p className="text-2xl font-bold text-gray-800 dark:text-white">{filtered.Department
-            }</p>
+            <p className="text-2xl font-bold text-gray-800 dark:text-white">{dashh.Department}</p>
           </div>
         </div>
       </div>

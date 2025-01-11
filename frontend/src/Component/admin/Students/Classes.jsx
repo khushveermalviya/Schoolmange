@@ -1,46 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { NavLink, useParams } from 'react-router-dom';
-import { useLazyQuery, gql } from '@apollo/client';
 import * as XLSX from 'xlsx';
 import { Loader2, FileSpreadsheet, UserCircle, BookOpen, BadgeCheck, Download } from 'lucide-react';
+import useUserStore from '../../../app/useUserStore';
 
-const STUDENTS_BY_CLASS_QUERY = gql`
-  query Studentdata($Class: String!) {
-    Studentdata(Class: $Class) {
-      StudentID
-      FirstName
-      LastName
-      Class
-    }
-  }
-`;
 
 export default function ClassView() {
   const { classId } = useParams();
-  const [filtered, setFiltered] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const { students, loading, error, fetchStudents } = useUserStore();
   const [searchTerm, setSearchTerm] = useState('');
 
-  const [fetchStudents, { data }] = useLazyQuery(STUDENTS_BY_CLASS_QUERY, {
-    variables: { Class: classId },
-    onCompleted: (data) => {
-      setFiltered(data.Studentdata || []);
-      setLoading(false);
-    },
-    onError: (error) => {
-      setError('An error occurred while fetching student data.');
-      setLoading(false);
-      console.error(error);
-    },
-  });
-
   useEffect(() => {
-    fetchStudents();
-  }, [classId, fetchStudents]);
+    fetchStudents(classId);
+    console.log(students)
+  }, [classId]);
 
   const handleGenerateExcel = () => {
-    const dataToExport = filtered.map(student => ({
+    const dataToExport = students.map(student => ({
       'Student Name': student.FirstName,
       'Last Name': student.LastName,
       'Class': student.Class,
@@ -53,7 +29,7 @@ export default function ClassView() {
     XLSX.writeFile(workbook, `Class_${classId}_Students.xlsx`);
   };
 
-  const filteredStudents = filtered.filter(student => 
+  const filteredStudents = students.filter(student => 
     student.FirstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
     student.LastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
     student.StudentID.includes(searchTerm)
@@ -91,7 +67,7 @@ export default function ClassView() {
                 Class {classId} Students
               </h1>
               <p className="mt-2 text-gray-600 dark:text-gray-400">
-                Total Students: {filtered.length}
+                Total Students: {students.length}
               </p>
             </div>
             <div className="mt-4 md:mt-0 flex flex-col sm:flex-row gap-4">

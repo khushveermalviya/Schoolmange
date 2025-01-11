@@ -4,7 +4,7 @@ import { GraphQLNonNull, GraphQLString, GraphQLList, GraphQLObjectType } from 'g
 const ComplaintType = new GraphQLObjectType({
   name: "Complaint",
   fields: () => ({
-    StudentID: { type: GraphQLString },
+    Studentid: { type: GraphQLString },
     Complaint: { type: GraphQLString },
     Class: { type: GraphQLString },
   })

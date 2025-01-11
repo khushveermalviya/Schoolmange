@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState ,useEffect} from 'react';
 import useUserStore from '../../app/useUserStore.jsx';
 import { NavLink, useLocation } from 'react-router-dom';
 import { Home, BookOpen, ClipboardList, AlertCircle, Brain } from 'lucide-react';
@@ -16,7 +16,9 @@ export default function Nav() {
   const student = useUserStore((state) => state.user);
   const location = useLocation();
   const isAiGuruRoute = location.pathname.toLowerCase().includes('aiguru');
-
+useEffect(()=>{
+  console.log(student)
+})
   // Desktop Navigation
   const DesktopNav = () => (
     <nav className="hidden md:block fixed top-0 left-0 right-0 z-50">

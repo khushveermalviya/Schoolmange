@@ -2,42 +2,12 @@ import React,{useState,useEffect} from 'react';
 import StatCard from './componenet/StatCard';
 import ChartCard from './componenet/ChartCard';
 import { Users, GraduationCap, DollarSign, BookOpen } from 'lucide-react';
-import { useLazyQuery, gql } from '@apollo/client';
+import useUserStore from '../../../app/useUserStore';
 
-
-const DASHBOARD_QUERY = gql`
-  query DashBoard {
-    DashBoard {
-      StudentCount
-      Faculty
-      Department
-    }
-  }
-`;
 
 export default function Dashboard() {
-  const [loading, setLoading] = useState(true);
-  const [filtered, setFiltered] = useState([]);
-
-  const [error, setError] = useState(null);
-  const [fetchDashboardData, { data }] = useLazyQuery(DASHBOARD_QUERY, {
-    onCompleted: (data) => {
-      setFiltered(data.DashBoard || []);
-      setLoading(false);
-    },
-    onError: (error) => {
-      setError('An error occurred while fetching dashboard data.');
-      setLoading(false);
-      console.error(error);
-      
-    },
-    
-  });
-  useEffect(() => {
-    fetchDashboardData();
-  }, [fetchDashboardData]);
-
-  
+   
+  const dashh= useUserStore((state)=>state.Dash)
   // Sample data for charts
   const studentData = {
     labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
@@ -85,13 +55,13 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatCard
           title="Total Students"
-          value={filtered.StudentCount}
+          value={dashh.StudentCount}
           icon={<GraduationCap className="w-6 h-6 text-blue-600" />}
           trend={12.5}
         />
         <StatCard
           title="Total Staff"
-          value={filtered.Faculty}
+          value={dashh.Faculty}
           icon={<Users className="w-6 h-6 text-green-600" />}
           trend={5.2}
         />
@@ -103,7 +73,7 @@ export default function Dashboard() {
         />
         <StatCard
           title="Department"
-          value={filtered.Department
+          value={dashh.Department
           }
           icon={<BookOpen className="w-6 h-6 text-orange-600" />}
           trend={-2.3}
