@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { gql, useLazyQuery } from '@apollo/client';
 import { PlusCircle, Edit2 } from 'lucide-react';
+import { NavLink } from 'react-router-dom';
 
 // Updated GraphQL query to match your schema
 const GET_STUDENT = gql`
@@ -16,7 +17,6 @@ const GET_STUDENT = gql`
 
 const StudentManagement = () => {
   const [selectedClass, setSelectedClass] = useState('1');
-  const [showAddModal, setShowAddModal] = useState(false);
   const [loading, setLoading] = useState(true);
   const [filtered, setFiltered] = useState([]);
   const [error, setError] = useState(null);
@@ -43,13 +43,13 @@ const StudentManagement = () => {
       {/* Header Section */}
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-semibold text-gray-800">Students</h1>
-        <button 
-          onClick={() => setShowAddModal(true)}
+        <NavLink 
+        to="Addstudent"
           className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors shadow-sm"
         >
           <PlusCircle size={20} />
           Add Student
-        </button>
+        </NavLink>
       </div>
 
       {/* Class Filter */}
@@ -123,23 +123,7 @@ const StudentManagement = () => {
         </table>
       </div>
 
-      {/* Add Student Modal placeholder - implement when mutation is ready */}
-      {showAddModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-          <div className="bg-white rounded-lg p-8 max-w-2xl w-full mx-4">
-            <h2 className="text-2xl font-semibold mb-6">Add New Student</h2>
-            {/* Implement AddStudentForm when mutation is ready */}
-            <div className="flex justify-end gap-4">
-              <button
-                onClick={() => setShowAddModal(false)}
-                className="px-4 py-2 border rounded-lg hover:bg-gray-50"
-              >
-                Close
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+  
     </div>
   );
 };

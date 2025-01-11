@@ -124,7 +124,7 @@ export default function Main() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+    <div className="min-h-screen bg-school bg-center bg-cover">
       <Toaster 
         position="top-right"
         toastOptions={{

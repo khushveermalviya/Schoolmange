@@ -1,7 +1,9 @@
+// StaffManagement.jsx
 import React, { useState, useEffect } from 'react';
 import { gql, useLazyQuery } from '@apollo/client';
-import DataTable from './componenet/DataTable';
+import DataTable from '../DataTable';
 import { Loader2 } from 'lucide-react';
+import { NavLink, Outlet } from 'react-router-dom';
 
 const STAFF_QUERY = gql`
   query GetAllStaff {
@@ -90,9 +92,9 @@ export default function StaffManagement() {
         <h1 className="text-2xl font-bold text-gray-800 dark:text-white">
           Staff Management
         </h1>
-        <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+        <NavLink to="addstaff" className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
           Add New Staff
-        </button>
+        </NavLink>
       </div>
 
       <div className="relative mb-4">
@@ -112,6 +114,7 @@ export default function StaffManagement() {
           onRowClick={(row) => console.log('Clicked row:', row)}
         />
       </div>
+  
     </div>
   );
 }

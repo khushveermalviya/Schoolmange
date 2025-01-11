@@ -10,6 +10,7 @@ import {StudentComplaint} from "./Complaint/Complaint.js"
 import  StudentDetail  from './AIGuru/StudentDetail.js';
 import { DashBoard } from './AdminDasboard/Dashboard.js';
 import GetAllStaff from './Administrative/Staff.js';
+import {StudentFees} from './Administrative/StudentFees.js';
 
 // Define ChatType
 const ChatType = new GraphQLObjectType({
@@ -35,6 +36,7 @@ const RootQuery = new GraphQLObjectType({
     StudentDetail,
     DashBoard,
     GetAllStaff,
+    StudentFees,
     getStudentChats: {
       type: new GraphQLList(ChatType),
       args: { StudentID: { type: GraphQLString } },

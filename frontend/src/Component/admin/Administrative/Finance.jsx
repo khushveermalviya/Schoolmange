@@ -1,7 +1,20 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import DataTable from './componenet/DataTable';
 import FilterBar from './componenet/FilterBar';
 import { DollarSign, CreditCard, Wallet, TrendingUp } from 'lucide-react';
+import { useQuery, gql } from '@apollo/client';
+
+const GET_STUDENT_FEES = gql`
+  query {
+    StudentFees {
+      StudentId
+      FirstName
+      FeeStatus
+      AmountPaid
+      TotalFee
+    }
+  }
+`;
 
 export default function Finance() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -31,24 +44,14 @@ export default function Finance() {
   ]);
 
   const columns = [
-    { key: 'id', label: 'Transaction ID' },
-    { key: 'date', label: 'Date' },
-    { key: 'type', label: 'Type' },
-    { key: 'amount', label: 'Amount' },
-    { key: 'category', label: 'Category' },
-    { key: 'status', label: 'Status' }
+    { key: 'StudentId', label: 'Student ID' },
+    { key: 'FirstName', label: 'First Name' },
+    { key: 'FeeStatus', label: 'Fee Status' },
+    { key: 'AmountPaid', label: 'Amount Paid (₹)' },
+    { key: 'TotalFee', label: 'Total Fee (₹)' }
   ];
 
-  const transactionData = [
-    {
-      id: 'TRX-001',
-      date: '2024-01-09',
-      type: 'Fee Payment',
-      amount: '$1,200',
-      category: 'Tuition',
-      status: 'Paid'
-    }
-  ];
+  const { loading, error, data } = useQuery(GET_STUDENT_FEES);
 
   const handleFilterChange = (key, value) => {
     setFilters(filters.map(filter => 
@@ -59,6 +62,55 @@ export default function Finance() {
   const handleFilterSubmit = () => {
     console.log('Applying filters:', filters);
   };
+
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>Error: {error.message}</p>;
+
+  // Format currency to INR
+  const formatINR = (amount) => {
+    return new Intl.NumberFormat('en-IN', {
+      style: 'currency',
+      currency: 'INR',
+      maximumFractionDigits: 0
+    }).format(amount);
+  };
+
+  // Calculate metrics from all student fees
+  const calculateMetrics = () => {
+    if (!data?.StudentFees) return {
+      totalRevenue: 0,
+      totalExpenses: 0,
+      pendingPayments: 0,
+      netProfit: 0
+    };
+
+    return data.StudentFees.reduce((acc, fee) => {
+      acc.totalRevenue += fee.TotalFee;
+      acc.amountPaid += fee.AmountPaid;
+      acc.pendingPayments += (fee.TotalFee - fee.AmountPaid);
+      // Assuming 30% expenses
+      acc.totalExpenses = acc.totalRevenue * 0.3;
+      acc.netProfit = acc.amountPaid - acc.totalExpenses;
+      return acc;
+    }, {
+      totalRevenue: 0,
+      amountPaid: 0,
+      pendingPayments: 0,
+      totalExpenses: 0,
+      netProfit: 0
+    });
+  };
+
+  const metrics = calculateMetrics();
+
+  // Format the transaction data
+  const transactionData = data?.StudentFees?.map(fee => ({
+    StudentId: fee.StudentId,
+    FirstName: fee.FirstName,
+    FeeStatus: fee.FeeStatus,
+    AmountPaid: formatINR(fee.AmountPaid),
+    TotalFee: formatINR(fee.TotalFee)
+  })) || [];
 
   return (
     <div className="space-y-6">
@@ -80,7 +132,7 @@ export default function Finance() {
             <DollarSign className="w-8 h-8 text-green-500" />
             <div>
               <p className="text-sm text-gray-500">Total Revenue</p>
-              <p className="text-2xl font-bold">$125,000</p>
+              <p className="text-2xl font-bold">{formatINR(metrics.totalRevenue)}</p>
             </div>
           </div>
         </div>
@@ -90,7 +142,7 @@ export default function Finance() {
             <Wallet className="w-8 h-8 text-red-500" />
             <div>
               <p className="text-sm text-gray-500">Total Expenses</p>
-              <p className="text-2xl font-bold">$45,000</p>
+              <p className="text-2xl font-bold">{formatINR(metrics.totalExpenses)}</p>
             </div>
           </div>
         </div>
@@ -100,7 +152,7 @@ export default function Finance() {
             <CreditCard className="w-8 h-8 text-blue-500" />
             <div>
               <p className="text-sm text-gray-500">Pending Payments</p>
-              <p className="text-2xl font-bold">$15,000</p>
+              <p className="text-2xl font-bold">{formatINR(metrics.pendingPayments)}</p>
             </div>
           </div>
         </div>
@@ -110,7 +162,7 @@ export default function Finance() {
             <TrendingUp className="w-8 h-8 text-purple-500" />
             <div>
               <p className="text-sm text-gray-500">Net Profit</p>
-              <p className="text-2xl font-bold">$80,000</p>
+              <p className="text-2xl font-bold">{formatINR(metrics.netProfit)}</p>
             </div>
           </div>
         </div>
