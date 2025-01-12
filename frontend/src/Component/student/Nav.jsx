@@ -4,11 +4,11 @@ import { NavLink, useLocation } from 'react-router-dom';
 import { Home, BookOpen, ClipboardList, AlertCircle, Brain } from 'lucide-react';
 
 const items = [
-  { title: 'Guru', to: 'Aiguru', icon: <Brain className="w-full h-full" /> },
-  { title: 'Attendance', to: 'Attendence', icon: <ClipboardList className="w-full h-full" /> },
   { title: 'Home', to: 'Home', icon: <Home className="w-full h-full" /> },
+  { title: 'Attendance', to: 'Attendence', icon: <ClipboardList className="w-full h-full" /> },
   { title: 'Result', to: 'result', icon: <BookOpen className="w-full h-full" /> },
-  { title: 'Complain', to: 'complain', icon: <AlertCircle className="w-full h-full" /> }
+  { title: 'Complain', to: 'complain', icon: <AlertCircle className="w-full h-full" /> },
+  { title: 'Guru', to: 'Aiguru', icon: <Brain className="w-full h-full" /> }
 ];
 
 export default function Nav() {

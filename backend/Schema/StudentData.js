@@ -1,6 +1,6 @@
 import {GraphQLObjectType,GraphQLString} from 'graphql'
 const StudentDataType = new GraphQLObjectType({
-    name:"studentdata",
+    name:"studentdatas",
     fields: () => ({
         StudentID: { type: GraphQLString },
         FirstName: { type: GraphQLString },

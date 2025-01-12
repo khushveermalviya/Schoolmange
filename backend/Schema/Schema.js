@@ -11,6 +11,10 @@ import  StudentDetail  from './AIGuru/StudentDetail.js';
 import { DashBoard } from './AdminDasboard/Dashboard.js';
 import GetAllStaff from './Administrative/Staff.js';
 import {StudentFees} from './Administrative/StudentFees.js';
+import { SaveAttendance } from './Administrative/AttendenceMutation.js';
+import { GetFacultyAttendance , GetStudentAttendance} from './Administrative/AttendenceQuery.js';
+
+
 
 // Define ChatType
 const ChatType = new GraphQLObjectType({
@@ -37,6 +41,8 @@ const RootQuery = new GraphQLObjectType({
     DashBoard,
     GetAllStaff,
     StudentFees,
+    GetFacultyAttendance,
+    GetStudentAttendance,
     getStudentChats: {
       type: new GraphQLList(ChatType),
       args: { StudentID: { type: GraphQLString } },
@@ -48,8 +54,14 @@ const RootQuery = new GraphQLObjectType({
     Aichat,
   },
 });
-
+const RootMutation = new GraphQLObjectType({
+  name: 'RootMutation',
+  fields: {
+    saveAttendance: SaveAttendance
+    // AiMutation:AiMutation
+  }
+});
 export default new GraphQLSchema({
   query: RootQuery,
-  mutation: AiMutation,
+  mutation: RootMutation,
 });
