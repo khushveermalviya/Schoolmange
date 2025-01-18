@@ -13,6 +13,8 @@ import GetAllStaff from './Administrative/Staff.js';
 import {StudentFees} from './Administrative/StudentFees.js';
 import { SaveAttendance } from './Administrative/AttendenceMutation.js';
 import { GetFacultyAttendance , GetStudentAttendance} from './Administrative/AttendenceQuery.js';
+import { AddStudentMutation } from './Administrative/StudentAdd.js';
+
 
 
 
@@ -57,7 +59,8 @@ const RootQuery = new GraphQLObjectType({
 const RootMutation = new GraphQLObjectType({
   name: 'RootMutation',
   fields: {
-    saveAttendance: SaveAttendance
+    saveAttendance: SaveAttendance,
+    addStudentMutation:AddStudentMutation
     // AiMutation:AiMutation
   }
 });

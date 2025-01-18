@@ -8,6 +8,7 @@ const sqlConfig = {
   password: process.env.AZURE_SQL_PASSWORD,
   database: process.env.AZURE_SQL_DATABASE,
   server: process.env.AZURE_SQL_SERVER,
+  port: 1433,
   options: {
     encrypt: true, // Required for Azure
     trustServerCertificate: false, // Set to true for self-signed certs

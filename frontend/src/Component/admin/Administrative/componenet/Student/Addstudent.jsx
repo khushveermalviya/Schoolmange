@@ -1,474 +1,474 @@
-import { useState } from 'react';
-import { useMutation } from '@apollo/client';
-import { gql } from '@apollo/client';
-import { AlertCircle, CheckCircle, Info, BookOpen, User, Home, Phone } from 'lucide-react';
+import { gql, useMutation } from '@apollo/client';
+import React, { useState, useEffect } from 'react';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const ADD_STUDENT = gql`
-  mutation AddStudent(
-    $first_name: String!
-    $last_name: String!
-    $date_of_birth: String!
-    $gender: String!
-    $admission_class: String!
-    $admission_date: String!
-    $blood_group: String
-    $previous_school: String
-    $parent_name: String!
-    $parent_occupation: String!
-    $parent_email: String!
-    $parent_phone: String!
-    $address: String!
-    $emergency_contact: String!
-    $medical_conditions: String
-    $documents_submitted: [String]!
-  ) {
-    addStudent(
-      first_name: $first_name
-      last_name: $last_name
-      date_of_birth: $date_of_birth
-      gender: $gender
-      admission_class: $admission_class
-      admission_date: $admission_date
-      blood_group: $blood_group
-      previous_school: $previous_school
-      parent_name: $parent_name
-      parent_occupation: $parent_occupation
-      parent_email: $parent_email
-      parent_phone: $parent_phone
-      address: $address
-      emergency_contact: $emergency_contact
-      medical_conditions: $medical_conditions
-      documents_submitted: $documents_submitted
-    ) {
-      id
+  mutation addStudentMutation($input: StudentInput!) {
+    addStudentMutation(input: $input) {
+      StudentID
+      Password
+      FirstName
+      LastName
+      FatherName
+      MotherName  
+      dob
+      phoneNumber
+      parentPhoneNumber
+      Email
+      address
+      gender
+      caste
+      Class
+      SchoolName
+      previousClass
     }
   }
 `;
 
+const SCHOOL_CODE = "ABCD";
+
 const AddStudent = () => {
   const [formData, setFormData] = useState({
-    first_name: '',
-    last_name: '',
-    date_of_birth: '',
-    gender: '',
-    admission_class: '',
-    admission_date: '',
-    blood_group: '',
-    previous_school: '',
-    parent_name: '',
-    parent_occupation: '',
-    parent_email: '',
-    parent_phone: '',
+    FirstName: '',
+    LastName: '',
+    FatherName: '',
+    MotherName: '',
+    dob: '',
+    phoneNumber: '',
+    parentPhoneNumber: '',
+    Email: '',
     address: '',
-    emergency_contact: '',
-    medical_conditions: '',
-    documents_submitted: []
+    gender: '',
+    caste: '',
+    Class: '',
+    SchoolName: '',
+    previousClass: '',
+    StudentID: '',
+    Password: ''
   });
 
-  const [addStudent, { loading, error }] = useMutation(ADD_STUDENT);
-  const [success, setSuccess] = useState(false);
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prevData => ({
+      ...prevData,
+      [name]: value
+    }));
+  };
 
+  const resetForm = () => {
+    setFormData({
+      FirstName: '',
+      LastName: '',
+      FatherName: '',
+      MotherName: '',
+      dob: '',
+      phoneNumber: '',
+      parentPhoneNumber: '',
+      Email: '',
+      address: '',
+      gender: '',
+      caste: '',
+      Class: '',
+      SchoolName: '',
+      previousClass: '',
+      StudentID: '',
+      Password: ''
+    });
+  };
+
+  useEffect(() => {
+    if (formData.FirstName && formData.dob) {
+      const namePart = formData.FirstName.substring(0, 3).toUpperCase();
+      const dobPart = new Date(formData.dob).getFullYear().toString();
+      const studentId = `${namePart}${dobPart}${SCHOOL_CODE}`;
+      const password = `${formData.FirstName.toLowerCase()}${dobPart}${SCHOOL_CODE}`;
+
+      setFormData(prevData => ({
+        ...prevData,
+        StudentID: studentId,
+        Password: password
+      }));
+    }
+  }, [formData.FirstName, formData.dob]);
+
+  const [validationErrors, setValidationErrors] = useState({});
+
+  const [addStudent, { loading }] = useMutation(ADD_STUDENT, {
+    onCompleted: (data) => {
+      toast.success('Student registered successfully!', {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
+      resetForm();
+    },
+    onError: (error) => {
+      console.error('Registration error:', error);
+      
+      // Extract the error message
+      const errorMessage = error.message?.includes('Student ID already in use') || error.message?.includes('Email already registered') || error.message?.includes('Student with same name and father\'s name exists')
+        ? error.message
+        : 'Failed to register student. Please try again.';
+  
+      toast.error(errorMessage, {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
+    }
+  });
+  
+  // Update the handleSubmit function
   const handleSubmit = async (e) => {
     e.preventDefault();
+  
+    // Validate form data
+    const errors = {};
+    if (!formData.FirstName) errors.FirstName = 'First Name is required';
+    if (!formData.LastName) errors.LastName = 'Last Name is required';
+    if (!formData.dob) errors.dob = 'Date of Birth is required';
+    if (!formData.phoneNumber) errors.phoneNumber = 'Phone Number is required';
+    if (!formData.parentPhoneNumber) errors.parentPhoneNumber = 'Parent Phone Number is required';
+    if (!formData.Email) errors.Email = 'Email is required';
+    if (!formData.address) errors.address = 'Address is required';
+    if (!formData.gender) errors.gender = 'Gender is required';
+    if (!formData.caste) errors.caste = 'Caste is required';
+    if (!formData.Class) errors.Class = 'Class is required';
+    if (!formData.SchoolName) errors.SchoolName = 'School Name is required';
+    if (!formData.previousClass) errors.previousClass = 'Previous Class is required';
+  
+    setValidationErrors(errors);
+  
+    if (Object.keys(errors).length > 0) {
+      toast.error('Please fill in all required fields');
+      return;
+    }
+  
     try {
-      const result = await addStudent({ variables: formData });
-      if (result.data) {
-        setSuccess(true);
-        setFormData({
-          first_name: '',
-          last_name: '',
-          date_of_birth: '',
-          gender: '',
-          admission_class: '',
-          admission_date: '',
-          blood_group: '',
-          previous_school: '',
-          parent_name: '',
-          parent_occupation: '',
-          parent_email: '',
-          parent_phone: '',
-          address: '',
-          emergency_contact: '',
-          medical_conditions: '',
-          documents_submitted: []
-        });
-        setTimeout(() => setSuccess(false), 3000);
-      }
-    } catch (err) {
-      console.error('Error adding student:', err);
+      await addStudent({ 
+        variables: { 
+          input: {
+            ...formData,
+            dob: new Date(formData.dob).toISOString().split('T')[0]
+          } 
+        } 
+      });
+    } catch (error) {
+      // Apollo will handle this error through onError callback
+      console.error('Submission error:', error);
     }
   };
 
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    if (type === 'checkbox') {
-      const document = name.replace('document_', '');
-      setFormData(prev => ({
-        ...prev,
-        documents_submitted: checked 
-          ? [...prev.documents_submitted, document]
-          : prev.documents_submitted.filter(doc => doc !== document)
-      }));
-    } else {
-      setFormData(prev => ({
-        ...prev,
-        [name]: value
-      }));
+  const renderGeneratedFields = () => (
+    <div className="space-y-4 bg-gray-50 p-6 rounded-lg">
+      <h2 className="text-xl font-semibold text-gray-800">Generated Information</h2>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label className="block text-sm font-medium text-gray-700">Student ID</label>
+          <input
+            type="text"
+            name="StudentID"
+            value={formData.StudentID}
+            readOnly
+            className="mt-1 block w-full rounded-md border-gray-300 bg-gray-100 shadow-sm focus:ring-blue-500 focus:border-blue-500 cursor-not-allowed"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700">Password</label>
+          <input
+            type="text"
+            name="Password"
+            value={formData.Password}
+            readOnly
+            className="mt-1 block w-full rounded-md border-gray-300 bg-gray-100 shadow-sm focus:ring-blue-500 focus:border-blue-500 cursor-not-allowed"
+          />
+        </div>
+      </div>
+    </div>
+  );
+
+  const inputClasses = (fieldName) => `
+    mt-1 block w-full rounded-md shadow-sm 
+    ${validationErrors[fieldName] 
+      ? 'border-red-500 focus:ring-red-500 focus:border-red-500' 
+      : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'
     }
-  };
+    transition duration-150 ease-in-out
+  `;
 
   return (
-    <div className="min-h-screen bg-gray-50/80 py-8 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-4xl w-full mx-auto space-y-8">
-        <div className="bg-white/90 p-8 rounded-xl shadow-sm">
-          <div className="border-b border-gray-100 pb-4 mb-8">
-            <h2 className="text-3xl font-bold text-center text-gray-800">
-              Student Registration
-            </h2>
-            <p className="text-center text-gray-500 mt-2">
-              Please fill in the student's information carefully
-            </p>
+    <div>
+    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white py-8">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="bg-white rounded-xl shadow-xl overflow-hidden">
+          <div className="px-6 py-4 bg-gradient-to-r from-blue-600 to-blue-700">
+            <h1 className="text-2xl font-bold text-white">Student Registration</h1>
           </div>
 
-          {error && (
-            <div className="alert alert-error mb-4 flex items-center bg-red-50 text-red-700 p-4 rounded-lg">
-              <AlertCircle className="w-5 h-5 mr-2" />
-              <span>Error: {error.message}</span>
-            </div>
-          )}
+          <form onSubmit={handleSubmit} className="p-6 space-y-8">
+            {renderGeneratedFields()}
 
-          {success && (
-            <div className="alert alert-success mb-4 flex items-center bg-green-50 text-green-700 p-4 rounded-lg">
-              <CheckCircle className="w-5 h-5 mr-2" />
-              <span>Student registered successfully!</span>
-            </div>
-          )}
-
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Student Information */}
-            <div className="bg-gray-50/50 p-6 rounded-lg border border-gray-100">
-              <div className="flex items-center mb-4 text-gray-700">
-                <User className="w-5 h-5 mr-2" />
-                <h3 className="text-lg font-medium">Student Details</h3>
-              </div>
+            <div className="space-y-6">
+              <h2 className="text-xl font-semibold text-gray-800">Personal Information</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="form-control">
-                  <label className="label">
-                    <span className="label-text text-gray-600">First Name</span>
-                  </label>
+                {/* Personal Information Fields */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">First Name</label>
                   <input
                     type="text"
-                    name="first_name"
-                    value={formData.first_name}
+                    name="FirstName"
+                    value={formData.FirstName}
                     onChange={handleChange}
-                    className="input input-bordered w-full bg-white/90"
+                    className={inputClasses('FirstName')}
                     required
                   />
+                  {validationErrors.FirstName && (
+                    <p className="mt-1 text-sm text-red-500">{validationErrors.FirstName}</p>
+                  )}
                 </div>
 
-                <div className="form-control">
-                  <label className="label">
-                    <span className="label-text text-gray-600">Last Name</span>
-                  </label>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Last Name</label>
                   <input
                     type="text"
-                    name="last_name"
-                    value={formData.last_name}
+                    name="LastName"
+                    value={formData.LastName}
                     onChange={handleChange}
-                    className="input input-bordered w-full bg-white/90"
+                    className={inputClasses('LastName')}
                     required
                   />
+                  {validationErrors.LastName && (
+                    <p className="mt-1 text-sm text-red-500">{validationErrors.LastName}</p>
+                  )}
                 </div>
 
-                <div className="form-control">
-                  <label className="label">
-                    <span className="label-text text-gray-600">Date of Birth</span>
-                  </label>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Date of Birth</label>
                   <input
                     type="date"
-                    name="date_of_birth"
-                    value={formData.date_of_birth}
+                    name="dob"
+                    value={formData.dob}
                     onChange={handleChange}
-                    className="input input-bordered w-full bg-white/90"
+                    className={inputClasses('dob')}
+                    required
+                  />
+                  {validationErrors.dob && (
+                    <p className="mt-1 text-sm text-red-500">{validationErrors.dob}</p>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Father's Name</label>
+                  <input
+                    type="text"
+                    name="FatherName"
+                    value={formData.FatherName}
+                    onChange={handleChange}
+                    className={inputClasses('FatherName')}
                     required
                   />
                 </div>
 
-                <div className="form-control">
-                  <label className="label">
-                    <span className="label-text text-gray-600">Gender</span>
-                  </label>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Mother's Name</label>
+                  <input
+                    type="text"
+                    name="MotherName"
+                    value={formData.MotherName}
+                    onChange={handleChange}
+                    className={inputClasses('MotherName')}
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Phone Number</label>
+                  <input
+                    type="tel"
+                    name="phoneNumber"
+                    value={formData.phoneNumber}
+                    onChange={handleChange}
+                    className={inputClasses('phoneNumber')}
+                    required
+                  />
+                  {validationErrors.phoneNumber && (
+                    <p className="mt-1 text-sm text-red-500">{validationErrors.phoneNumber}</p>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Parent Phone Number</label>
+                  <input
+                    type="tel"
+                    name="parentPhoneNumber"
+                    value={formData.parentPhoneNumber}
+                    onChange={handleChange}
+                    className={inputClasses('parentPhoneNumber')}
+                    required
+                  />
+                  {validationErrors.parentPhoneNumber && (
+                    <p className="mt-1 text-sm text-red-500">{validationErrors.parentPhoneNumber}</p>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Email</label>
+                  <input
+                    type="email"
+                    name="Email"
+                    value={formData.Email}
+                    onChange={handleChange}
+                    className={inputClasses('Email')}
+                    required
+                  />
+                  {validationErrors.Email && (
+                    <p className="mt-1 text-sm text-red-500">{validationErrors.Email}</p>
+                  )}
+                </div>
+
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-medium text-gray-700">Address</label>
+                  <textarea
+                    name="address"
+                    value={formData.address}
+                    onChange={handleChange}
+                    className={inputClasses('address')}
+                    required
+                    rows="3"
+                  />
+                  {validationErrors.address && (
+                    <p className="mt-1 text-sm text-red-500">{validationErrors.address}</p>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Gender</label>
                   <select
                     name="gender"
                     value={formData.gender}
                     onChange={handleChange}
-                    className="select select-bordered w-full bg-white/90"
+                    className={inputClasses('gender')}
                     required
                   >
                     <option value="">Select Gender</option>
-                    <option value="Male">Male</option>
-                    <option value="Female">Female</option>
-                    <option value="Other">Other</option>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                    <option value="other">Other</option>
                   </select>
+                  {validationErrors.gender && (
+                    <p className="mt-1 text-sm text-red-500">{validationErrors.gender}</p>
+                  )}
                 </div>
 
-                <div className="form-control">
-                  <label className="label">
-                    <span className="label-text text-gray-600">Blood Group</span>
-                  </label>
-                  <select
-                    name="blood_group"
-                    value={formData.blood_group}
-                    onChange={handleChange}
-                    className="select select-bordered w-full bg-white/90"
-                  >
-                    <option value="">Select Blood Group</option>
-                    <option value="A+">A+</option>
-                    <option value="A-">A-</option>
-                    <option value="B+">B+</option>
-                    <option value="B-">B-</option>
-                    <option value="O+">O+</option>
-                    <option value="O-">O-</option>
-                    <option value="AB+">AB+</option>
-                    <option value="AB-">AB-</option>
-                  </select>
-                </div>
-
-                <div className="form-control">
-                  <label className="label">
-                    <span className="label-text text-gray-600">Medical Conditions</span>
-                  </label>
-                  <textarea
-                    name="medical_conditions"
-                    value={formData.medical_conditions}
-                    onChange={handleChange}
-                    className="textarea textarea-bordered bg-white/90"
-                    placeholder="Any medical conditions or allergies"
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Academic Information */}
-            <div className="bg-gray-50/50 p-6 rounded-lg border border-gray-100">
-              <div className="flex items-center mb-4 text-gray-700">
-                <BookOpen className="w-5 h-5 mr-2" />
-                <h3 className="text-lg font-medium">Academic Information</h3>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="form-control">
-                  <label className="label">
-                    <span className="label-text text-gray-600">Admission Class</span>
-                  </label>
-                  <select
-                    name="admission_class"
-                    value={formData.admission_class}
-                    onChange={handleChange}
-                    className="select select-bordered w-full bg-white/90"
-                    required
-                  >
-                    <option value="">Select Class</option>
-                    <option value="Nursery">Nursery</option>
-                    <option value="KG">KG</option>
-                    <option value="1">Class 1</option>
-                    <option value="2">Class 2</option>
-                    <option value="3">Class 3</option>
-                    <option value="4">Class 4</option>
-                    <option value="5">Class 5</option>
-                  </select>
-                </div>
-
-                <div className="form-control">
-                  <label className="label">
-                    <span className="label-text text-gray-600">Admission Date</span>
-                  </label>
-                  <input
-                    type="date"
-                    name="admission_date"
-                    value={formData.admission_date}
-                    onChange={handleChange}
-                    className="input input-bordered w-full bg-white/90"
-                    required
-                  />
-                </div>
-
-                <div className="form-control md:col-span-2">
-                  <label className="label">
-                    <span className="label-text text-gray-600">Previous School (if any)</span>
-                  </label>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Caste</label>
                   <input
                     type="text"
-                    name="previous_school"
-                    value={formData.previous_school}
+                    name="caste"
+                    value={formData.caste}
                     onChange={handleChange}
-                    className="input input-bordered w-full bg-white/90"
-                    placeholder="Name and address of previous school"
+                    className={inputClasses('caste')}
+                    required
                   />
+                  {validationErrors.caste && (
+                    <p className="mt-1 text-sm text-red-500">{validationErrors.caste}</p>
+                  )}
                 </div>
-              </div>
-            </div>
 
-            {/* Parent/Guardian Information */}
-            <div className="bg-gray-50/50 p-6 rounded-lg border border-gray-100">
-              <div className="flex items-center mb-4 text-gray-700">
-                <Phone className="w-5 h-5 mr-2" />
-                <h3 className="text-lg font-medium">Parent/Guardian Information</h3>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="form-control">
-                  <label className="label">
-                    <span className="label-text text-gray-600">Parent/Guardian Name</span>
-                  </label>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Class</label>
                   <input
                     type="text"
-                    name="parent_name"
-                    value={formData.parent_name}
+                    name="Class"
+                    value={formData.Class}
                     onChange={handleChange}
-                    className="input input-bordered w-full bg-white/90"
+                    className={inputClasses('Class')}
                     required
                   />
+                  {validationErrors.Class && (
+                    <p className="mt-1 text-sm text-red-500">{validationErrors.Class}</p>
+                  )}
                 </div>
 
-                <div className="form-control">
-                  <label className="label">
-                    <span className="label-text text-gray-600">Occupation</span>
-                  </label>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">School Name</label>
                   <input
                     type="text"
-                    name="parent_occupation"
-                    value={formData.parent_occupation}
+                    name="SchoolName"
+                    value={formData.SchoolName}
                     onChange={handleChange}
-                    className="input input-bordered w-full bg-white/90"
+                    className={inputClasses('SchoolName')}
                     required
                   />
+                  {validationErrors.SchoolName && (
+                    <p className="mt-1 text-sm text-red-500">{validationErrors.SchoolName}</p>
+                  )}
                 </div>
 
-                <div className="form-control">
-                  <label className="label">
-                    <span className="label-text text-gray-600">Email</span>
-                  </label>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Previous Class</label>
                   <input
-                    type="email"
-                    name="parent_email"
-                    value={formData.parent_email}
+                    type="text"
+                    name="previousClass"
+                    value={formData.previousClass}
                     onChange={handleChange}
-                    className="input input-bordered w-full bg-white/90"
+                    className={inputClasses('previousClass')}
                     required
                   />
-                </div>
-
-                <div className="form-control">
-                  <label className="label">
-                    <span className="label-text text-gray-600">Phone Number</span>
-                  </label>
-                  <input
-                    type="tel"
-                    name="parent_phone"
-                    value={formData.parent_phone}
-                    onChange={handleChange}
-                    className="input input-bordered w-full bg-white/90"
-                    required
-                  />
-                </div>
-
-                <div className="form-control">
-                  <label className="label">
-                    <span className="label-text text-gray-600">Emergency Contact</span>
-                  </label>
-                  <input
-                    type="tel"
-                    name="emergency_contact"
-                    value={formData.emergency_contact}
-                    onChange={handleChange}
-                    className="input input-bordered w-full bg-white/90"
-                    required
-                  />
+                  {validationErrors.previousClass && (
+                    <p className="mt-1 text-sm text-red-500">{validationErrors.previousClass}</p>
+                  )}
                 </div>
               </div>
             </div>
 
-            {/* Address Information */}
-            <div className="bg-gray-50/50 p-6 rounded-lg border border-gray-100">
-              <div className="flex items-center mb-4 text-gray-700">
-                <Home className="w-5 h-5 mr-2" />
-                <h3 className="text-lg font-medium">Address Information</h3>
-              </div>
-              <div className="form-control">
-                <label className="label">
-                  <span className="label-text text-gray-600">Complete Address</span>
-                </label>
-                <textarea
-                  name="address"
-                  value={formData.address}
-                  onChange={handleChange}
-                  className="textarea textarea-bordered h-24 bg-white/90"
-                  required
-                  placeholder="Enter complete residential address"
-                />
-              </div>
-            </div>
-
-            {/* Documents Required */}
-            <div className="bg-gray-50/50 p-6 rounded-lg border border-gray-100">
-              <h3 className="text-lg font-medium mb-4 text-gray-700">Required Documents</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="flex items-center space-x">
-                                    <Home className="w-5 h-5 mr-2" />
-                <h3 className="text-lg font-medium">Address Details</h3>
-              </div>
-              <div className="form-control">
-                <label className="label">
-                  <span className="label-text text-gray-600">Address</span>
-                </label>
-                <textarea
-                  name="address"
-                  value={formData.address}
-                  onChange={handleChange}
-                  className="textarea textarea-bordered bg-white/90"
-                  placeholder="Full address"
-                  required
-                />
-              </div>
-            </div>
-</div>
-            {/* Document Submission */}
-            <div className="bg-gray-50/50 p-6 rounded-lg border border-gray-100">
-              <div className="flex items-center mb-4 text-gray-700">
-                <Info className="w-5 h-5 mr-2" />
-                <h3 className="text-lg font-medium">Document Submission</h3>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {['Birth Certificate', 'Transfer Certificate', 'Aadhaar Card', 'Passport Size Photo'].map(
-                  (doc, index) => (
-                    <label key={index} className="flex items-center space-x-3">
-                      <input
-                        type="checkbox"
-                        name={`document_${doc}`}
-                        checked={formData.documents_submitted.includes(doc)}
-                        onChange={handleChange}
-                        className="checkbox checkbox-primary"
-                      />
-                      <span className="text-gray-600">{doc}</span>
-                    </label>
-                  )
-                )}
-              </div>
-            </div>
-
-            {/* Submit Button */}
-            <div className="form-control">
+            <div className="flex justify-end pt-6">
               <button
                 type="submit"
-                className={`btn btn-primary w-full ${loading ? 'loading' : ''}`}
                 disabled={loading}
-              >
-                {loading ? 'Submitting...' : 'Register Student'}
-              </button>
-            </div>
-          </form>
+                className={`
+                  px-6 py-2 rounded-md text-white font-semibold
+                  transform transition-all duration-150
+                  ${loading 
+                    ? 'bg-blue-400 cursor-not-allowed'
+                    : 'bg-blue-600 hover:bg-blue-700 hover:scale-105'
+                  }
+                  focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500
+                  shadow-md hover:shadow `}
+                >
+                  <span className="flex items-center">
+                    {loading ? (
+                      <>
+                        <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Processing...
+                      </>
+                    ) : (
+                      <>
+                        <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        Submit Registration
+                      </>
+                    )}
+                  </span>
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       </div>
-    </div>
+      <ToastContainer />
+ </div>
   );
 };
 
