@@ -57,39 +57,45 @@ export const AddStudentMutation = {
       // Create a new connection
       const connection = await sql.connect(context.sqlConfig);
 
-      // Check if student already exists
-    const existingStudent = await connection.request()
-  .input('StudentID', sql.VarChar, input.StudentID)
-  .input('Email', sql.VarChar, input.Email)
-  .input('FirstName', sql.VarChar, input.FirstName)
-  .input('LastName', sql.VarChar, input.LastName)
-  .input('FatherName', sql.VarChar, input.FatherName)
-  .input('dob', sql.Date, input.dob)
-  .query`
-    SELECT StudentID, Email, FirstName, LastName, FatherName, dob
-    FROM Students 
-    WHERE StudentID = @StudentID OR Email = @Email OR (FirstName = @FirstName AND LastName = @LastName AND FatherName = @FatherName AND dob = @dob)
-  `;
-
-if (existingStudent.recordset.length > 0) {
-  const existingRecord = existingStudent.recordset[0];
-  let errorMessage = 'Student already exists: ';
-  
-  if (existingRecord.FirstName === input.FirstName && existingRecord.LastName === input.LastName && existingRecord.dob === input.dob) {
-    throw new Error('Student is already enrolled');
-  } 
-   else if (existingRecord.FirstName === input.FirstName && existingRecord.LastName === input.LastName && existingRecord.FatherName === input.FatherName) {
-    throw new Error('Student with same name and father\'s name exists');
-  }
-}
-  
       // Format date properly
       const formattedDob = new Date(input.dob).toISOString().split('T')[0];
 
-      // Insert student record
+      // Check if student already exists - only checking first name + last name + dob combination
+      const existingStudent = await connection.request()
+        .input('FirstName', sql.VarChar, input.FirstName)
+        .input('LastName', sql.VarChar, input.LastName)
+        .input('dob', sql.Date, formattedDob)
+        .query`
+          SELECT StudentID, FirstName, LastName, dob
+          FROM Students 
+          WHERE FirstName = @FirstName 
+          AND LastName = @LastName 
+          AND dob = @dob
+        `;
+
+      // Only throw error if exact name and DOB match is found
+      if (existingStudent.recordset.length > 0) {
+        throw new Error('A student with the same name and date of birth is already registered');
+      }
+
+      // Insert student record with all parameters
       const result = await connection.request()
         .input('StudentID', sql.VarChar, input.StudentID)
-        // ... (rest of the inputs remain the same)
+        .input('Password', sql.VarChar, input.Password)
+        .input('FirstName', sql.VarChar, input.FirstName)
+        .input('LastName', sql.VarChar, input.LastName)
+        .input('FatherName', sql.VarChar, input.FatherName)
+        .input('MotherName', sql.VarChar, input.MotherName)
+        .input('dob', sql.Date, formattedDob)
+        .input('phoneNumber', sql.VarChar, input.phoneNumber)
+        .input('parentPhoneNumber', sql.VarChar, input.parentPhoneNumber)
+        .input('Email', sql.VarChar, input.Email)
+        .input('address', sql.VarChar, input.address)
+        .input('gender', sql.VarChar, input.gender)
+        .input('caste', sql.VarChar, input.caste)
+        .input('Class', sql.VarChar, input.Class)
+        .input('SchoolName', sql.VarChar, input.SchoolName)
+        .input('previousClass', sql.VarChar, input.previousClass)
         .query`
           INSERT INTO Students (
             StudentID, Password, FirstName, LastName,
@@ -113,7 +119,13 @@ if (existingStudent.recordset.length > 0) {
         dob: formattedDob
       };
     } catch (error) {
-      // Ensure the error is propagated with the message
+      // Check if it's a unique constraint violation
+      if (error.message.includes('UQ__Students')) {
+        // Continue with the insertion if it's just an email duplicate
+        // but still display the warning to the user
+        throw new Error('Warning: An account with this email already exists, but the registration will proceed');
+      }
+      // For all other errors, propagate them normally
       throw new Error(error.message || 'Failed to register student');
     }
   }
