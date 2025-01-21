@@ -1,8 +1,10 @@
+
 import { StrictMode } from 'react';
+import { App } from '@capacitor/app';
 import { createRoot } from 'react-dom/client';
 import './index.css';
 import { ApolloClient, InMemoryCache, ApolloProvider, HttpLink } from '@apollo/client';
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { createBrowserRouter, RouterProvider, Outlet } from 'react-router-dom';
 import Main from './Component/Main.jsx';
 import Admin from './pages/Admin.jsx';
 import Student from './pages/Student.jsx';
@@ -24,128 +26,137 @@ import Details from './Component/admin/Students/Details.jsx';
 import Delete from './Component/admin/Students/Delete.jsx';
 import Annunosment from './Component/admin/Students/Annunosment.jsx';
 import Update from './Component/admin/Students/Update.jsx';
-import Studentlog from './Component/student/Studentlog.jsx';
-
 import First from './Component/student/Chart/First.jsx';
 import { UserProvider } from './Component/student/UserContext.jsx';
 import Protect from './Component/admin/Protect.jsx';
 import Smart from './Component/student/AiGURU/Smart.jsx';
 import Complaint from './Component/admin/Students/Complaint.jsx';
 import AdminRoutes from "./Routes/adminRoutes.jsx";
-import FacuiltyRoutes from "./Routes/FacuiltyRoutes.jsx" // Corrected import
+import FacuiltyRoutes from "./Routes/FacuiltyRoutes.jsx";
+import { BackButtonHandler } from './BackButtonHandler';
 import cnt from '../Apolloclient.jsx';
-// Import ErrorBoundary
+
+// Root Layout Component
+const RootLayout = () => {
+  return (
+    <>
+      <BackButtonHandler />
+      <Outlet />
+    </>
+  );
+};
 
 const router = createBrowserRouter([
-  { 
-    path: '/',
-    element: <Main />,
-
-  },
   {
-    path: '/admin',
-    element: <Adminlayout />,
-
+    path: '/',
+    element: <RootLayout />,
     children: [
-      {
-        path: "",
-        element: <Login />
+      { 
+        path: '/',
+        element: <Protect><Main /></Protect>
       },
       {
-        path: "adminPanel",
-        element: <Protected><LoginLayout /></Protected>,
+        path: '/admin',
+        element: <Adminlayout />,
         children: [
           {
-            path: '',
-            element: <Protected><Admin /></Protected>
+            path: "",
+            element: <Login />
           },
           {
-            path: 'Facility/*',
-            element: <Protected><FacuiltyRoutes/></Protected>
-          },
-          {
-            path: 'Administrative/*',
-            element: <Protected><AdminRoutes /></Protected> // Corrected usage
-          },
-          {
-            path: "class",
-            element: <ClassesLayout />,
+            path: "adminPanel",
+            element: <Protected><LoginLayout /></Protected>,
             children: [
               {
-                path: "",
-                element: <Protected><S1 /></Protected>
-              },  
-              {
-                path: "add",
-                element: <Form />
+                path: '',
+                element: <Protected><Admin /></Protected>
               },
               {
-                path: "delete",
-                element: <Delete />
+                path: 'Facility/*',
+                element: <Protected><FacuiltyRoutes/></Protected>
               },
               {
-                path: "annunosment",
-                element: <Annunosment />
+                path: 'Administrative/*',
+                element: <Protected><AdminRoutes /></Protected>
               },
               {
-                path: "Complaint",
-                element: <Complaint/>
-              },
-              {
-                path: ":classId",
-                element: <Classaddlayout />,
+                path: "class",
+                element: <ClassesLayout />,
                 children: [
                   {
                     path: "",
-                    element: <Protected><Classes /></Protected>, // Main Classes Page
+                    element: <Protected><S1 /></Protected>
+                  },  
+                  {
+                    path: "add",
+                    element: <Form />
                   },
                   {
-                    path: "details/:studentId",
-                    element: <Protected><Details /></Protected>
+                    path: "delete",
+                    element: <Delete />
                   },
+                  {
+                    path: "annunosment",
+                    element: <Annunosment />
+                  },
+                  {
+                    path: "Complaint",
+                    element: <Complaint/>
+                  },
+                  {
+                    path: ":classId",
+                    element: <Classaddlayout />,
+                    children: [
+                      {
+                        path: "",
+                        element: <Protected><Classes /></Protected>
+                      },
+                      {
+                        path: "details/:studentId",
+                        element: <Protected><Details /></Protected>
+                      },
+                    ]
+                  }
                 ]
               }
             ]
           }
         ]
-      }
-    ]
-  },
-  {
-    path: '/Student',
-    element: <Protect><Layout/></Protect>,
-
-    children: [
-      {
-        path: '',
-        element: <First />
       },
       {
-        path: 'result',
-        element: <Result />
-      },
-      {
-        path: 'Home',
-        element: <First />
-      },
-      {
-        path: 'Attendence',
-        element: <Attendence />
-      },
-      {
-        path: 'complain',
-        element: <Complain />
-      },
-      {
-        path: 'Aiguru',
-        element: <Smart/>
+        path: '/Student',
+        element: <Protect><Layout/></Protect>,
+        children: [
+          {
+            path: '',
+            element: <First />
+          },
+          {
+            path: 'result',
+            element: <Result />
+          },
+          {
+            path: 'Home',
+            element: <First />
+          },
+          {
+            path: 'Attendence',
+            element: <Attendence />
+          },
+          {
+            path: 'complain',
+            element: <Complain />
+          },
+          {
+            path: 'Aiguru',
+            element: <Smart/>
+          }
+        ]
       }
     ]
   }
 ]);
 
-
-<cnt/>
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <ApolloProvider client={cnt}>

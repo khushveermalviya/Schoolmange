@@ -30,3 +30,6 @@ dist-ssr
 /node_modules
 /backend/node_modules
 /frontend/node_modules
+/frontend/node_modules
+/frontend/Admin
+/frontend/android
