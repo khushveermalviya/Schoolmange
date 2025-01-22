@@ -1,10 +1,9 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import useUserStore from '../../app/useUserStore.jsx';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
-import { Home, BookOpen, ClipboardList, AlertCircle, Brain, LogOut } from 'lucide-react';
+import { Home, BookOpen, ClipboardList, AlertCircle, Brain, LogOut, MessageCircle, X } from 'lucide-react';
 import { Toaster, toast } from 'react-hot-toast';
 
-// Logout Message Component
 const LogoutMessage = ({ studentId, isVisible }) => {
   if (!isVisible) return null;
   
@@ -31,13 +30,15 @@ const items = [
 export default function Nav() {
   const [isActive, setActiveItem] = useState('Home');
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [messageCount, setMessageCount] = useState(3);
   const student = useUserStore((state) => state.user);
   const location = useLocation();
-  const isAiGuruRoute = location.pathname.toLowerCase().includes('aiguru');
   const navigate = useNavigate();
+  const isAiGuruRoute = location.pathname.toLowerCase().includes('aiguru');
+  const isGroupChatRoute = location.pathname.toLowerCase().includes('groupchat');
+
 
   const handleLogout = () => {
-    // Show toast notification
     toast.success(`Goodbye ${student.StudentID}! See you again!`, {
       duration: 3000,
       position: 'top-center',
@@ -50,10 +51,7 @@ export default function Nav() {
       icon: '👋',
     });
 
-    // Show on-screen message and start logout process
     setIsLoggingOut(true);
-
-    // Delay the actual logout to show animations
     setTimeout(() => {
       localStorage.removeItem('token');
       localStorage.removeItem('userType');
@@ -61,27 +59,23 @@ export default function Nav() {
     }, 2000);
   };
 
-  // Desktop Navigation (same as before)
+  // Desktop Navigation
   const DesktopNav = () => (
     <nav className="hidden md:block fixed top-0 left-0 right-0 z-50">
       <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-        <div className="max-w-7xl  px-4 sm:px-6 lg:px-8">
-          
+        <div className="max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between gap-20 h-16">
-            {/* Logo Section */}
             <div className="flex items-center gap-4 w-40">
-       
-            <div className="avatar">
-  <div className="w-10 rounded-full">
-    <img src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp" />
-  </div>
-</div>
-              <span className="text-xl font-bold ">
+              <div className="avatar">
+                <div className="w-10 rounded-full">
+                  <img src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp" />
+                </div>
+              </div>
+              <span className="text-xl font-bold">
                 {student.StudentID}
               </span>
             </div>
 
-            {/* Navigation Links */}
             <div className="flex items-center space-x-1">
               {items.map((item) => (
                 <NavLink
@@ -94,12 +88,23 @@ export default function Nav() {
                 >
                   <div className="w-5 h-5">{item.icon}</div>
                   <span className="font-medium">{item.title}</span>
-
-                  {/* Hover and Active Indicator */}
-              
                 </NavLink>
               ))}
-                <button
+              <NavLink
+                to="groupchat"
+                className="relative px-4 py-2 flex items-center space-x-2 text-gray-600"
+              >
+                <div className="w-5 h-5">
+                  <MessageCircle className="w-full h-full" />
+                  {messageCount > 0 && (
+                    <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
+                      {messageCount}
+                    </div>
+                  )}
+                </div>
+                <span className="font-medium">Messages</span>
+              </NavLink>
+              <button
                 onClick={handleLogout}
                 className="px-4 py-2 flex items-center space-x-2 text-gray-600 hover:text-red-600 transition-colors duration-200"
               >
@@ -119,7 +124,25 @@ export default function Nav() {
   const MobileHeader = () => (
     <nav className="md:hidden fixed top-0 left-0 right-0 z-50 backdrop-blur-md bg-white/80 dark:bg-gray-800/80 border-b border-gray-200 dark:border-gray-700">
       <div className="flex justify-between items-center h-14 px-4">
-        <div className="w-8" />
+        {isGroupChatRoute ? (
+          <button 
+            onClick={() => navigate('/')} 
+            className="relative w-8 h-8 flex items-center justify-center text-gray-600"
+          >
+            <X className="w-6 h-6" />
+          </button>
+        ) : (
+          <NavLink to="groupchat">
+            <button className="relative w-8 h-8 flex items-center justify-center text-gray-600">
+              <MessageCircle className="w-6 h-6" />
+              {messageCount > 0 && (
+                <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
+                  {messageCount}
+                </div>
+              )}
+            </button>
+          </NavLink>
+        )}
         
         <div className="flex items-center justify-center">
           <img src="/vite.svg" alt="Logo" className="h-8 w-auto" />
@@ -141,60 +164,58 @@ export default function Nav() {
   );
 
   // Mobile Bottom Navigation with glass effect
-  const MobileNav = () => (
-    <nav className={`
-      md:hidden fixed z-50 transition-all duration-300 left-0 right-0
-      ${isAiGuruRoute ? 'top-14' : 'bottom-4'}
-      ${isAiGuruRoute ? 'px-0' : 'px-4'}
-    `}>
-      <div className={`
-        flex justify-around items-center h-16 
-        backdrop-blur-lg bg-white/90 dark:bg-gray-800/90
-        shadow-lg rounded-2xl mx-auto
+  const MobileNav = () => {
+    if (isGroupChatRoute) return null;
+    
+    return (
+      <nav className={`
+        md:hidden fixed z-50 transition-all duration-300 left-0 right-0
+        ${isAiGuruRoute ? 'top-14' : 'bottom-4'}
+        ${isAiGuruRoute ? 'px-0' : 'px-4'}
       `}>
-        {items.map((item) => (
-          <NavLink
-            key={item.title}
-            to={item.to}
-            className={({ isActive }) => `
-              flex flex-col items-center justify-center w-16 py-1 px-2
-              ${isActive ? 'text-purple-600 dark:text-purple-400' : 'text-gray-600 dark:text-gray-400'}
-            `}
-          >
-            <div className="w-6 h-6 mb-1 transition-colors duration-200">
-              {item.icon}
-            </div>
-            <span className="text-xs transition-colors duration-200">
-              {item.title}
-            </span>
-            <div className={`
-              absolute ${isAiGuruRoute ? 'bottom-0' : '-top-0.5'} w-1 h-1 
-              bg-purple-600 dark:bg-purple-400 rounded-full transition-opacity duration-200
-              ${isActive ? 'opacity-100' : 'opacity-0'}
-            `} />
-          </NavLink>
-        ))}
-      </div>
-    </nav>
-  );
+        <div className={`
+          flex justify-around items-center h-16 
+          backdrop-blur-lg bg-white/90 dark:bg-gray-800/90
+          shadow-lg rounded-2xl mx-auto
+        `}>
+          {items.map((item) => (
+            <NavLink
+              key={item.title}
+              to={item.to}
+              className={({ isActive }) => `
+                flex flex-col items-center justify-center w-16 py-1 px-2
+                ${isActive ? 'text-purple-600 dark:text-purple-400' : 'text-gray-600 dark:text-gray-400'}
+              `}
+            >
+              <div className="w-6 h-6 mb-1 transition-colors duration-200">
+                {item.icon}
+              </div>
+              <span className="text-xs transition-colors duration-200">
+                {item.title}
+              </span>
+              <div className={`
+                absolute ${isAiGuruRoute ? 'bottom-0' : '-top-0.5'} w-1 h-1 
+                bg-purple-600 dark:bg-purple-400 rounded-full transition-opacity duration-200
+                ${isActive ? 'opacity-100' : 'opacity-0'}
+              `} />
+            </NavLink>
+          ))}
+        </div>
+      </nav>
+    );
+  };
 
   return (
     <>
-      {/* Toast Container */}
       <Toaster />
-      
-      {/* Logout Message */}
       <LogoutMessage 
         studentId={student.StudentID}
         isVisible={isLoggingOut}
       />
-      
-      {/* Navigation Components */}
       <DesktopNav />
       <MobileHeader />
       <MobileNav />
       
-      {/* Spacing */}
       <div className="md:hidden h-14" />
       <div className="hidden md:block h-16" />
     </>

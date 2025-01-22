@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { gql } from '@apollo/client';
-import cnt from '../../Apolloclient';
+import {client} from '../../Apolloclient.jsx';
 
 // GraphQL Queries
 const DASHBOARD_QUERY = gql`
@@ -42,7 +42,7 @@ const useUserStore = create(
         fetchStudents: async (classId) => {
           set({ loading: true, error: null }); // Set loading state
           try {
-            const { data: studentData } = await cnt.query({
+            const { data: studentData } = await client.query({
               query: STUDENTS_BY_CLASS_QUERY,
               variables: { Class: classId },
             });
@@ -61,7 +61,7 @@ const useUserStore = create(
           set({ loading: true, error: null }); // Set loading state
           try {
             // Fetch both student data and dashboard data
-            const fetchStudentData = cnt
+            const fetchStudentData = client
               .query({
                 query: STUDENTS_BY_CLASS_QUERY,
                 variables: { Class: classId },
@@ -71,7 +71,7 @@ const useUserStore = create(
                 return { data: { Studentdata: [] } }; // Default empty data
               });
 
-            const fetchDashboardData = cnt
+            const fetchDashboardData = client
               .query({
                 query: DASHBOARD_QUERY,
               })

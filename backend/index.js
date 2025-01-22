@@ -18,10 +18,10 @@ app.use(authMiddleware); // Apply general authentication middleware to all route
 app.use('/graphql', graphqlHTTP({
   schema,
   graphiql: true,
-  // customFormatErrorFn: (err) => {
-  //   console.error(err);
-  //   return { message: err.message, locations: err.locations, stack: err.stack ? err.stack.split('\n') : [], path: err.path };
-  // },
+  customFormatErrorFn: (err) => {
+    console.error(err);
+    return { message: err.message, locations: err.locations, stack: err.stack ? err.stack.split('\n') : [], path: err.path };
+  },
 }));
 
 const PORT = process.env.PORT || 5000;

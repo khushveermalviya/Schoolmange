@@ -3,6 +3,8 @@ import { Calendar, ChevronLeft, ChevronRight } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
 import { gql, useQuery } from '@apollo/client';
 import useUserStore from '../../app/useUserStore';
+import Skeleton from 'react-loading-skeleton';
+import 'react-loading-skeleton/dist/skeleton.css';
 
 const GET_STUDENT_ATTENDANCE = gql`
   query GetStudentAttendance($StudentID: String!) {
@@ -132,8 +134,50 @@ const Attendance = () => {
   };
 
   if (loading) return (
-    <div className="min-h-screen flex items-center justify-center">
-      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+    <div className="min-h-screen bg-gray-50 p-6">
+      <div className="max-w-7xl mx-auto space-y-6">
+        {/* Header Stats Skeleton */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="bg-white rounded-xl shadow-sm p-6 flex flex-col items-center justify-center">
+            <Skeleton circle={true} height={144} width={144} />
+          </div>
+          <div className="bg-white rounded-xl shadow-sm p-6 flex flex-col justify-between">
+            <Skeleton height={24} width="50%" />
+            <Skeleton height={48} width="100%" />
+            <Skeleton height={8} width="100%" />
+          </div>
+          <div className="bg-white rounded-xl shadow-sm p-6 flex flex-col justify-between">
+            <Skeleton height={24} width="50%" />
+            <Skeleton height={48} width="100%" />
+            <Skeleton height={8} width="100%" />
+          </div>
+        </div>
+
+        {/* Charts Section Skeleton */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="bg-white rounded-xl shadow-sm p-6">
+            <Skeleton height={24} width="50%" />
+            <Skeleton height={256} width="100%" />
+          </div>
+          <div className="bg-white rounded-xl shadow-sm p-6">
+            <Skeleton height={24} width="50%" />
+            <Skeleton height={256} width="100%" />
+          </div>
+        </div>
+
+        {/* Calendar Section Skeleton */}
+        <div className="bg-white rounded-xl shadow-sm p-6">
+          <Skeleton height={24} width="50%" />
+          <div className="grid grid-cols-7 gap-2 mt-4">
+            {Array.from({ length: 7 }).map((_, index) => (
+              <Skeleton key={index} height={32} width="100%" />
+            ))}
+            {Array.from({ length: 30 }).map((_, index) => (
+              <Skeleton key={index} height={32} width="100%" />
+            ))}
+          </div>
+        </div>
+      </div>
     </div>
   );
   

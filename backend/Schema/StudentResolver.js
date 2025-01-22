@@ -12,7 +12,7 @@ const studentLogin = {
   },
   resolve: async (parent, args) => {
     const result = await sql.query`
-      SELECT StudentID, Password, FirstName, LastName, WeeklyPerformance
+      SELECT StudentID, Password, FirstName, LastName, Class, WeeklyPerformance
       FROM Students
       WHERE StudentID = ${args.StudentID} AND Password = ${args.Password}
     `;
@@ -25,12 +25,13 @@ const studentLogin = {
       SECRET_KEY,
       { expiresIn: '1h' }
     );
-console.log(token)
+
     return {
       token,
       StudentID: stud.StudentID,
       FirstName: stud.FirstName,
       LastName: stud.LastName,
+      Class: stud.Class,
       WeeklyPerformance: JSON.parse(stud.WeeklyPerformance || '[]'),
     };
   },

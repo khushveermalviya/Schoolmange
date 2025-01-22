@@ -1,4 +1,4 @@
-import { GraphQLObjectType, GraphQLString, GraphQLList } from 'graphql';
+import { GraphQLObjectType, GraphQLString, GraphQLList, GraphQLInt } from 'graphql';
 
 const StudentLoginType = new GraphQLObjectType({
   name: 'StudentLogin',
@@ -6,6 +6,7 @@ const StudentLoginType = new GraphQLObjectType({
     StudentID: { type: GraphQLString },
     FirstName: { type: GraphQLString },
     LastName: { type: GraphQLString },
+    Class: { type: GraphQLInt },
     WeeklyPerformance: { type: new GraphQLList(GraphQLString) },
     token: { type: GraphQLString },
   }),

@@ -34,7 +34,8 @@ import Complaint from './Component/admin/Students/Complaint.jsx';
 import AdminRoutes from "./Routes/adminRoutes.jsx";
 import FacuiltyRoutes from "./Routes/FacuiltyRoutes.jsx";
 import { BackButtonHandler } from './BackButtonHandler';
-import cnt from '../Apolloclient.jsx';
+import  { client } from '../Apolloclient.jsx';
+import GroupChat from './Component/student/Groupchat.jsx';
 
 // Root Layout Component
 const RootLayout = () => {
@@ -150,6 +151,9 @@ const router = createBrowserRouter([
           {
             path: 'Aiguru',
             element: <Smart/>
+          },{
+            path:"groupchat",
+            element:<GroupChat/>
           }
         ]
       }
@@ -159,7 +163,7 @@ const router = createBrowserRouter([
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <ApolloProvider client={cnt}>
+    <ApolloProvider client={client}>
       <UserProvider>
         <RouterProvider router={router} />
       </UserProvider>
