@@ -1,20 +1,47 @@
-// File: /src/apollo/client.js
-import { ApolloClient, InMemoryCache, split, HttpLink } from '@apollo/client';
-import { GraphQLWsLink } from '@apollo/client/link/subscriptions';
+import {
+  ApolloClient,
+  InMemoryCache,
+  split,
+  HttpLink,
+  ApolloLink,
+} from '@apollo/client';
+import { WebSocketLink } from '@apollo/client/link/ws';
 import { getMainDefinition } from '@apollo/client/utilities';
-import { createClient } from 'graphql-ws';
 
+// Your Azure App Service endpoint
+const serverEndpoint = 'https://center-gefucegncpf7akcc.centralindia-01.azurewebsites.net';
+
+// HTTP Link
 const httpLink = new HttpLink({
-  uri: 'https://center-gefucegncpf7akcc.centralindia-01.azurewebsites.net/graphql'
+  uri: `${serverEndpoint}/graphql`,
 });
 
-const wsLink = new GraphQLWsLink(createClient({
-  url: 'http://localhost:5000/graphql',
-  connectionParams: () => ({
-    authToken: localStorage.getItem('token')
-  })
-}));
+// WebSocket Link
+const wsLink = new WebSocketLink({
+  uri: `${serverEndpoint.replace(/^https/, 'wss')}/graphql`,
+  options: {
+    reconnect: true,
+    connectionParams: () => {
+      const token = localStorage.getItem('token');
+      return {
+        Authorization: token ? `Bearer ${token}` : '',
+      };
+    },
+  },
+});
 
+// Authentication Link for HTTP requests
+const authLink = new ApolloLink((operation, forward) => {
+  const token = localStorage.getItem('token');
+  operation.setContext({
+    headers: {
+      authorization: token ? `Bearer ${token}` : '',
+    },
+  });
+  return forward(operation);
+});
+
+// Split Link for HTTP and WebSocket
 const splitLink = split(
   ({ query }) => {
     const definition = getMainDefinition(query);
@@ -24,15 +51,14 @@ const splitLink = split(
     );
   },
   wsLink,
-  httpLink
+  authLink.concat(httpLink) // Apply authLink to HTTP link
 );
 
-export const client = new ApolloClient({
+// Apollo Client Instance
+const client = new ApolloClient({
   link: splitLink,
-  cache: new InMemoryCache()
+  cache: new InMemoryCache(),
+  connectToDevTools: true, // Enable Apollo DevTools
 });
 
-
-    //  // uri: 'https://backend-kz3r.onrender.com/graphql',
-    //  uri:"http://localhost:5000/graphql",
-    //  // uri:'https://center-gefucegncpf7akcc.centralindia-01.azurewebsites.net/graphql',
+export default client;

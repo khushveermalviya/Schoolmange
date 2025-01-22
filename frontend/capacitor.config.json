@@ -5,7 +5,7 @@
   "assets": "./assets",
  "plugins": {
     "SplashScreen": {
-      "launchShowDuration": 6000,
+      "launchShowDuration": 2000,
       
       "launchFadeOutDuration": 8000,
       "backgroundColor": "#e21eee",

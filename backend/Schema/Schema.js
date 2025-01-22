@@ -1,4 +1,3 @@
-// File: schema.js
 import { GraphQLSchema, GraphQLObjectType, GraphQLList, GraphQLString } from 'graphql';
 import sql from 'mssql';
 import studentLogin from './StudentResolver.js';
@@ -13,7 +12,7 @@ import { StudentFees } from './Administrative/StudentFees.js';
 import { SaveAttendance } from './Administrative/AttendenceMutation.js';
 import { GetFacultyAttendance, GetStudentAttendance } from './Administrative/AttendenceQuery.js';
 import { AddStudentMutation } from './Administrative/StudentAdd.js';
-import { GroupQueryType, GroupMutationType, RootSubscription } from './Students/GroupChat.js';
+import { groupQueries, groupMutations, RootSubscription } from './Students/GroupChat.js';
 
 // Define ChatType
 const ChatType = new GraphQLObjectType({
@@ -31,7 +30,7 @@ const ChatType = new GraphQLObjectType({
 // Define RootQuery
 const RootQuery = new GraphQLObjectType({
     name: 'RootQueryType',
-    fields: {
+    fields: () => ({
         studentLogin,
         FacultyLogin,
         Studentdata,
@@ -42,7 +41,7 @@ const RootQuery = new GraphQLObjectType({
         StudentFees,
         GetFacultyAttendance,
         GetStudentAttendance,
-        // GroupQueryType,
+        ...groupQueries,
         getStudentChats: {
             type: new GraphQLList(ChatType),
             args: { StudentID: { type: GraphQLString } },
@@ -52,17 +51,17 @@ const RootQuery = new GraphQLObjectType({
             },
         },
         Aichat,
-    },
+    }),
 });
 
 // Define RootMutation
 const RootMutation = new GraphQLObjectType({
     name: 'RootMutation',
-    fields: {
+    fields: () => ({
         saveAttendance: SaveAttendance,
         addStudentMutation: AddStudentMutation,
-        // groupMutationType:GroupMutationType
-    }
+        ...groupMutations
+    })
 });
 
 // Create and export the schema

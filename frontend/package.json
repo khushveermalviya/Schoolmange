@@ -26,7 +26,7 @@
     "daisyui": "^4.12.23",
     "date-fns": "^4.1.0",
     "firebase": "^10.13.0",
-    "framer-motion": "^11.16.0",
+    "framer-motion": "^11.18.2",
     "graphql": "^16.9.0",
     "graphql-ws": "^5.16.2",
     "jwt-decode": "^4.0.0",
@@ -48,6 +48,7 @@
     "react-top-loading-bar": "^2.3.1",
     "recharts": "^2.12.7",
     "scripts": "^0.1.0",
+    "subscriptions-transport-ws": "^0.11.0",
     "tailwind-merge": "^2.6.0",
     "xlsx": "^0.18.5",
     "zustand": "^5.0.2"

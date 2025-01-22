@@ -2,8 +2,10 @@ import jwt from 'jsonwebtoken';
 import sql from 'mssql';
 import StudentLoginType from './StudentLogin.js';
 import { GraphQLNonNull, GraphQLString } from 'graphql';
-import { SECRET_KEY } from '../Config/secret.js';
-
+import dotenv from 'dotenv';
+dotenv.config();
+// import { SECRET_KEY } from '../Config/secret.js';
+const SECRET_KEY = process.env.SECRET_KEY; //not imported
 const studentLogin = {
   type: StudentLoginType,
   args: {

@@ -34,7 +34,7 @@ import Complaint from './Component/admin/Students/Complaint.jsx';
 import AdminRoutes from "./Routes/adminRoutes.jsx";
 import FacuiltyRoutes from "./Routes/FacuiltyRoutes.jsx";
 import { BackButtonHandler } from './BackButtonHandler';
-import  { client } from '../Apolloclient.jsx';
+import   client  from '../Apolloclient.jsx';
 import GroupChat from './Component/student/Groupchat.jsx';
 
 // Root Layout Component

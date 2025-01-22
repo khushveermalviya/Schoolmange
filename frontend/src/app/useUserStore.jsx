@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { gql } from '@apollo/client';
-import {client} from '../../Apolloclient.jsx';
+import client from '../../Apolloclient.jsx';
 
 // GraphQL Queries
 const DASHBOARD_QUERY = gql`
