@@ -2,20 +2,21 @@
   "appId": "tech.edusystem",
   "appName": "EduSystem",
   "webDir": "dist",
+  "assets": "./assets",
  "plugins": {
     "SplashScreen": {
-      "launchShowDuration": 3000,
-      "launchAutoHide": true,
-      "launchFadeOutDuration": 3000,
-      "backgroundColor": "#ffffffff",
+      "launchShowDuration": 6000,
+      
+      "launchFadeOutDuration": 8000,
+      "backgroundColor": "#e21eee",
       "androidSplashResourceName": "splash",
-      "androidScaleType": "CENTER_CROP",
+  
       "showSpinner": true,
       "androidSpinnerStyle": "large",
-      "iosSpinnerStyle": "small",
-      "spinnerColor": "#999999",
+      "iosSpinnerStyle": "big",
+      "spinnerColor": "#e21eee",
       "splashFullScreen": true,
-      "splashImmersive": true,
+
       "layoutName": "launch_screen",
       "useDialog": true
     }
