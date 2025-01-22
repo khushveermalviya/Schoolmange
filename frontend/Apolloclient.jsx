@@ -5,7 +5,7 @@ import { getMainDefinition } from '@apollo/client/utilities';
 import { createClient } from 'graphql-ws';
 
 const httpLink = new HttpLink({
-  uri: 'http://localhost:5000/graphql'
+  uri: 'https://center-gefucegncpf7akcc.centralindia-01.azurewebsites.net/graphql'
 });
 
 const wsLink = new GraphQLWsLink(createClient({
