@@ -1,9 +1,58 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import useUserStore from '../../app/useUserStore.jsx';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
-import { Home, BookOpen, ClipboardList, AlertCircle, Brain, LogOut, MessageCircle, X } from 'lucide-react';
+import { 
+  Home, 
+  BookOpen, 
+  ClipboardList, 
+  AlertCircle, 
+  Brain, 
+  LogOut, 
+  MessageCircle, 
+  X 
+} from 'lucide-react';
 import { Toaster, toast } from 'react-hot-toast';
 
+// Logout Confirmation Modal Component
+const LogoutConfirmationModal = ({ isOpen, onClose, onConfirm, studentId }) => {
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50">
+      <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-xl w-80 max-w-sm">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-xl font-bold text-gray-800 dark:text-gray-200">Confirm Logout</h2>
+          <button 
+            onClick={onClose} 
+            className="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
+          >
+            <X className="w-6 h-6" />
+          </button>
+        </div>
+        <p className="text-gray-600 dark:text-gray-300 mb-6 text-center">
+          Are you sure you want to log out, {studentId}?
+        </p>
+        <div className="flex justify-between space-x-4">
+          <button 
+            onClick={onClose}
+            className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+          >
+            Cancel
+          </button>
+          <button 
+            onClick={onConfirm}
+            className="flex-1 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors flex items-center justify-center space-x-2"
+          >
+            <LogOut className="w-5 h-5" />
+            <span>Logout</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Logout Message Component
 const LogoutMessage = ({ studentId, isVisible }) => {
   if (!isVisible) return null;
   
@@ -19,6 +68,7 @@ const LogoutMessage = ({ studentId, isVisible }) => {
   );
 };
 
+// Navigation Items
 const items = [
   { title: 'Home', to: 'Home', icon: <Home className="w-full h-full" /> },
   { title: 'Attendance', to: 'Attendence', icon: <ClipboardList className="w-full h-full" /> },
@@ -28,7 +78,8 @@ const items = [
 ];
 
 export default function Nav() {
-  const [isActive, setActiveItem] = useState('Home');
+  const[isActive,SetisActive]=useState("Home")
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [messageCount, setMessageCount] = useState(3);
   const student = useUserStore((state) => state.user);
@@ -37,8 +88,11 @@ export default function Nav() {
   const isAiGuruRoute = location.pathname.toLowerCase().includes('aiguru');
   const isGroupChatRoute = location.pathname.toLowerCase().includes('groupchat');
 
+  const handleLogoutClick = () => {
+    setIsLogoutModalOpen(true);
+  };
 
-  const handleLogout = () => {
+  const handleLogoutConfirm = () => {
     toast.success(`Goodbye ${student.StudentID}! See you again!`, {
       duration: 3000,
       position: 'top-center',
@@ -52,11 +106,16 @@ export default function Nav() {
     });
 
     setIsLoggingOut(true);
+    setIsLogoutModalOpen(false);
     setTimeout(() => {
       localStorage.removeItem('token');
       localStorage.removeItem('userType');
       navigate('/');
     }, 2000);
+  };
+
+  const handleLogoutCancel = () => {
+    setIsLogoutModalOpen(false);
   };
 
   // Desktop Navigation
@@ -105,7 +164,7 @@ export default function Nav() {
                 <span className="font-medium">Messages</span>
               </NavLink>
               <button
-                onClick={handleLogout}
+                onClick={handleLogoutClick}
                 className="px-4 py-2 flex items-center space-x-2 text-gray-600 hover:text-red-600 transition-colors duration-200"
               >
                 <div className="w-5 h-5">
@@ -149,7 +208,7 @@ export default function Nav() {
         </div>
         
         <button
-          onClick={handleLogout}
+          onClick={handleLogoutClick}
           disabled={isLoggingOut}
           className={`
             w-8 h-8 flex items-center justify-center
@@ -208,6 +267,12 @@ export default function Nav() {
   return (
     <>
       <Toaster />
+      <LogoutConfirmationModal 
+        isOpen={isLogoutModalOpen}
+        onClose={handleLogoutCancel}
+        onConfirm={handleLogoutConfirm}
+        studentId={student.StudentID}
+      />
       <LogoutMessage 
         studentId={student.StudentID}
         isVisible={isLoggingOut}
