@@ -4,7 +4,7 @@ import { App } from '@capacitor/app';
 import { createRoot } from 'react-dom/client';
 import './index.css';
 import { ApolloClient, InMemoryCache, ApolloProvider, HttpLink } from '@apollo/client';
-import { createBrowserRouter, RouterProvider, Outlet } from 'react-router-dom';
+import { createBrowserRouter, RouterProvider, Outlet ,createHashRouter} from 'react-router-dom';
 import Main from './Component/Main.jsx';
 import Admin from './pages/Admin.jsx';
 import Student from './pages/Student.jsx';
@@ -47,7 +47,7 @@ const RootLayout = () => {
   );
 };
 
-const router = createBrowserRouter([
+const router = createHashRouter([
   {
     path: '/',
     element: <RootLayout />,
