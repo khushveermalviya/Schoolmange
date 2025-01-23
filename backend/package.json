@@ -6,12 +6,13 @@
   "type": "module",
   "scripts": {
     "dev": "nodemon index.js",
-    "json:server": "json-server --watch db.json",
     "build:azure": "npm run build"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@apollo/server": "^4.11.3",
+    "@graphql-tools/schema": "^10.0.16",
     "apollo-server-express": "^3.13.0",
     "axios": "^1.7.3",
     "cors": "^2.8.5",
@@ -19,12 +20,10 @@
     "date-fns": "^4.1.0",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
-    "express-graphql": "^0.12.0",
     "graphql": "^16.10.0",
     "graphql-subscriptions": "^3.0.0",
     "graphql-tag": "^2.12.6",
     "graphql-ws": "^6.0.2",
-    "json-server": "^1.0.0-beta.3",
     "lodash": "^4.17.21",
     "mssql": "^11.0.1",
     "nodemon": "^3.1.4",

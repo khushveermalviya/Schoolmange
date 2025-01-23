@@ -157,7 +157,7 @@ const groupMutations = {
                 messageSent: newMessage,
                 classNumber: context.student.Class
             });
-
+            
             return newMessage;
         }
     }

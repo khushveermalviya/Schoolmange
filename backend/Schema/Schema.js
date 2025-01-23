@@ -1,4 +1,4 @@
-import { GraphQLSchema, GraphQLObjectType, GraphQLList, GraphQLString } from 'graphql';
+import { GraphQLSchema, GraphQLObjectType, GraphQLList, GraphQLString, GraphQLInt, GraphQLBoolean } from 'graphql';
 import sql from 'mssql';
 import studentLogin from './StudentResolver.js';
 import FacultyLogin from './FacultyResolver.js';
@@ -14,7 +14,7 @@ import { GetFacultyAttendance, GetStudentAttendance } from './Administrative/Att
 import { AddStudentMutation } from './Administrative/StudentAdd.js';
 import { groupQueries, groupMutations, RootSubscription } from './Students/GroupChat.js';
 
-// Define ChatType
+// Additional Types
 const ChatType = new GraphQLObjectType({
     name: 'Chat',
     fields: () => ({
@@ -27,10 +27,33 @@ const ChatType = new GraphQLObjectType({
     }),
 });
 
-// Define RootQuery
+const LoginType = new GraphQLObjectType({
+    name: 'Login',
+    fields: () => ({
+        token: { type: GraphQLString },
+        user: { type: GraphQLObjectType },
+        success: { type: GraphQLBoolean },
+        message: { type: GraphQLString }
+    })
+});
+
+const UserProfileType = new GraphQLObjectType({
+    name: 'UserProfile',
+    fields: () => ({
+        UserID: { type: GraphQLString },
+        FirstName: { type: GraphQLString },
+        LastName: { type: GraphQLString },
+        Email: { type: GraphQLString },
+        Phone: { type: GraphQLString },
+        Role: { type: GraphQLString }
+    })
+});
+
+// Root Query with Additional Resolvers
 const RootQuery = new GraphQLObjectType({
     name: 'RootQueryType',
     fields: () => ({
+        // Existing Resolvers
         studentLogin,
         FacultyLogin,
         Studentdata,
@@ -42,29 +65,83 @@ const RootQuery = new GraphQLObjectType({
         GetFacultyAttendance,
         GetStudentAttendance,
         ...groupQueries,
+        Aichat,
+
+        // New Fetch Resolvers
         getStudentChats: {
             type: new GraphQLList(ChatType),
             args: { StudentID: { type: GraphQLString } },
-            resolve(parent, args) {
-                return sql.query`SELECT * FROM StudentChat WHERE StudentID = ${args.StudentID}`
-                    .then(result => result.recordset);
+            resolve: async (parent, args) => {
+                const result = await sql.query`
+                    SELECT * FROM StudentChat 
+                    WHERE StudentID = ${args.StudentID}
+                `;
+                return result.recordset;
             },
         },
-        Aichat,
+        getUserProfile: {
+            type: UserProfileType,
+            args: { UserID: { type: GraphQLString } },
+            resolve: async (parent, args) => {
+                const result = await sql.query`
+                    SELECT * FROM Users 
+                    WHERE UserID = ${args.UserID}
+                `;
+                return result.recordset[0];
+            }
+        },
+        getAllUsers: {
+            type: new GraphQLList(UserProfileType),
+            resolve: async () => {
+                const result = await sql.query`
+                    SELECT * FROM Users
+                `;
+                return result.recordset;
+            }
+        }
     }),
 });
 
-// Define RootMutation
+// Root Mutation with Additional Mutations
 const RootMutation = new GraphQLObjectType({
     name: 'RootMutation',
     fields: () => ({
         saveAttendance: SaveAttendance,
         addStudentMutation: AddStudentMutation,
-        ...groupMutations
+        ...groupMutations,
+
+        // Additional Mutations
+        updateUserProfile: {
+            type: UserProfileType,
+            args: {
+                UserID: { type: GraphQLString },
+                FirstName: { type: GraphQLString },
+                LastName: { type: GraphQLString },
+                Email: { type: GraphQLString },
+                Phone: { type: GraphQLString }
+            },
+            resolve: async (parent, args) => {
+                await sql.query`
+                    UPDATE Users 
+                    SET 
+                        FirstName = ${args.FirstName}, 
+                        LastName = ${args.LastName},
+                        Email = ${args.Email},
+                        Phone = ${args.Phone}
+                    WHERE UserID = ${args.UserID}
+                `;
+                
+                const result = await sql.query`
+                    SELECT * FROM Users 
+                    WHERE UserID = ${args.UserID}
+                `;
+                return result.recordset[0];
+            }
+        }
     })
 });
 
-// Create and export the schema
+// Create and export the comprehensive schema
 export default new GraphQLSchema({
     query: RootQuery,
     mutation: RootMutation,
