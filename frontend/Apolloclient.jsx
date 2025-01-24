@@ -9,11 +9,11 @@
     import { getMainDefinition } from '@apollo/client/utilities';
 
     // Your Azure App Service endpoint
-    const serverEndpoint = 'http://localhost:5000';
+    const serverEndpoint = 'https://center-gefucegncpf7akcc.centralindia-01.azurewebsites.net';
     // https://center-gefucegncpf7akcc.centralindia-01.azurewebsites.net
     // HTTP Link
     const httpLink = new HttpLink({
-      uri: `${serverEndpoint}/graphql`,
+      uri: `${serverEndpoint}/graphql`, 
     });
 
     // WebSocket Link
