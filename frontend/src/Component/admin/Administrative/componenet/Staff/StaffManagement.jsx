@@ -1,13 +1,13 @@
-// StaffManagement.jsx
 import React, { useState, useEffect } from 'react';
 import { gql, useLazyQuery } from '@apollo/client';
 import DataTable from '../DataTable';
 import { Loader2 } from 'lucide-react';
-import { NavLink, Outlet } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 
 const STAFF_QUERY = gql`
   query GetAllStaff {
     GetAllStaff {
+      id
       firstName
       department
       role
@@ -23,17 +23,18 @@ export default function StaffManagement() {
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
   const [fetchStaff] = useLazyQuery(STAFF_QUERY, {
     onCompleted: (data) => {
-      // Transform the data to match your table structure
       const transformedData = data.GetAllStaff.map(staff => ({
-        name: staff.firstName, // Map firstName to name for table
+        id: staff.id, // Include ID for navigation
+        name: staff.firstName,
         department: staff.department,
         role: staff.role,
         email: staff.email,
         phone: staff.phone,
-        status: staff.status
+        status: staff.status,
       }));
       setStaffData(transformedData);
       setLoading(false);
@@ -47,12 +48,11 @@ export default function StaffManagement() {
 
   useEffect(() => {
     fetchStaff();
-  }, []); // Remove fetchStaff from dependencies to avoid infinite loop
+  }, []);
 
   // Filter function for search
   const getFilteredData = () => {
     if (!searchQuery) return staffData;
-    
     return staffData.filter((staff) =>
       staff.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       staff.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -111,10 +111,9 @@ export default function StaffManagement() {
         <DataTable
           columns={columns}
           data={getFilteredData()}
-          onRowClick={(row) => console.log('Clicked row:', row)}
+          onRowClick={(row) => navigate(`${row.id}`)} // Navigate to staff details page
         />
       </div>
-  
     </div>
   );
 }

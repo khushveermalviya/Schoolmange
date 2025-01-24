@@ -19,7 +19,7 @@ const sqlConfig = {
 };
 
 // Function to establish the connection with retry mechanism
-const AzureDb = async (retries = 5) => {
+const AzureDb = async (retries = 2) => {
   while (retries) {
     try {
       await sql.connect(sqlConfig);

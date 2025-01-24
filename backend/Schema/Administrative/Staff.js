@@ -1,4 +1,4 @@
-import { GraphQLObjectType, GraphQLString, GraphQLNonNull, GraphQLList } from "graphql";
+import { GraphQLObjectType, GraphQLString, GraphQLNonNull, GraphQLList, GraphQLID } from "graphql";
 import sql from "mssql";
 
 // Define the Staff Type
@@ -38,4 +38,30 @@ const GetAllStaff = {
   },
 };
 
-export default GetAllStaff;
+// Define the Query for fetching a single staff member by ID
+const GetStaffById = {
+  type: StaffType, // Single StaffType
+  args: {
+    id: { type: new GraphQLNonNull(GraphQLID) }, // ID argument
+  },
+  async resolve(parent, args) {
+    try {
+      const result = await sql.query`
+        SELECT 
+          id, first_name AS firstName, last_name AS lastName, email, phone,
+          department, role, status, joining_date AS joiningDate,
+          created_at AS createdAt, updated_at AS updatedAt
+        FROM Staff
+        WHERE id = ${args.id}
+      `;
+      if (result.recordset.length === 0) {
+        throw new Error("Staff not found");
+      }
+      return result.recordset[0]; // Return the first row (single staff member)
+    } catch (err) {
+      throw new Error("Error fetching staff by ID: " + err.message);
+    }
+  },
+};
+
+export { GetAllStaff, GetStaffById }; // Export both queries
