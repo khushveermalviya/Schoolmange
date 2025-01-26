@@ -8,7 +8,7 @@ import { StudentComplaint } from "./Complaint/Complaint.js";
 import StudentDetail from './AIGuru/StudentDetail.js';
 import { DashBoard } from './AdminDasboard/Dashboard.js';
 import { GetAllStaff, GetStaffById } from './Administrative/Staff.js';
-import { StudentFees } from './Administrative/StudentFees.js';
+import { StudentFees ,StudentFeeById} from './Administrative/StudentFees.js';
 import { SaveAttendance } from './Administrative/AttendenceMutation.js';
 import { GetFacultyAttendance, GetStudentAttendance } from './Administrative/AttendenceQuery.js';
 import { AddStudentMutation } from './Administrative/StudentAdd.js';
@@ -79,6 +79,7 @@ const RootQuery = new GraphQLObjectType({
     GetFacultyAttendance,
     GetStudentAttendance,
     GetStaffById,
+    StudentFeeById,
     ...groupQueries,
     Aichat,
 

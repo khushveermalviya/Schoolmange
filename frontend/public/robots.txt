@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+
+# Geo-targeted paths
+Disallow: /tmp/
+Disallow: /test/
+
+# Sitemap for better indexing
+Sitemap: https://edusystem.tech/sitemap.xml
+Sitemap: https://edusystem.tech/rajasthan-sitemap.xml

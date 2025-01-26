@@ -2,8 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useLazyQuery, gql } from '@apollo/client';
 import { useNavigate } from 'react-router-dom';
 import toast, { Toaster } from 'react-hot-toast';
-import { Loader2, UserCircle2, Key, AlertCircle } from 'lucide-react';
-import MainNav from "./MainNav.jsx";
+import { Loader2, UserCircle2, Key, Eye, EyeOff, AlertCircle } from 'lucide-react';
 import useUserStore from '../app/useUserStore.jsx';
 
 const LOGIN_QUERY = gql`
@@ -19,6 +18,46 @@ const LOGIN_QUERY = gql`
   }
 `;
 
+export const PasswordInput = ({ 
+  value, 
+  onChange, 
+  onKeyPress, 
+  placeholder = "Password" 
+}) => {
+  const [showPassword, setShowPassword] = useState(false);
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+
+  return (
+    <div className="relative">
+      <Key className="absolute left-3 top-3 text-gray-400" size={20} />
+      <input
+        type={showPassword ? "text" : "password"}
+        name="password"
+        placeholder={placeholder}
+        value={value}
+        onChange={onChange}
+        onKeyPress={onKeyPress}
+        className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-300"
+      />
+      <button
+        type="button"
+        onClick={togglePasswordVisibility}
+        className="absolute right-3 top-3 text-gray-500 hover:text-indigo-600 transition-colors"
+        aria-label={showPassword ? "Hide password" : "Show password"}
+      >
+        {showPassword ? (
+          <EyeOff size={20} />
+        ) : (
+          <Eye size={20} />
+        )}
+      </button>
+    </div>
+  );
+};
+
 export default function Main() {
   const [data, setData] = useState({
     username: "",
@@ -29,21 +68,6 @@ export default function Main() {
   const [login, { data: queryData, error: queryError }] = useLazyQuery(LOGIN_QUERY);
   const navigate = useNavigate();
   const setUser = useUserStore((state) => state.setUser);
-
-  // Check for connection status
-  // useEffect(() => {
-  //   const checkConnection = async () => {
-  //     try {
-  //       await fetch(process.env.REACT_APP_API_URL || 'http://localhost:5000');
-  //     } catch (error) {
-  //       toast.error('Server connection failed. Please check your internet connection.', {
-  //         icon: '🔌',
-  //         duration: 5000,
-  //       });
-  //     }
-  //   };
-  //   checkConnection();
-  // }, []);
 
   useEffect(() => {
     if (queryError) {
@@ -67,12 +91,10 @@ export default function Main() {
         icon: '🔐'
       });
       
-      // Store token and user data
       localStorage.setItem("token", token);
       localStorage.setItem("userData", JSON.stringify(userDetails));
       setUser(userDetails);
 
-      // Show success and redirect
       setTimeout(() => {
         toast.dismiss(loadingToast);
         toast.success(`Welcome back, ${userDetails.FirstName}!`, {
@@ -149,16 +171,15 @@ export default function Main() {
       />
       
       <div className="absolute top-4 right-4 z-10">
-        <button 
+        {/* <button 
           onClick={() => navigate('/admin')}
           className="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 transition-all duration-300 shadow-lg hover:shadow-xl"
         >
           Admin Portal
-        </button>
+        </button> */}
       </div>
       
       <div className="flex justify-between items-center min-h-screen p-4">
-
         <div className="w-full max-w-md mx-auto">
           <div className="bg-white rounded-2xl shadow-2xl p-8 transform transition-all duration-300 hover:shadow-3xl">
             <div className="text-center mb-8">
@@ -180,18 +201,11 @@ export default function Main() {
                 />
               </div>
               
-              <div className="relative">
-                <Key className="absolute left-3 top-3 text-gray-400" size={20} />
-                <input
-                  type="password"
-                  name="password"
-                  placeholder="Password"
-                  value={data.password}
-                  onChange={onHandle}
-                  onKeyPress={handleKeyPress}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-300"
-                />
-              </div>
+              <PasswordInput
+                value={data.password}
+                onChange={onHandle}
+                onKeyPress={handleKeyPress}
+              />
 
               <button 
                 onClick={handleClick} 
@@ -205,8 +219,6 @@ export default function Main() {
                   </>
                 ) : 'Login to Dashboard'}
               </button>
-
-             
             </div>
           </div>
         </div>

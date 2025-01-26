@@ -126,6 +126,8 @@ const AddStudent = () => {
     switch (name) {
       case 'FirstName':
       case 'LastName':
+      case 'FatherName':  
+      case 'MotherName':
         return /^[A-Za-z\s]{2,30}$/.test(value) ? '' : 'Only letters allowed (2-30 characters)';
       case 'phoneNumber':
       case 'parentPhoneNumber':
@@ -277,6 +279,28 @@ const AddStudent = () => {
                     onChange={handleChange}
                     className={inputClassName('LastName')}
                     placeholder="Enter last name"
+                  />
+                </div>
+                <div>
+                  <label className={labelClassName}>FatherName</label>
+                  <input
+                    type="text"
+                    name="FatherName"
+                    value={formData.FatherName}
+                    onChange={handleChange}
+                    className={inputClassName('FatherName')}
+                    placeholder="Enter FatherName"
+                  />
+                </div>
+                <div>
+                  <label className={labelClassName}>MotherName</label>
+                  <input
+                    type="text"
+                    name="MotherName"
+                    value={formData.MotherName}
+                    onChange={handleChange}
+                    className={inputClassName('MotherName')}
+                    placeholder="Enter MotherName"
                   />
                 </div>
 

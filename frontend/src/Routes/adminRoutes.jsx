@@ -12,6 +12,8 @@ import Facilities from '../Component/admin/Administrative/Facilities';
 import Addstaff from '../Component/admin/Administrative/componenet/Staff/Addstaff';
 import AddStudent from '../Component/admin/Administrative/componenet/Student/Addstudent.jsx';
 import StaffDetails from '../Component/admin/Administrative/componenet/Staff/StaffDetails.jsx'; // Import StaffDetails component
+import Classlist from '../Component/admin/Administrative/componenet/Finance/Classlist.jsx';
+import StudentFeeDetails from '../Component/admin/Administrative/componenet/Finance/StudentFeeDetails.jsx';
 
 export default function AdminRoutes() {
   return (
@@ -23,6 +25,8 @@ export default function AdminRoutes() {
         <Route path="staff/:id" element={<StaffDetails />} /> {/* Add route for StaffDetails */}
         <Route path="academics" element={<Academics />} />
         <Route path="finance" element={<Finance />} />
+        <Route path='finance/:classNumber' element={<Classlist/>}/>
+        <Route path='finance/:classNumber/detail/:studentId' element={<StudentFeeDetails/>}/>
         <Route path="students" element={<Students />} />
         <Route path="students/Addstudent" element={<AddStudent />} />
         <Route path="facilities" element={<Facilities />} />
