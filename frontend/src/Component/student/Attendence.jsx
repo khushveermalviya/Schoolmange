@@ -17,16 +17,16 @@ import Skeleton from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
 
 const GET_STUDENT_ATTENDANCE = gql`
-  query GetStudentAttendance($StudentID: String!) {
-    GetStudentAttendance(StudentID: $StudentID) {
-      StudentID
-      Date
-      Status
-      AttendanceID
-      Remarks
+    query GetStudentAttendance($StudentID: String!) {
+      GetStudentAttendance(StudentID: $StudentID) {
+        StudentID
+        Date
+        Status
+        AttendanceID
+        Remarks
+      }
     }
-  }
-`;
+  `;
 
 const CircularProgress = ({ percentage }) => {
   const radius = 60;
