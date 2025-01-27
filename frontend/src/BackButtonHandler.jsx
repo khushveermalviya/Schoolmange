@@ -17,7 +17,9 @@ export const BackButtonHandler = () => {
     const backButtonListener = App.addListener('backButton', handleBackButton);
 
     return () => {
-      backButtonListener.remove();
+      backButtonListener.then(listener => listener.remove()).catch(() => {
+        App.removeAllListeners('backButton');
+      });
     };
   }, [navigate]);
 

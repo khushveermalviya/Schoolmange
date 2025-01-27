@@ -61,7 +61,15 @@ const useUserStore = create(
           set({ loading: true, error: null }); // Set loading state
           try {
             // Fetch both student data and dashboard data
-           
+            const fetchStudentData = client
+              .query({
+                query: STUDENTS_BY_CLASS_QUERY,
+                variables: { Class: classId },
+              })
+              .catch((error) => {
+                console.error('Error fetching student data:', error);
+                return { data: { Studentdata: [] } }; // Default empty data
+              });
 
             const fetchDashboardData = client
               .query({
