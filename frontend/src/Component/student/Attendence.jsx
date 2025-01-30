@@ -17,16 +17,16 @@ import Skeleton from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
 
 const GET_STUDENT_ATTENDANCE = gql`
-    query GetStudentAttendance($StudentID: String!) {
-      GetStudentAttendance(StudentID: $StudentID) {
-        StudentID
-        Date
-        Status
-        AttendanceID
-        Remarks
-      }
+  query GetStudentAttendance($StudentID: String!) {
+    GetStudentAttendance(StudentID: $StudentID) {
+      StudentID
+      Date
+      Status
+      AttendanceID
+      Remarks
     }
-  `;
+  }
+`;
 
 const CircularProgress = ({ percentage }) => {
   const radius = 60;
@@ -100,15 +100,26 @@ const Attendance = () => {
     let absentCount = 0;
 
     attendanceRecords.forEach((record) => {
-      const date = new Date(record.Date);
-      const day = date.getDate();
-      const month = date.getMonth(); 
-      const year = date.getFullYear();
-      const monthKey = date.toLocaleString('default', { month: 'short' });
-      const dateKey = `<span class="math-inline">\{year\}\-</span>{month}-${day}`;
+      // Convert timestamp to Date object - handle both string and number formats
+      const timestamp = typeof record.Date === 'string' ? Number(record.Date) : record.Date;
+      const date = new Date(timestamp);
       
-      calendarMapping[dateKey] = record.Status.toLowerCase();
+      // Format the date key consistently
+      const year = date.getFullYear();
+      const month = (date.getMonth() + 1).toString().padStart(2, '0');
+      const day = date.getDate().toString().padStart(2, '0');
+      const dateKey = `${year}-${month}-${day}`;
+      
+      // Format month key for monthly stats
+      const monthKey = date.toLocaleString('default', { month: 'short' });
 
+      // Store the full record in calendarMapping
+      calendarMapping[dateKey] = {
+        ...record,
+        Status: record.Status.toLowerCase() // Normalize status to lowercase
+      };
+
+      // Update monthly statistics
       if (!monthlyStats[monthKey]) {
         monthlyStats[monthKey] = { present: 0, absent: 0, total: 0 };
       }
@@ -143,19 +154,25 @@ const Attendance = () => {
     });
   };
 
+  const getFirstDayOfMonth = (date) => {
+    const firstDay = new Date(date.getFullYear(), date.getMonth(), 1);
+    return firstDay.getDay();
+  };
+
   const getDaysInMonth = (date) => {
     return new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
   };
 
-  const getFirstDayOfMonth = (date) => {
-    return new Date(date.getFullYear(), date.getMonth(), 1).getDay();
-  }
-
   const getAttendanceStatus = (day) => {
     const year = currentMonth.getFullYear();
-    const month = currentMonth.getMonth();
-    const dateKey = `<span class="math-inline">\{year\}\-</span>{month}-${day}`;
-    return calendarData[dateKey] || 'none';
+    const month = (currentMonth.getMonth() + 1).toString().padStart(2, '0');
+    const formattedDay = day.toString().padStart(2, '0');
+    const dateKey = `${year}-${month}-${formattedDay}`;
+    
+    console.log('Checking date key:', dateKey); // Debug log
+    console.log('Available dates:', Object.keys(calendarData)); // Debug log
+    
+    return calendarData[dateKey] || { Status: 'none' };
   };
 
   if (loading)
@@ -376,7 +393,7 @@ const Attendance = () => {
               </button>
             </div>
           </div>
-          
+
           <div className="grid grid-cols-7 gap-x-2 gap-y-4">
             {/* Days of the week */}
             {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
@@ -386,30 +403,38 @@ const Attendance = () => {
             ))}
 
             {/* Calendar days */}
-            {Array.from({ length: getFirstDayOfMonth(currentMonth) }).map((_, index) => (
-              <div key={`empty-${index}`} className=""></div>
-            ))}
+            {Array.from({ length: getFirstDayOfMonth(currentMonth) }).map(
+              (_, index) => (
+                <div key={`empty-${index}`} className=""></div>
+              )
+            )}
 
-            {Array.from({ length: getDaysInMonth(currentMonth) }).map(
-              (_, index) => {
-                const day = index + 1;
-                const status = getAttendanceStatus(day);
-                const isWeekend = (getFirstDayOfMonth(currentMonth) + index) % 7 === 0 || (getFirstDayOfMonth(currentMonth) + index) % 7 === 6;
-                return (
-                  <div
-                    key={day}
-                    className={`p-3 rounded-lg border text-center transition-colors ${
-                      status === 'present'
-                        ? 'bg-green-100 text-green-800 border-green-300'
-                        : status === 'absent'
-                        ? 'bg-red-100 text-red-800 border-red-300'
-                        : isWeekend
-                        ? 'bg-gray-100 text-gray-500' // Weekends
-                        : 'bg-gray-50 text-gray-700 border-gray-200' // Default (no data, weekdays)
-                    } hover:shadow-md cursor-pointer`}
-                  >
-                    {day}
-                  </div>
+{Array.from({ length: getDaysInMonth(currentMonth) }).map((_, index) => {
+      const day = index + 1;
+      const record = getAttendanceStatus(day);
+      const status = record.Status?.toLowerCase(); // Add optional chaining
+      const remarks = record.Remarks;
+      const isWeekend =
+        (getFirstDayOfMonth(currentMonth) + index) % 7 === 0 ||
+        (getFirstDayOfMonth(currentMonth) + index) % 7 === 6;
+
+      return (
+        <div
+          key={day}
+          className={`p-3 rounded-lg border text-center transition-colors ${
+            status === 'present'
+              ? 'bg-green-100 text-green-800 border-green-300'
+              : status === 'absent'
+              ? 'bg-red-100 text-red-800 border-red-300'
+              : remarks === 'Holiday'
+              ? 'bg-yellow-100 text-yellow-800 border-yellow-300'
+              : isWeekend
+              ? 'bg-gray-100 text-gray-500'
+              : 'bg-gray-50 text-gray-700 border-gray-200'
+          } hover:shadow-md cursor-pointer`}
+        >
+          {day}
+        </div>
                 );
               }
             )}

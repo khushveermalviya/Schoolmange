@@ -16,6 +16,7 @@ const FacultyNav = ({ isOpen, closeNav }) => {
   const navItems = [
     { icon: <BookOpen className="w-5 h-5" />, title: 'FDashboard', path: '' },
     { icon: <BookOpen className="w-5 h-5" />, title: 'Subjects', path: 'subjects' },
+    { icon: <BookOpen className="w-5 h-5" />, title: 'Students', path: 'class' },
     { icon: <ClipboardList className="w-5 h-5" />, title: 'Attendance', path: 'attendance' },
     { icon: <Calendar className="w-5 h-5" />, title: 'Timetable', path: 'timetable' },
     { icon: <FileText className="w-5 h-5" />, title: 'Reports', path: 'reports' },

@@ -13,37 +13,75 @@ const SaveAttendance = {
     Remarks: { type: GraphQLString }
   },
   async resolve(parent, args) {
-    // Initialize transaction outside try block
     let transaction = null;
+
     try {
-      // Create new transaction
+      // Validate that the date is today
+      const currentDate = new Date().toISOString().split('T')[0]; // Get today's date in YYYY-MM-DD format
+      if (args.Date !== currentDate) {
+        throw new Error("Attendance can only be marked for today.");
+      }
+
+      // Begin transaction
       transaction = new sql.Transaction(sql.globalConnection);
       await transaction.begin();
 
       const insertedRecords = [];
 
-      // Insert attendance records for each student
+      // Loop through each student ID in AttendanceRecords
       for (const studentId of args.AttendanceRecords) {
         const request = new sql.Request(transaction);
-        const result = await request
+
+        // Check if attendance already exists for this student on the given date
+        const checkRequest = new sql.Request(transaction);
+        const checkResult = await checkRequest
           .input('StudentID', sql.VarChar(50), studentId)
-          .input('Username', sql.NVarChar(100), args.Username)
           .input('Date', sql.Date, args.Date)
-          .input('Status', sql.NVarChar(20), args.Status)
-          .input('Remarks', sql.NVarChar(255), args.Remarks || null)
           .query(`
-            INSERT INTO Attendance (StudentID, Username, Date, Status, Remarks)
-            OUTPUT INSERTED.*
-            VALUES (@StudentID, @Username, @Date, @Status, @Remarks)
+            SELECT COUNT(*) AS RecordCount
+            FROM Attendance
+            WHERE StudentID = @StudentID AND Date = @Date
           `);
-        
-        insertedRecords.push(result.recordset[0]);
+
+        const recordCount = checkResult.recordset[0].RecordCount;
+
+        if (recordCount > 0) {
+          // Update existing attendance record for latecomers
+          const updateResult = await request
+            .input('StudentID', sql.VarChar(50), studentId)
+            .input('Username', sql.NVarChar(100), args.Username)
+            .input('Date', sql.Date, args.Date)
+            .input('Status', sql.NVarChar(20), args.Status)
+            .input('Remarks', sql.NVarChar(255), args.Remarks || null)
+            .query(`
+              UPDATE Attendance
+              SET Status = @Status, Remarks = @Remarks
+              OUTPUT INSERTED.*
+              WHERE StudentID = @StudentID AND Date = @Date
+            `);
+
+          insertedRecords.push(updateResult.recordset[0]);
+        } else {
+          // Insert new attendance record
+          const insertResult = await request
+            .input('StudentID', sql.VarChar(50), studentId)
+            .input('Username', sql.NVarChar(100), args.Username)
+            .input('Date', sql.Date, args.Date)
+            .input('Status', sql.NVarChar(20), args.Status)
+            .input('Remarks', sql.NVarChar(255), args.Remarks || null)
+            .query(`
+              INSERT INTO Attendance (StudentID, Username, Date, Status, Remarks)
+              OUTPUT INSERTED.*
+              VALUES (@StudentID, @Username, @Date, @Status, @Remarks)
+            `);
+
+          insertedRecords.push(insertResult.recordset[0]);
+        }
       }
 
       // Commit transaction
       await transaction.commit();
       return insertedRecords;
-
     } catch (error) {
       // Rollback transaction if it exists
       if (transaction) {
@@ -54,16 +92,13 @@ const SaveAttendance = {
         }
       }
       throw new Error(`Failed to save attendance: ${error.message}`);
-
     } finally {
       // Clean up transaction in finally block
       transaction = null;
     }
   }
 };
-
 export { SaveAttendance };
-
 // Note: Make sure you have a global connection established
 // Add this to your database connection setup file:
 /*

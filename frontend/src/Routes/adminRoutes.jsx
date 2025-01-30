@@ -14,6 +14,7 @@ import AddStudent from '../Component/admin/Administrative/componenet/Student/Add
 import StaffDetails from '../Component/admin/Administrative/componenet/Staff/StaffDetails.jsx'; // Import StaffDetails component
 import Classlist from '../Component/admin/Administrative/componenet/Finance/Classlist.jsx';
 import StudentFeeDetails from '../Component/admin/Administrative/componenet/Finance/StudentFeeDetails.jsx';
+import EditStudent from '../Component/admin/Administrative/componenet/Student/EditStudent.jsx';
 
 export default function AdminRoutes() {
   return (
@@ -28,6 +29,7 @@ export default function AdminRoutes() {
         <Route path='finance/:classNumber' element={<Classlist/>}/>
         <Route path='finance/:classNumber/detail/:studentId' element={<StudentFeeDetails/>}/>
         <Route path="students" element={<Students />} />
+        <Route path="students/:studentId" element={<EditStudent />} />
         <Route path="students/Addstudent" element={<AddStudent />} />
         <Route path="facilities" element={<Facilities />} />
         <Route path="reports" element={<Reports />} />

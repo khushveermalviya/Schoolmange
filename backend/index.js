@@ -9,10 +9,10 @@ import { WebSocketServer } from 'ws';
 import jwt from 'jsonwebtoken';
 import sql from 'mssql';
 import { createServer } from 'http';
-
 import schema from './Schema/Schema.js';  // Import the comprehensive schema
 import AzureDb from './db/SecondDb.js';
 import authMiddleware from './middleware/authMiddleware.js';
+import bodyParser from 'body-parser';
 
 dotenv.config();
 
@@ -90,7 +90,8 @@ async function startServer() {
 
     app.use(cors());
     app.use(authMiddleware);
-
+    app.use(bodyParser.json({ limit: '5mb' })); 
+    app.use(bodyParser.urlencoded({ limit: '5mb', extended: true }));
     app.use(
         '/graphql',
         express.json(),

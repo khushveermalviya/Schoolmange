@@ -19,7 +19,7 @@ const dashh= useUserStore((state)=>state.Dash)
     
         </div>
         
-        <div className="grid md:grid-cols-3 gap-8 px-4">
+        <div className="grid md:grid-cols-2 gap-8 px-4">
           {/* Faculty Card */}
           <NavLink 
             to="Facility"
@@ -31,17 +31,17 @@ const dashh= useUserStore((state)=>state.Dash)
               <Users className="w-20 h-20 text-blue-600 group-hover:text-white transition-colors duration-300" />
               <div>
                 <h2 className="text-3xl md:text-4xl font-bold text-gray-800 group-hover:text-white text-center transition-colors duration-300">
-                  Faculty Portal
+                Student Portal
                 </h2>
                 <p className="mt-2 text-gray-600 group-hover:text-blue-100 text-center transition-colors duration-300">
-                  Manage faculty members and resources
+                Manage student information and classes And Faculty
                 </p>
               </div>
             </div>
           </NavLink>
 
           {/* Student Card */}
-          <NavLink 
+          {/* <NavLink 
             to="class"
             className="group relative overflow-hidden rounded-2xl bg-white dark:bg-gray-800 shadow-lg hover:shadow-2xl transform hover:-translate-y-2 transition-all duration-300"
           >
@@ -58,7 +58,7 @@ const dashh= useUserStore((state)=>state.Dash)
                 </p>
               </div>
             </div>
-          </NavLink>
+          </NavLink> */}  
 
           {/* Administrative Card */}
           <NavLink 

@@ -51,34 +51,7 @@ export default function ClassDashboard() {
                 <Grid className="h-8 w-8 text-blue-600 dark:text-blue-400" />
               </div>
               <div className="hidden md:ml-6 md:flex md:space-x-8">
-                <NavLink
-                  to="add"
-                  className="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-900 dark:text-gray-100 border-b-2 border-transparent hover:border-blue-500"
-                >
-                  <Users className="h-4 w-4 mr-2" />
-                  Add
-                </NavLink>
-                <NavLink
-                  to="delete"
-                  className="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-900 dark:text-gray-100 border-b-2 border-transparent hover:border-blue-500"
-                >
-                  <X className="h-4 w-4 mr-2" />
-                  Delete
-                </NavLink>
-                <NavLink
-                  to="annunosment"
-                  className="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-900 dark:text-gray-100 border-b-2 border-transparent hover:border-blue-500"
-                >
-                  <Bell className="h-4 w-4 mr-2" />
-                  Announcements
-                </NavLink>
-                <NavLink
-                  to="Complaint"
-                  className="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-900 dark:text-gray-100 border-b-2 border-transparent hover:border-blue-500"
-                >
-                  <AlertTriangle className="h-4 w-4 mr-2" />
-                  Complaints
-                </NavLink>
+
               </div>
             </div>
 

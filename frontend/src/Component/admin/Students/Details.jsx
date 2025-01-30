@@ -13,7 +13,7 @@ const FETCH_STUDENT_DETAIL = gql`
       Email
       FatherName
       MotherName
-      TotalPresent
+    
     }
   }
 `;

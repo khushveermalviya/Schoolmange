@@ -11,7 +11,7 @@ import { GetAllStaff, GetStaffById } from './Administrative/Staff.js';
 import { StudentFees ,StudentFeeById} from './Administrative/StudentFees.js';
 import { SaveAttendance } from './Administrative/AttendenceMutation.js';
 import { GetFacultyAttendance, GetStudentAttendance } from './Administrative/AttendenceQuery.js';
-import { AddStudentMutation } from './Administrative/StudentAdd.js';
+import { AddStudentMutation,UpdateStudentMutation } from './Administrative/StudentAdd.js';
 import { groupQueries, groupMutations, RootSubscription } from './Students/GroupChat.js';
 
 // Import Timetable-related types and resolvers
@@ -135,6 +135,7 @@ const RootMutation = new GraphQLObjectType({
     addStudentMutation: AddStudentMutation,
     updateTimetableEntry :UpdateTimetableEntry, 
     deleteTimetableEntry:DeleteTimetableEntry,
+    updateStudentMutation:UpdateStudentMutation,
     ...groupMutations,
 
     // Additional Mutations

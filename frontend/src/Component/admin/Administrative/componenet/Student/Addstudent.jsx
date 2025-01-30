@@ -197,9 +197,10 @@ const AddStudent = () => {
         variables: {
           input: {
             ...formData,
-            dob: new Date(formData.dob).toISOString().split('T')[0]
-          }
-        }
+            dob: new Date(formData.dob).toISOString().split('T')[0],
+            Class: parseInt(formData.Class, 10), // Convert Class to an integer here
+          },
+        },
       });
     } catch (error) {
       console.error('Submission error:', error);

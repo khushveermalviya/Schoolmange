@@ -17,20 +17,16 @@ import S1 from './Component/admin/Students/S1.jsx';
 import Adminlayout from './Routes/Adminlayout.jsx';
 import Classes from './Component/admin/Students/Classes.jsx';
 import ClassesLayout from './Routes/ClassesLayout.jsx';
-import Form from './Component/admin/Students/Form.jsx';
+
 import Classaddlayout from './Routes/Classaddlayout.jsx';
 import Login from './Component/admin/Login.jsx';
 import LoginLayout from './Routes/LoginLayout.jsx';
 import Protected from './Routes/Protected.jsx';
 import Details from './Component/admin/Students/Details.jsx';
-import Delete from './Component/admin/Students/Delete.jsx';
-import Annunosment from './Component/admin/Students/Annunosment.jsx';
-import Update from './Component/admin/Students/Update.jsx';
 import First from './Component/student/Chart/First.jsx';
 import { UserProvider } from './Component/student/UserContext.jsx';
 import Protect from './Component/admin/Protect.jsx';
 import Smart from './Component/student/AiGURU/Smart.jsx';
-import Complaint from './Component/admin/Students/Complaint.jsx';
 import AdminRoutes from "./Routes/adminRoutes.jsx";
 import FacuiltyRoutes from "./Routes/FacuiltyRoutes.jsx";
 import { BackButtonHandler } from './BackButtonHandler';
@@ -88,22 +84,7 @@ const router = createHashRouter([
                     path: "",
                     element: <Protected><S1 /></Protected>
                   },  
-                  {
-                    path: "add",
-                    element: <Form />
-                  },
-                  {
-                    path: "delete",
-                    element: <Delete />
-                  },
-                  {
-                    path: "annunosment",
-                    element: <Annunosment />
-                  },
-                  {
-                    path: "Complaint",
-                    element: <Complaint/>
-                  },
+               
                   {
                     path: ":classId",
                     element: <Classaddlayout />,
