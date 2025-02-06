@@ -15,7 +15,7 @@ import StaffDetails from '../Component/admin/Administrative/componenet/Staff/Sta
 import Classlist from '../Component/admin/Administrative/componenet/Finance/Classlist.jsx';
 import StudentFeeDetails from '../Component/admin/Administrative/componenet/Finance/StudentFeeDetails.jsx';
 import EditStudent from '../Component/admin/Administrative/componenet/Student/EditStudent.jsx';
-
+import Notification from '../Component/admin/Administrative/Notification.jsx';
 export default function AdminRoutes() {
   return (
     <Routes>
@@ -33,6 +33,7 @@ export default function AdminRoutes() {
         <Route path="students/Addstudent" element={<AddStudent />} />
         <Route path="facilities" element={<Facilities />} />
         <Route path="reports" element={<Reports />} />
+        <Route path="Notification" element={<Notification />} />
         <Route path="settings" element={<TimetableManagement />} />
       </Route>
     </Routes>

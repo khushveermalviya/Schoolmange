@@ -13,7 +13,7 @@ const FacultyLogin = {
   resolve: async (parent, args) => {
     const result = await sql.query`
       SELECT Username, Password
-      FROM Faculty
+      FROM Staff
       WHERE Username = ${args.Username} AND Password = ${args.Password}
     `;
 

@@ -2,6 +2,7 @@ import { GraphQLList, GraphQLID, GraphQLString, GraphQLNonNull } from 'graphql';
 import sql from 'mssql';
 import { TimetableType, SubjectType, ClassType, StaffTypess } from './TimeTableTypes.js';
 
+
 // Add Timetable Entry
 const GetAllClasses = {
   type: new GraphQLList(ClassType),
@@ -214,7 +215,29 @@ const DeleteTimetableEntry = {
     }
   }
 };
+const Timetablefaculty = {
+  type: TimetableType,
+  args: {
+    id: { type: new GraphQLNonNull(GraphQLID) }
+  },
+  async resolve(parent, args) {
+    try {
+      // Execute the SQL query and assign the result
+      const result = await sql.query`SELECT * FROM Timetable WHERE id = ${args.id}`;
 
+      // Check if the result contains any data
+      if (result.recordset.length === 0) {
+        throw new Error("Timetable entry not found");
+      }
+
+      // Return the first entry from the result
+      return result.recordset[0];
+    } catch (err) {
+      // Provide a more descriptive error message
+      throw new Error(`Error fetching timetable entry: ${err.message}`);
+    }
+  }
+};
 export {
   GetTimetableByTeacher,
   GetAllClasses,
@@ -224,5 +247,6 @@ export {
   AddTimetableEntry,
   GetTimetableEntries,
   UpdateTimetableEntry,
-  DeleteTimetableEntry
+  DeleteTimetableEntry,
+  Timetablefaculty
 };

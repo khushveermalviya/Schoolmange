@@ -1,10 +1,9 @@
-// AiMutation.js
 import { GraphQLNonNull, GraphQLString, GraphQLObjectType } from 'graphql';
 import AichatType from './AichatType.js'; // Ensure this path is correct
 import sql from 'mssql';
 
 const AiMutation = new GraphQLObjectType({
-  name: 'AiMutation',
+  name: 'AiMutation', // Updated to a unique and descriptive name
   fields: {
     addChat: {
       type: AichatType,

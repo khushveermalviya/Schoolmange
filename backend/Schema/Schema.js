@@ -13,7 +13,8 @@ import { SaveAttendance } from './Administrative/AttendenceMutation.js';
 import { GetFacultyAttendance, GetStudentAttendance } from './Administrative/AttendenceQuery.js';
 import { AddStudentMutation,UpdateStudentMutation } from './Administrative/StudentAdd.js';
 import { groupQueries, groupMutations, RootSubscription } from './Students/GroupChat.js';
-
+import AichatType from './AIGuru/AichatType.js';
+import { NotificationQueries, NotificationMutations } from './Administrative/Alert.js'
 // Import Timetable-related types and resolvers
 import {
   GetAllClasses,
@@ -24,10 +25,12 @@ import {
   AddTimetableEntry,
   GetTimetableEntries, 
   UpdateTimetableEntry, 
-  DeleteTimetableEntry 
+  DeleteTimetableEntry ,
+  Timetablefaculty
 
 } from './Administrative/TimeTable.js';
-
+import AiMutation from './AIGuru/AiMutation.js';
+import { AddStaff } from './Administrative/Addstaff.js';
 // Additional Types
 const ChatType = new GraphQLObjectType({
   name: 'Chat',
@@ -81,6 +84,8 @@ const RootQuery = new GraphQLObjectType({
     GetStaffById,
     StudentFeeById,
     ...groupQueries,
+    Timetablefaculty,
+    ...NotificationQueries,
     Aichat,
 
     // New Fetch Resolvers
@@ -133,10 +138,42 @@ const RootMutation = new GraphQLObjectType({
   fields: () => ({
     saveAttendance: SaveAttendance,
     addStudentMutation: AddStudentMutation,
-    updateTimetableEntry :UpdateTimetableEntry, 
-    deleteTimetableEntry:DeleteTimetableEntry,
-    updateStudentMutation:UpdateStudentMutation,
+    updateTimetableEntry: UpdateTimetableEntry,
+    deleteTimetableEntry: DeleteTimetableEntry,
+    updateStudentMutation: UpdateStudentMutation,
+    addStaff:AddStaff,
+    ...NotificationMutations,
     ...groupMutations,
+
+    // Add the `addChat` mutation directly
+    addChat: {
+      type: AichatType, // Ensure AichatType is imported
+      args: {
+        StudentID: { type: new GraphQLNonNull(GraphQLString) },
+        user_type: { type: new GraphQLNonNull(GraphQLString) },
+        prompt: { type: new GraphQLNonNull(GraphQLString) },
+        response: { type: new GraphQLNonNull(GraphQLString) },
+      },
+      resolve(parent, args) {
+        return sql.query`
+          INSERT INTO StudentChat (StudentID, user_type, prompt, response)
+          VALUES (${args.StudentID}, ${args.user_type}, ${args.prompt}, ${args.response})
+          SELECT SCOPE_IDENTITY() AS chat_id
+        `
+          .then(result => ({
+            chat_id: result.recordset[0].chat_id,
+            StudentID: args.StudentID,
+            user_type: args.user_type,
+            prompt: args.prompt,
+            response: args.response,
+            created_at: new Date().toISOString(),
+          }))
+          .catch(err => {
+            console.error('Error adding chat', err);
+            throw new Error('Error adding chat');
+          });
+      },
+    },
 
     // Additional Mutations
     updateUserProfile: {
@@ -169,7 +206,6 @@ const RootMutation = new GraphQLObjectType({
 
     // Timetable-related Mutations
     addTimetableEntry: AddTimetableEntry,
-
   }),
 });
 

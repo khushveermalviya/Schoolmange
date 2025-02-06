@@ -1,27 +1,52 @@
 import React from 'react';
+import { useQuery } from '@apollo/client';
+import { gql } from '@apollo/client';
+
+// Define the GraphQL query
+const TIME_TABLE = gql`
+  query Timetablefaculty($id: String!) {
+    Timetablefaculty(id: $id) {
+      id
+      class_id
+      subject_id
+      teacher_id
+      period
+      created_at
+      updated_at
+    }
+  }
+`;
 
 export default function Timetable() {
-  const timetable = [
-    { day: 'Monday', subject: 'Mathematics', time: '9:00 AM - 10:30 AM' },
-    { day: 'Monday', subject: 'Science', time: '11:00 AM - 12:30 PM' },
-    { day: 'Tuesday', subject: 'History', time: '9:00 AM - 10:30 AM' },
-  ];
+  const timetableId = '9'; // Replace with the actual ID or dynamic value
 
+  // Use the useQuery hook to fetch data on component mount
+  const { loading, error, data } = useQuery(TIME_TABLE, {
+    variables: { id: timetableId },
+  });
+
+  // Render the component
   return (
-    <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
-      <h2 className="text-xl font-bold text-gray-800 dark:text-white mb-4">Timetable</h2>
-      <div className="space-y-4">
-        {timetable.map((entry, index) => (
-          <div
-            key={index}
-            className="flex justify-between items-center p-4 rounded-lg bg-gray-100 dark:bg-gray-700"
-          >
-            <span className="font-medium text-gray-700 dark:text-gray-300">{entry.day}</span>
-            <span className="text-gray-600 dark:text-gray-400">{entry.subject}</span>
-            <span className="text-gray-500 dark:text-gray-400">{entry.time}</span>
-          </div>
-        ))}
-      </div>
+    <div>
+      <h1>Timetable for Faculty</h1>
+      {loading && <p>Loading...</p>}
+      {error && <p>Error: {error.message}</p>}
+      {data && data.Timetablefaculty && (
+        <div>
+          <h2>Timetable Details</h2>
+          {data.Timetablefaculty.map((item) => (
+            <div key={item.id} className="timetable-item">
+              <p>ID: {item.id}</p>
+              <p>Class ID: {item.class_id}</p>
+              <p>Subject ID: {item.subject_id}</p>
+              <p>Teacher ID: {item.teacher_id}</p>
+              <p>Period: {item.period}</p>
+              <p>Created At: {item.created_at}</p>
+              <p>Updated At: {item.updated_at}</p>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

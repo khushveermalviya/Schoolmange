@@ -169,8 +169,7 @@ const Attendance = () => {
     const formattedDay = day.toString().padStart(2, '0');
     const dateKey = `${year}-${month}-${formattedDay}`;
     
-    console.log('Checking date key:', dateKey); // Debug log
-    console.log('Available dates:', Object.keys(calendarData)); // Debug log
+ 
     
     return calendarData[dateKey] || { Status: 'none' };
   };

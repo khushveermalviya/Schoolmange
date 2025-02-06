@@ -3,29 +3,22 @@ import axios from 'axios';
 const fetch = async (prompt) => {
   try {
     const response = await axios({
-      url: "https://api.deepseek.com/v1/chat/completions",
+      url: "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=AIzaSyA41e30bRIExneKwJobo24AC2NdYBmh_2Q",
       method: "post",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer sk-5ccf63351e1a4455b8814bd77923811d`
-      },
       data: {
-        model: "deepseek-chat",
-        messages: [
+        contents: [
           {
-            role: "user",
-            content: prompt
-          }
+            parts: [{ text: prompt }],
+          },
         ],
-        temperature: 0.7,
-        max_tokens: 2048
-      }
+      },
     });
 
-    return response.data.choices[0].message.content;
+    const textResponse = response.data.candidates[0].content.parts[0].text;
+    return textResponse;
   } catch (err) {
-    console.error("API Error:", err.response?.data || err.message);
-    return "Sorry, I encountered an error. Please try again.";
+    console.error("Something went wrong", err);
+    return "Error generating response";
   }
 };
 
