@@ -1,4 +1,12 @@
-
+import React, { useState, useRef } from 'react';
+import { useQuery, useMutation, gql } from '@apollo/client';
+import {
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
+  PieChart, Pie, Cell, ResponsiveContainer
+} from 'recharts';
+import { Calendar, Receipt, Download, Edit, Plus, FileDown } from 'lucide-react';
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
 
 const GET_EXPENSES = gql`
   query GetExpenses {
@@ -69,7 +77,6 @@ const UPDATE_EXPENSE = gql`
   }
 `;
 
-
 const ExpenseManagement = () => {
   const [showForm, setShowForm] = useState(false);
   const [showEditForm, setShowEditForm] = useState(false);
@@ -90,9 +97,6 @@ const ExpenseManagement = () => {
     refetchQueries: [{ query: GET_EXPENSES }]
   });
 
-  const chartRef = useRef(null); // Ref for the chart
-
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -101,7 +105,7 @@ const ExpenseManagement = () => {
           ...formData,
           categoryId: parseInt(formData.categoryId),
           amount: parseFloat(formData.amount),
-          expenseDate: formData.expenseDate // Already in YYYY-MM-DD format
+          expenseDate: formData.expenseDate
         }
       });
       setShowForm(false);
@@ -126,7 +130,7 @@ const ExpenseManagement = () => {
           ...formData,
           categoryId: parseInt(formData.categoryId),
           amount: parseFloat(formData.amount),
-          expenseDate: formData.expenseDate // Already in YYYY-MM-DD format
+          expenseDate: formData.expenseDate
         }
       });
       setShowEditForm(false);
@@ -136,110 +140,98 @@ const ExpenseManagement = () => {
     }
   };
 
-
-
   const generateExpenseReport = (expense) => {
-      const doc = new jsPDF();
-
-      // School/Company Header (Replace with your actual details)
-      doc.setFontSize(22);
-      doc.text("Your School/Company Name", 105, 20, { align: 'center' });
-      doc.setFontSize(12);
-      doc.text("Address Line 1, City, State, ZIP", 105, 30, { align: 'center' });
-      doc.text("Phone: (123) 456-7890 | Email: info@yourschool.com", 105, 37, { align: 'center' });
-
-
-      doc.setFontSize(16);
-      doc.text("Expense Receipt", 105, 50, { align: 'center' });
-      doc.setFontSize(12);
-      doc.text(`Date: ${new Date().toLocaleDateString()}`, 15, 60); // Current Date
-      doc.text(`Receipt ID: ${expense.ExpenseID}`, 15, 67);
-
-      // Expense Details Table
-      const tableData = [
-          ["Category", expense.Category.CategoryName],
-          ["Amount", `$${parseFloat(expense.Amount).toFixed(2)}`],
-          ["Description", expense.Description || 'N/A'],
-          ["Expense Date", new Date(expense.ExpenseDate).toLocaleDateString()],
-          ["Created At", new Date(expense.CreatedAt).toLocaleDateString()],
-          ["Updated At", expense.UpdatedAt ? new Date(expense.UpdatedAt).toLocaleDateString() : 'N/A'],
-      ];
-
-
-      doc.autoTable({
-          startY: 75,
-          head: [['Field', 'Value']],
-          body: tableData,
-          theme: 'grid',
-          columnStyles: {
-              0: { fontStyle: 'bold' }
-          }
-      });
-
-      // Signature Line
-      doc.text("_____________________________", 140, doc.autoTable.previous.finalY + 30); // Signature line
-      doc.text("Signature", 150, doc.autoTable.previous.finalY + 40);
-
-      // Footer
-      doc.setFontSize(10);
-      doc.text("Thank you for your business!", 105, doc.internal.pageSize.getHeight() - 10, { align: 'center' });
-
-      doc.save(`receipt-${expense.ExpenseID}.pdf`);
-  };
-
-
-  const downloadAllReceipts = () => {
-      if (!data?.expenses?.length) return;
-
     const doc = new jsPDF();
 
-    // School/Company Header
     doc.setFontSize(22);
     doc.text("Your School/Company Name", 105, 20, { align: 'center' });
     doc.setFontSize(12);
     doc.text("Address Line 1, City, State, ZIP", 105, 30, { align: 'center' });
     doc.text("Phone: (123) 456-7890 | Email: info@yourschool.com", 105, 37, { align: 'center' });
 
-      doc.setFontSize(16);
-      doc.text("Expense Receipts Summary", 105, 50, {align: 'center'});
+    doc.setFontSize(16);
+    doc.text("Expense Receipt", 105, 50, { align: 'center' });
+    doc.setFontSize(12);
+    doc.text(`Date: ${new Date().toLocaleDateString()}`, 15, 60);
+    doc.text(`Receipt ID: ${expense.ExpenseID}`, 15, 67);
 
-      let startY = 60;
+    const tableData = [
+      ["Category", expense.Category.CategoryName],
+      ["Amount", `$${parseFloat(expense.Amount).toFixed(2)}`],
+      ["Description", expense.Description || 'N/A'],
+      ["Expense Date", new Date(parseInt(expense.ExpenseDate)).toLocaleDateString()],
+      ["Created At", new Date(parseInt(expense.CreatedAt)).toLocaleDateString()],
+      ["Updated At", expense.UpdatedAt ? new Date(parseInt(expense.UpdatedAt)).toLocaleDateString() : 'N/A'],
+    ];
 
-      data.expenses.forEach((expense, index) => {
+    doc.autoTable({
+      startY: 75,
+      head: [['Field', 'Value']],
+      body: tableData,
+      theme: 'grid',
+      columnStyles: {
+        0: { fontStyle: 'bold' }
+      }
+    });
 
-          const tableData = [
-              ["Receipt ID", expense.ExpenseID],
-              ["Date", new Date(expense.ExpenseDate).toLocaleDateString()],
-              ["Category", expense.Category.CategoryName],
-              ["Amount", `$${parseFloat(expense.Amount).toFixed(2)}`],
-              ["Description", expense.Description || 'N/A'],
-              ["Created", new Date(expense.CreatedAt).toLocaleDateString()],
-              ["Updated", expense.UpdatedAt ? new Date(expense.UpdatedAt).toLocaleDateString() : 'N/A'],
-          ];
+    doc.text("_____________________________", 140, doc.autoTable.previous.finalY + 30);
+    doc.text("Signature", 150, doc.autoTable.previous.finalY + 40);
 
-        if (index > 0) {
-            startY += 10;
-            if (startY >= doc.internal.pageSize.getHeight() - 40) { //check page end
-                doc.addPage();
-                startY = 20;
-            }
-        }
+    doc.setFontSize(10);
+    doc.text("Thank you for your business!", 105, doc.internal.pageSize.getHeight() - 10, { align: 'center' });
 
-          doc.autoTable({
-            startY: startY,
-              head: [['Field', 'Value']],
-              body: tableData,
-              theme: 'grid',
-               columnStyles: {
-                  0: { fontStyle: 'bold' }
-              }
-          });
-        startY = doc.autoTable.previous.finalY;
-      });
-      doc.save(`all-receipts-${new Date().toISOString().split('T')[0]}.pdf`);
+    doc.save(`receipt-${expense.ExpenseID}.pdf`);
   };
 
+  const downloadAllReceipts = () => {
+    if (!data?.expenses?.length) return;
 
+    const doc = new jsPDF();
+
+    doc.setFontSize(22);
+    doc.text("Your School/Company Name", 105, 20, { align: 'center' });
+    doc.setFontSize(12);
+    doc.text("Address Line 1, City, State, ZIP", 105, 30, { align: 'center' });
+    doc.text("Phone: (123) 456-7890 | Email: info@yourschool.com", 105, 37, { align: 'center' });
+
+    doc.setFontSize(16);
+    doc.text("Expense Receipts Summary", 105, 50, { align: 'center' });
+
+    let startY = 60;
+
+    data.expenses.forEach((expense, index) => {
+      const tableData = [
+        ["Receipt ID", expense.ExpenseID],
+        ["Date", new Date(expense.ExpenseDate).toLocaleDateString()],
+        ["Category", expense.Category.CategoryName],
+        ["Amount", `$${parseFloat(expense.Amount).toFixed(2)}`],
+        ["Description", expense.Description || 'N/A'],
+        ["Created", new Date(parseInt(expense.CreatedAt)).toLocaleDateString()],
+        ["Updated", expense.UpdatedAt ? new Date(parseInt(expense.UpdatedAt)).toLocaleDateString() : 'N/A'],
+      ];
+
+      if (index > 0) {
+        startY += 10;
+        if (startY >= doc.internal.pageSize.getHeight() - 40) {
+          doc.addPage();
+          startY = 20;
+        }
+      }
+
+      doc.autoTable({
+        startY: startY,
+        head: [['Field', 'Value']],
+        body: tableData,
+        theme: 'grid',
+        columnStyles: {
+          0: { fontStyle: 'bold' }
+        }
+      });
+      startY = doc.autoTable.previous.finalY;
+    });
+
+    doc.save(`all-receipts-${new Date().toISOString().split('T')[0]}.pdf`);
+  };
 
   if (loading) return (
     <div className="flex items-center justify-center min-h-screen">
@@ -250,7 +242,6 @@ const ExpenseManagement = () => {
   if (error) return <div className="p-4 text-error">Error: {error.message}</div>;
 
   const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#AF19FF', '#FF19A3'];
-
 
   const categoryData = data.categories.map(category => {
     const expensesInCategory = data.expenses.filter(expense => expense.CategoryID === category.CategoryID);
@@ -275,7 +266,6 @@ const ExpenseManagement = () => {
     amount
   }));
 
-
   return (
     <div className="container mx-auto p-4">
       <div className="flex justify-between items-center mb-6">
@@ -296,52 +286,48 @@ const ExpenseManagement = () => {
         </div>
       </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-            {/* Bar Chart */}
-            <div>
-              <h2 className="text-lg font-semibold mb-2">Expenses by Category (Bar Chart)</h2>
-                <ResponsiveContainer width="100%" height={300}>
-                <BarChart
-                    data={barChartData}
-                    margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-                  >
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="category" />
-                    <YAxis />
-                    <Tooltip />
-                    <Legend />
-                    <Bar dataKey="amount" fill="#8884d8" />
-                </BarChart>
-                </ResponsiveContainer>
-            </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+        <div>
+          <h2 className="text-lg font-semibold mb-2">Expenses by Category (Bar Chart)</h2>
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart
+              data={barChartData}
+              margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+            >
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="category" />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              <Bar dataKey="amount" fill="#8884d8" />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
 
-
-             {/* Pie Chart */}
-            <div>
-              <h2 className="text-lg font-semibold mb-2">Expenses by Category (Pie Chart)</h2>
-                 <ResponsiveContainer width="100%" height={300}>
-                    <PieChart>
-                      <Pie
-                        data={categoryData}
-                        cx="50%"
-                        cy="50%"
-                        labelLine={false}
-                        outerRadius={80}
-                        fill="#8884d8"
-                        dataKey="value"
-                        label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                      >
-                         {categoryData.map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                          ))}
-                      </Pie>
-                      <Tooltip />
-                    <Legend />
-                    </PieChart>
-                  </ResponsiveContainer>
-            </div>
+        <div>
+          <h2 className="text-lg font-semibold mb-2">Expenses by Category (Pie Chart)</h2>
+          <ResponsiveContainer width="100%" height={300}>
+            <PieChart>
+              <Pie
+                data={categoryData}
+                cx="50%"
+                cy="50%"
+                labelLine={false}
+                outerRadius={80}
+                fill="#8884d8"
+                dataKey="value"
+                label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+              >
+                {categoryData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                ))}
+              </Pie>
+              <Tooltip />
+              <Legend />
+            </PieChart>
+          </ResponsiveContainer>
+        </div>
       </div>
-
 
       {showForm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
@@ -420,7 +406,6 @@ const ExpenseManagement = () => {
           <div className="bg-white rounded-lg p-6 max-w-2xl w-full">
             <h2 className="text-xl font-bold mb-4">Edit Expense</h2>
             <form onSubmit={handleUpdate} className="space-y-4">
-              {/* Same form fields as Add form */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <select
                   className="select select-bordered w-full"
@@ -505,7 +490,7 @@ const ExpenseManagement = () => {
           <tbody>
             {data.expenses.map((expense) => (
               <tr key={expense.ExpenseID}>
-                <td>{new Date(expense.ExpenseDate).toLocaleDateString()}</td>
+   <td>{new Date(parseInt(expense.ExpenseDate)).toLocaleDateString()}</td>
                 <td>{expense.Category.CategoryName}</td>
                 <td>{expense.Description}</td>
                 <td className="text-right">
@@ -541,7 +526,6 @@ const ExpenseManagement = () => {
         </table>
       </div>
     </div>
-
   );
 };
 

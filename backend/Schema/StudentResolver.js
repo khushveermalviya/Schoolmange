@@ -14,7 +14,7 @@ const studentLogin = {
   },
   resolve: async (parent, args) => {
     const result = await sql.query`
-      SELECT StudentID, Password, FirstName, LastName, Class, WeeklyPerformance
+      SELECT StudentID, Password, FirstName, LastName, Class,FatherName, SchoolName,WeeklyPerformance
       FROM Students
       WHERE StudentID = ${args.StudentID} AND Password = ${args.Password}
     `;
@@ -34,6 +34,8 @@ const studentLogin = {
       FirstName: stud.FirstName,
       LastName: stud.LastName,
       Class: stud.Class,
+      FatherName:stud.FatherName,
+      SchoolName:stud.SchoolName,
       WeeklyPerformance: JSON.parse(stud.WeeklyPerformance || '[]'),
     };
   },

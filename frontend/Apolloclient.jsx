@@ -11,6 +11,7 @@
     // Your Azure App Service endpoint
     const serverEndpoint = 'https://center-gefucegncpf7akcc.centralindia-01.azurewebsites.net';
     // https://center-gefucegncpf7akcc.centralindia-01.azurewebsites.net
+    //http://localhost:5000
     // HTTP Link
     const httpLink = new HttpLink({
       uri: `${serverEndpoint}/graphql`, 

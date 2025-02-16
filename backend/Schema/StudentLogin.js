@@ -6,6 +6,8 @@ const StudentLoginType = new GraphQLObjectType({
     StudentID: { type: GraphQLString },
     FirstName: { type: GraphQLString },
     LastName: { type: GraphQLString },
+    FatherName: { type: GraphQLString },
+    SchoolName: { type: GraphQLString },
     Class: { type: GraphQLInt },
     WeeklyPerformance: { type: new GraphQLList(GraphQLString) },
     token: { type: GraphQLString },

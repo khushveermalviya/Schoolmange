@@ -11,6 +11,8 @@ const LOGIN_QUERY = gql`
       StudentID
       FirstName
       LastName
+      FatherName
+   SchoolName
       Class
       token
       WeeklyPerformance

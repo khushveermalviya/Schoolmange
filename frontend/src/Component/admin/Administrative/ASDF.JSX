@@ -1,4 +1,12 @@
-
+import React, { useState, useRef } from 'react';
+import { useQuery, useMutation, gql } from '@apollo/client';
+import {
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
+  PieChart, Pie, Cell, ResponsiveContainer
+} from 'recharts';
+import { Calendar, Receipt, Download, Edit, Plus, FileDown } from 'lucide-react';
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
 
 const GET_EXPENSES = gql`
   query GetExpenses {

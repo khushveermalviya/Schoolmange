@@ -3,6 +3,7 @@ import { useQuery, gql } from '@apollo/client';
 import { PieChart, Pie, Cell, ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 import { Moon, Sun, Book, Calendar, Bell, CheckCircle, Bookmark, Trophy } from 'lucide-react';
 import useUserStore from '../../../app/useUserStore';
+import TopPerformersCard from './Rank';
 
 const GET_NOTIFICATIONS = gql`
   query Notifications($studentId: ID!) {
@@ -16,6 +17,61 @@ const GET_NOTIFICATIONS = gql`
     }
   }
 `;
+
+const GET_STUDENT_RESULTS = gql`
+  query StudentResults($studentId: String!) {
+    getStudentResults(StudentID: $studentId) {
+      ResultID
+      StudentID
+      ExamTypeID
+      SubjectName
+      MarksObtained
+      MaxMarks
+      ExamDate
+      Semester
+      AcademicYear
+      Grade
+      Remarks
+    }
+  }
+`;
+
+const GET_CLASS_RANKINGS = gql`
+  query ClassRankings($class: Int!) {
+    getClassRankings(Class: $class) {
+      StudentID
+      Class
+      StudentName
+      AverageScore
+      ClassRank
+    }
+  }
+`;
+
+const GET_STUDENT_ATTENDANCE = gql`
+  query GetStudentAttendance($StudentID: String!) {
+    GetStudentAttendance(StudentID: $StudentID) {
+      StudentID
+      Date
+      Status
+      AttendanceID
+      Remarks
+    }
+  }
+`;
+
+// const GET_TOP_PERFORMERS = gql`
+//   query GetClassRankings($class: Int!) {
+//     getClassRankings(Class: $class) {
+//       Class
+//     StudentID
+//     StudentName
+//     TotalSubjects
+//     AverageMarks
+//     Rank
+//     }
+//   }
+// `;
 
 // Theme Toggle Component
 const ThemeToggle = () => {
@@ -95,33 +151,140 @@ const DailyQuote = ({ quote, author }) => (
   </div>
 );
 
+// const TopPerformersCard = ({ student }) => {
+//   const { loading, error, data } = useQuery(GET_TOP_PERFORMERS, {
+//     variables: { 
+//       class: student.Class,
+//     },
+//     pollInterval: 300000, // Refresh every 5 minutes
+//   });
+
+//   if (loading) {
+//     return (
+//       <div className="flex justify-center p-4">
+//         <span className="loading loading-spinner loading-md"></span>
+//       </div>
+//     );
+//   }
+
+//   if (error) {
+//     return (
+//       <div className="alert alert-error">
+//         <span>Error loading rankings</span>
+//       </div>
+//     );
+//   }
+
+//   return (
+//     <div className="card bg-base-100 shadow-xl">
+//       <div className="card-body">
+//         <h3 className="card-title flex items-center gap-2">
+//           <Trophy className="w-5 h-5" />
+//           Top Performers in Class {student.Class}
+//         </h3>
+//         <div className="overflow-x-auto">
+//           <table className="table table-zebra">
+//             <thead>
+//               <tr>
+//                 <th>Rank</th>
+//                 <th>Student Name</th>
+//                 <th>Score</th>
+//                 <th>Subjects</th>
+//               </tr>
+//             </thead>
+//             <tbody>
+//               {data?.topPerformers?.map((performer) => (
+//                 <tr 
+//                   key={performer.StudentID} 
+//                   className={performer.Rank <= 3 ? 'font-semibold' : ''}
+//                 >
+//                   <td>
+//                     {performer.Rank <= 3 ? (
+//                       <div className="flex items-center gap-2">
+//                         <span className={`badge ${
+//                           performer.Rank === 1 ? 'badge-warning' :
+//                           performer.Rank === 2 ? 'badge-secondary' :
+//                           'badge-accent'
+//                         }`}>
+//                           {performer.Rank}
+//                         </span>
+//                         {performer.Rank === 1 && <Trophy className="w-4 h-4 text-warning" />}
+//                       </div>
+//                     ) : (
+//                       performer.Rank
+//                     )}
+//                   </td>
+//                   <td>
+//                     {performer.StudentName}
+//                     {performer.StudentID === student.StudentID && 
+//                       <span className="ml-2 badge badge-sm">You</span>
+//                     }
+//                   </td>
+//                   <td>{performer.AverageMarks.toFixed(1)}%</td>
+//                   <td>{performer.TotalSubjects}</td>
+//                 </tr>
+//               ))}
+//             </tbody>
+//           </table>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// };
+
 export default function Dashboard() {
   const student = useUserStore((state) => state.user);
   const [currentNotification, setCurrentNotification] = useState(null);
   const [viewedNotifications, setViewedNotifications] = useState(new Set());
   const [performanceScore, setPerformanceScore] = useState(78);
 
-  const { loading, error, data } = useQuery(GET_NOTIFICATIONS, {
+  const { loading: notificationsLoading, error: notificationsError, data: notificationsData } = useQuery(GET_NOTIFICATIONS, {
     variables: { studentId: student.StudentID },
     pollInterval: 30000,
   });
 
-  const quotes = [
-    {
-      quote: "Education is the passport to the future, for tomorrow belongs to those who prepare for it today.",
-      author: "Malcolm X"
-    },
-    {
-      quote: "The beautiful thing about learning is that no one can take it away from you.",
-      author: "B.B. King"
-    },
-    {
-      quote: "Success is not final, failure is not fatal: it is the courage to continue that counts.",
-      author: "Winston Churchill"
-    }
-  ];
+  const { loading: resultsLoading, error: resultsError, data: resultsData } = useQuery(GET_STUDENT_RESULTS, {
+    variables: { studentId: student.StudentID },
+  });
 
-  const [currentQuote, setCurrentQuote] = useState(quotes[0]);
+  const { loading: rankingsLoading, error: rankingsError, data: rankingsData } = useQuery(GET_CLASS_RANKINGS, {
+    variables: { class: student.Class },
+  });
+
+  useEffect(() => {
+   
+    if (resultsData) {
+      const totalMarks = resultsData.getStudentResults.reduce((acc, result) => acc + result.MarksObtained, 0);
+      const maxMarks = resultsData.getStudentResults.reduce((acc, result) => acc + result.MaxMarks, 0);
+      const performance = (totalMarks / maxMarks) * 100;
+      setPerformanceScore(performance);
+    }
+  }, [resultsData]);
+
+  const subjectProgress = resultsData?.getStudentResults.map(result => ({
+    subject: result.SubjectName,
+    completed: result.MarksObtained,
+    total: result.MaxMarks
+  })) || [];
+
+  const [currentQuote, setCurrentQuote] = useState({
+    quote: "Education is the passport to the future, for tomorrow belongs to those who prepare for it today.",
+    author: "Malcolm X"
+  });
+
+  useEffect(() => {
+    const fetchQuote = async () => {
+      try {
+        const response = await fetch('https://api.quotable.io/random');
+        const data = await response.json();
+        setCurrentQuote({ quote: data.content, author: data.author });
+      } catch (error) {
+        console.error('Error fetching quote:', error);
+      }
+    };
+
+    fetchQuote();
+  }, []);
 
   const achievements = [
     { id: 1, title: "Perfect Attendance - March", icon: <Trophy className="w-5 h-5" />, date: "2024-03-15" },
@@ -141,39 +304,15 @@ export default function Dashboard() {
     { id: 3, task: "Practice for History Presentation", completed: false, dueDate: "2024-04-15" }
   ]);
 
-  const attendanceData = [
-    { month: 'Jan', attendance: 95 },
-    { month: 'Feb', attendance: 98 },
-    { month: 'Mar', attendance: 92 },
-    { month: 'Apr', attendance: 96 }
-  ];
-
-  const subjectProgress = [
-    { subject: "Mathematics", completed: 75, total: 100 },
-    { subject: "Science", completed: 80, total: 100 },
-    { subject: "English", completed: 85, total: 100 },
-    { subject: "History", completed: 70, total: 100 }
-  ];
-
-  useEffect(() => {
-    // Change quote daily
-    const interval = setInterval(() => {
-      const randomIndex = Math.floor(Math.random() * quotes.length);
-      setCurrentQuote(quotes[randomIndex]);
-    }, 86400000); // 24 hours
-
-    return () => clearInterval(interval);
-  }, []);
+  const handleDismissNotification = (notificationId) => {
+    setViewedNotifications(prev => new Set([...prev, notificationId]));
+    setCurrentNotification(null);
+  };
 
   const toggleTodo = (id) => {
     setTodos(todos.map(todo =>
       todo.id === id ? { ...todo, completed: !todo.completed } : todo
     ));
-  };
-
-  const handleDismissNotification = (notificationId) => {
-    setViewedNotifications(prev => new Set([...prev, notificationId]));
-    setCurrentNotification(null);
   };
 
   return (
@@ -188,9 +327,9 @@ export default function Dashboard() {
             <button className="btn btn-ghost btn-circle">
               <div className="indicator">
                 <Bell className="h-5 w-5" />
-                {data?.notifications?.length > 0 && (
+                {notificationsData?.notifications?.length > 0 && (
                   <span className="badge badge-sm badge-primary indicator-item">
-                    {data.notifications.length}
+                    {notificationsData.notifications.length}
                   </span>
                 )}
               </div>
@@ -264,26 +403,7 @@ export default function Dashboard() {
 
             {/* Attendance Chart */}
             <div className="card bg-base-100 shadow-xl">
-              <div className="card-body">
-                <h3 className="card-title">Attendance Overview</h3>
-                <div className="h-64">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={attendanceData}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="month" />
-                      <YAxis domain={[0, 100]} />
-                      <Tooltip />
-                      <Legend />
-                      <Line 
-                        type="monotone" 
-                        dataKey="attendance" 
-                        stroke="#8884d8" 
-                        strokeWidth={2}
-                      />
-                    </LineChart>
-                  </ResponsiveContainer>
-                </div>
-              </div>
+           
             </div>
           </div>
 
@@ -296,18 +416,18 @@ export default function Dashboard() {
                   <Bell className="w-5 h-5" />
                   Notifications
                 </h3>
-                {loading && (
+                {notificationsLoading && (
                   <div className="flex justify-center">
                     <span className="loading loading-spinner loading-md"></span>
                   </div>
                 )}
-                {error && (
+                {notificationsError && (
                   <div className="alert alert-error">
                     <span>Error loading notifications</span>
                   </div>
                 )}
                 <div className="space-y-3">
-                  {data?.notifications?.map((notification) => (
+                  {notificationsData?.notifications?.map((notification) => (
                     <div 
                       key={notification.NotificationId}
                       className={`alert ${
@@ -361,6 +481,9 @@ export default function Dashboard() {
               </div>
             </div>
 
+            {/* Top Performers */}
+            <TopPerformersCard student={student} />
+
             {/* Todo List */}
             <div className="card bg-base-100 shadow-xl">
               <div className="card-body">
@@ -373,65 +496,39 @@ export default function Dashboard() {
                     <div key={todo.id} className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
                         <input
-                        type="checkbox"
-                        checked={todo.completed}
-                        onChange={() => toggleTodo(todo.id)}
-                        className="checkbox checkbox-primary"
-                      />
-                      <div>
-                        <p className={`font-semibold ${todo.completed ? 'line-through opacity-50' : ''}`}>
-                          {todo.task}
-                        </p>
-                        <p className="text-sm opacity-70">Due: {new Date(todo.dueDate).toLocaleDateString()}</p>
+                          type="checkbox"
+                          checked={todo.completed}
+                          onChange={() => toggleTodo(todo.id)}
+                          className="checkbox checkbox-primary"
+                        />
+                        <div>
+                          <p className={`font-semibold ${todo.completed ? 'line-through opacity-50' : ''}`}>
+                            {todo.task}
+                          </p>
+                          <p className="text-sm opacity-70">Due: {new Date(todo.dueDate).toLocaleDateString()}</p>
+                        </div>
+                      </div>
+                      <div className={`badge ${isOverdue(todo.dueDate) ? 'badge-error' : 'badge-ghost'}`}>
+                        {isOverdue(todo.dueDate) ? 'Overdue' : 'Pending'}
                       </div>
                     </div>
-                    <div className={`badge ${isOverdue(todo.dueDate) ? 'badge-error' : 'badge-ghost'}`}>
-                      {isOverdue(todo.dueDate) ? 'Overdue' : 'Pending'}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* Study Resources */}
-          <div className="card bg-base-100 shadow-xl">
-            <div className="card-body">
-              <h3 className="card-title flex items-center gap-2">
-                <Book className="w-5 h-5" />
-                Study Resources
-              </h3>
-              <div className="space-y-3">
-                {studyResources.map((resource, index) => (
-                  <div key={index} className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="bg-base-200 p-2 rounded-lg">
-                        {resource.icon}
-                      </div>
-                      <div>
-                        <p className="font-semibold">{resource.title}</p>
-                        <p className="text-sm opacity-70">{resource.subject}</p>
-                      </div>
-                    </div>
-                    <button className="btn btn-sm btn-ghost">View</button>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
 
-    {/* Footer */}
-    <footer className="footer footer-center p-4 bg-base-100 text-base-content mt-8">
-      <div>
-        <p>Copyright © 2024 - All rights reserved</p>
-      </div>
-    </footer>
-  </div>
-);
-}
+      {/* Footer */}
+      <footer className="footer footer-center p-4 bg-base-100 text-base-content mt-8">
+        <div>
+          <p>Copyright © 2024 - All rights reserved</p>
+        </div>
+      </footer>
+    </div>
+  );
+};
 
 // Utility functions
 const isOverdue = (dueDate) => {

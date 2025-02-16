@@ -17,6 +17,7 @@ export default function Administrative({ Username }) {
     { icon: <Users className="w-5 h-5" />, title: "Staff Management", path: "staff" },
     { icon: <GraduationCap className="w-5 h-5" />, title: "Students", path: "students" },
     { icon: <DollarSign className="w-5 h-5" />, title: "Finance", path: "finance" },
+    { icon: <DollarSign className="w-5 h-5" />, title: "ExpenseManagement", path: "ExpenseManagement" },
     { icon: <BookOpen className="w-5 h-5" />, title: "Academics", path: "academics" },
     { icon: <Building2 className="w-5 h-5" />, title: "Facilities", path: "facilities" },
     { icon: <FileText className="w-5 h-5" />, title: "Reports", path: "reports" },
