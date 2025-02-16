@@ -48,17 +48,17 @@ const GET_CLASS_RANKINGS = gql`
   }
 `;
 
-const GET_STUDENT_ATTENDANCE = gql`
-  query GetStudentAttendance($StudentID: String!) {
-    GetStudentAttendance(StudentID: $StudentID) {
-      StudentID
-      Date
-      Status
-      AttendanceID
-      Remarks
-    }
-  }
-`;
+// const GET_STUDENT_ATTENDANCE = gql`
+//   query GetStudentAttendance($StudentID: String!) {
+//     GetStudentAttendance(StudentID: $StudentID) {
+//       StudentID
+//       Date
+//       Status
+//       AttendanceID
+//       Remarks
+//     }
+//   }
+// `;
 
 // const GET_TOP_PERFORMERS = gql`
 //   query GetClassRankings($class: Int!) {
@@ -138,18 +138,18 @@ const GaugeChart = ({ value }) => {
 };
 
 // Quote Component
-const DailyQuote = ({ quote, author }) => (
-  <div className="card bg-base-100 shadow-xl">
-    <div className="card-body">
-      <h3 className="card-title flex items-center gap-2">
-        <Bookmark className="w-5 h-5" />
-        Quote of the Day
-      </h3>
-      <blockquote className="text-lg italic">"{quote}"</blockquote>
-      <p className="text-right font-semibold">- {author}</p>
-    </div>
-  </div>
-);
+// const DailyQuote = ({ quote, author }) => (
+//   <div className="card bg-base-100 shadow-xl">
+//     <div className="card-body">
+//       <h3 className="card-title flex items-center gap-2">
+//         <Bookmark className="w-5 h-5" />
+//         Quote of the Day
+//       </h3>
+//       <blockquote className="text-lg italic">"{quote}"</blockquote>
+//       <p className="text-right font-semibold">- {author}</p>
+//     </div>
+//   </div>
+// );
 
 // const TopPerformersCard = ({ student }) => {
 //   const { loading, error, data } = useQuery(GET_TOP_PERFORMERS, {
@@ -267,24 +267,24 @@ export default function Dashboard() {
     total: result.MaxMarks
   })) || [];
 
-  const [currentQuote, setCurrentQuote] = useState({
-    quote: "Education is the passport to the future, for tomorrow belongs to those who prepare for it today.",
-    author: "Malcolm X"
-  });
+  // const [currentQuote, setCurrentQuote] = useState({
+  //   quote: "Education is the passport to the future, for tomorrow belongs to those who prepare for it today.",
+  //   author: "Malcolm X"
+  // });
 
-  useEffect(() => {
-    const fetchQuote = async () => {
-      try {
-        const response = await fetch('https://api.quotable.io/random');
-        const data = await response.json();
-        setCurrentQuote({ quote: data.content, author: data.author });
-      } catch (error) {
-        console.error('Error fetching quote:', error);
-      }
-    };
+  // useEffect(() => {
+  //   const fetchQuote = async () => {
+  //     try {
+  //       const response = await fetch('https://api.quotable.io/random');
+  //       const data = await response.json();
+  //       setCurrentQuote({ quote: data.content, author: data.author });
+  //     } catch (error) {
+  //       console.error('Error fetching quote:', error);
+  //     }
+  //   };
 
-    fetchQuote();
-  }, []);
+  //   fetchQuote();
+  // }, []);
 
   const achievements = [
     { id: 1, title: "Perfect Attendance - March", icon: <Trophy className="w-5 h-5" />, date: "2024-03-15" },
@@ -358,7 +358,7 @@ export default function Dashboard() {
             </div>
 
             {/* Quote Card */}
-            <DailyQuote quote={currentQuote.quote} author={currentQuote.author} />
+            {/* <DailyQuote quote={currentQuote.quote} author={currentQuote.author} /> */}
 
             {/* Achievements */}
             <div className="card bg-base-100 shadow-xl">
