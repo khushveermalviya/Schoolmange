@@ -33,6 +33,8 @@ import AiMutation from './AIGuru/AiMutation.js';
 import { AddStaff } from './Administrative/Addstaff.js';
 import {  Expenses,ExpenseMutation} from './Administrative/Expenses.js';
 import {addStudentResult,getStudentResults,getClassRankings} from "./Administrative/Result.js"
+import {ClassTeacherQuery} from "./Administrative/ClassTeacher.js"
+
 // Additional Types
 const ChatType = new GraphQLObjectType({
   name: 'Chat',
@@ -90,8 +92,8 @@ const RootQuery = new GraphQLObjectType({
     ...NotificationQueries,
     Aichat,
     ...Expenses,
-    addStudentResult,getStudentResults,getClassRankings,
-
+    getStudentResults,getClassRankings,
+    ClassTeacherQuery,
     // New Fetch Resolvers
     getStudentChats: {
       type: new GraphQLList(ChatType),
@@ -149,6 +151,7 @@ const RootMutation = new GraphQLObjectType({
     ...NotificationMutations,
     ...groupMutations,
     ...ExpenseMutation,
+    addStudentResult,
 
 
 

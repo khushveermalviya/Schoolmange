@@ -22,7 +22,8 @@ export default function Administrative({ Username }) {
     { icon: <Building2 className="w-5 h-5" />, title: "Facilities", path: "facilities" },
     { icon: <FileText className="w-5 h-5" />, title: "Reports", path: "reports" },
     { icon: <FileText className="w-5 h-5" />, title: "Notification", path: "Notification" },
-    { icon: <Settings className="w-5 h-5" />, title: "Settings", path: "settings" },
+    { icon: <Settings className="w-5 h-5" />, title: "TimetableManagement", path: "TimeTable" },
+    { icon: <Settings className="w-5 h-5" />, title: "Settings", path: "Setting" },
   ];
   const handleLogout = () => {
     localStorage.removeItem('tokenss');

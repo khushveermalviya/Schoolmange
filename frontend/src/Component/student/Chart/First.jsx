@@ -4,7 +4,7 @@ import { PieChart, Pie, Cell, ResponsiveContainer, LineChart, Line, XAxis, YAxis
 import { Moon, Sun, Book, Calendar, Bell, CheckCircle, Bookmark, Trophy } from 'lucide-react';
 import useUserStore from '../../../app/useUserStore';
 import TopPerformersCard from './Rank';
-
+import RankingCelebration from './Rankingcelebration';
 const GET_NOTIFICATIONS = gql`
   query Notifications($studentId: ID!) {
     notifications(StudentId: $studentId) {
@@ -131,12 +131,12 @@ const GaugeChart = ({ value }) => {
       />
       <div className="absolute left-1/2 bottom-[20%] w-4 h-4 rounded-full bg-current transform -translate-x-1/2 -translate-y-1/2" />
       <div className="absolute bottom-0 left-0 right-0 text-center">
-        <span className="font-bold text-2xl">{value}%</span>
+    <span className="font-bold text-2xl">{value.toFixed(2)}%</span>
       </div>
     </div>
   );
 };
-
+  
 // Quote Component
 // const DailyQuote = ({ quote, author }) => (
 //   <div className="card bg-base-100 shadow-xl">
@@ -236,7 +236,7 @@ export default function Dashboard() {
   const student = useUserStore((state) => state.user);
   const [currentNotification, setCurrentNotification] = useState(null);
   const [viewedNotifications, setViewedNotifications] = useState(new Set());
-  const [performanceScore, setPerformanceScore] = useState(78);
+  const [performanceScore, setPerformanceScore] = useState(0);
 
   const { loading: notificationsLoading, error: notificationsError, data: notificationsData } = useQuery(GET_NOTIFICATIONS, {
     variables: { studentId: student.StudentID },
@@ -318,6 +318,10 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-white-200 transition-colors duration-200">
       {/* Navbar */}
+      <RankingCelebration 
+  studentRank={rankingsData?.getClassRankings[0]?.ClassRank} 
+  studentName={student.FirstName}
+/>
       <div className="navbar bg-base-100 shadow-lg px-4">
         <div className="flex-1">
           <h1 className="text-xl font-bold">Student Dashboard</h1>

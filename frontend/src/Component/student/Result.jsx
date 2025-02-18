@@ -1,19 +1,20 @@
 // ResultPage.js
 import React, { useState, useEffect } from 'react';
 import { useQuery } from '@apollo/client';
-import { BarChart, Bar, PieChart, Pie, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell   } from 'recharts';
+import { BarChart, Bar, PieChart, Pie, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell } from 'recharts';
 import { Download, Search, Calendar } from 'lucide-react';
 import { gql } from '@apollo/client';
 import useUserStore from '../../app/useUserStore';
-import jsPDF from "jspdf"
-
+import jsPDF from "jspdf";
+import 'jspdf-autotable';
 
 const GET_STUDENT_RESULTS = gql`
-  query GetStudentResults($StudentID: String!) {
-    getStudentResults(StudentID: $StudentID) {
+  query GetStudentResults($StudentID: String!, $ExamType: String) {
+    getStudentResults(StudentID: $StudentID, ExamType: $ExamType) {
       ResultID
       StudentID
       ExamTypeID
+      ExamType
       SubjectName
       MarksObtained
       MaxMarks
@@ -27,7 +28,7 @@ const GET_STUDENT_RESULTS = gql`
 `;
 
 // PDF Generation Helper
- const generatePDF = (studentInfo, results) => {
+const generatePDF = (studentInfo, results) => {
   const doc = new jsPDF();
   
   // Header
@@ -116,7 +117,10 @@ const ResultPage = () => {
   const { StudentID, FirstName, LastName, FatherName, SchoolName, WeeklyPerformance } = user;
 
   const { loading, error, data } = useQuery(GET_STUDENT_RESULTS, {
-    variables: { StudentID },
+    variables: { 
+      StudentID, 
+      ExamType: selectedExam || null  // Send null if selectedExam is empty
+    },
   });
 
   const COLORS = ['#3F51B5', '#4CAF50', '#FFC107', '#FF5722', '#9C27B0'];
@@ -281,9 +285,12 @@ const ResultPage = () => {
                   value={selectedExam}
                   onChange={(e) => setSelectedExam(e.target.value)}
                 >
-                  <option value="">All Exams</option>
-                  <option value="1">Mid Term</option>
-                  <option value="2">Final Term</option>
+                  <option value="">All</option>
+                  <option value="First">First Test</option>
+                  <option value="Second">Second Test</option>
+                  <option value="Third">Third Test</option>
+                  <option value="Half">Half Yearly</option>
+                  <option value="Yearly">Yearly</option>
                 </select>
                 <button 
                   onClick={handleExport}

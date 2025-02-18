@@ -1,422 +1,140 @@
-import React, { useState, useEffect } from 'react';
-import { useQuery, useMutation, gql } from '@apollo/client';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import jsPDF from 'jspdf';
+import React, { useState } from 'react';
+import { useQuery } from '@apollo/client';
+import { toast } from 'react-hot-toast';
+import { Save, Users, School, Lock, Settings } from 'lucide-react';
 
-// GraphQL Queries
-const GET_CLASSES = gql`
-  query GetAllClasses {
-    getAllClasses {
-      id
-      class_name
-      section
-    }
-  }
-`;
+const Setting = () => {
+  const [selectedTeachers, setSelectedTeachers] = useState([]);
+  const [selectedClass, setSelectedClass] = useState('');
+  const [password, setPassword] = useState('');
 
-const GET_SUBJECTS = gql`
-  query GetAllSubjects {
-    getAllSubjects {
-      id
-      subject_name
-    }
-  }
-`;
 
-const GET_TEACHERS = gql`
-  query GetAllStaff {
-    GetAllStaff {
-      id
-      firstName
-      lastName
-      email
-      department
-    }
-  }
-`;
+  const classes = Array.from({ length: 12 }, (_, i) => `Class ${i + 1}`);
 
-const GET_TIMETABLE_ENTRIES = gql`
-  query GetTimetableEntries {
-    getTimetableEntries {
-      id
-      created_at
-      class_id
-      period
-      subject_id
-      teacher_id
-      updated_at
-    }
-  }
-`;
-
-const ADD_TIMETABLE_ENTRY = gql`
-  mutation AddTimetableEntry(
-    $class_id: ID!
-    $subject_id: ID!
-    $teacher_id: ID!
-    $period: String!
-  ) {
-    addTimetableEntry(
-      class_id: $class_id
-      subject_id: $subject_id
-      teacher_id: $teacher_id
-      period: $period
-    ) {
-      id
-      class_id
-      subject_id
-      teacher_id
-      period
-    }
-  }
-`;
-
-const UPDATE_TIMETABLE_ENTRY = gql`
-  mutation UpdateTimetableEntry(
-    $id: ID!
-    $class_id: ID
-    $subject_id: ID
-    $teacher_id: ID
-    $period: String
-  ) {
-    updateTimetableEntry(
-      id: $id
-      class_id: $class_id
-      subject_id: $subject_id
-      teacher_id: $teacher_id
-      period: $period
-    ) {
-      id
-      class_id
-      subject_id
-      teacher_id
-      period
-    }
-  }
-`;
-
-const DELETE_TIMETABLE_ENTRY = gql`
-  mutation DeleteTimetableEntry($id: ID!) {
-    deleteTimetableEntry(id: $id)
-  }
-`;
-
-const TimetableManagement = () => {
-  const [formData, setFormData] = useState({
-    id: '', // Added for editing
-    class_id: '',
-    subject_id: '',
-    teacher_id: '',
-    period: '',
-  });
-  const [isEditing, setIsEditing] = useState(false); // Track editing state
-
-  // Fetch queries
-  const { data: classData } = useQuery(GET_CLASSES);
-  const { data: teacherData, loading: teacherLoading } = useQuery(GET_TEACHERS);
-  const { data: subjectData, loading: subjectLoading } = useQuery(GET_SUBJECTS);
-  const { data: timetableData, refetch: refetchTimetable } = useQuery(GET_TIMETABLE_ENTRIES);
-
-  // Mutations
-  const [addTimetableEntry] = useMutation(ADD_TIMETABLE_ENTRY);
-  const [updateTimetableEntry] = useMutation(UPDATE_TIMETABLE_ENTRY, {
-    refetchQueries: [{ query: GET_TIMETABLE_ENTRIES }],
-  });
-  const [deleteTimetableEntry] = useMutation(DELETE_TIMETABLE_ENTRY);
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
-  const generatePDF = () => {
-    const doc = new jsPDF();
-
-    // Add timetable title
-    doc.setFontSize(18);
-    doc.text('Timetable Entry Details', 10, 10);
-
-    // Add timetable data
-    doc.setFontSize(12);
-    let yPos = 20;
-
-    // Class details
-    const selectedClass = classData?.getAllClasses.find((cls) => cls.id === formData.class_id);
-    doc.text(`Class: ${selectedClass?.class_name || ''} (${selectedClass?.section || ''})`, 10, yPos);
-    yPos += 10;
-
-    // Subject details
-    const selectedSubject = subjectData?.getAllSubjects.find((sub) => sub.id === formData.subject_id);
-    doc.text(`Subject: ${selectedSubject?.subject_name || ''}`, 10, yPos);
-    yPos += 10;
-
-    // Teacher details
-    const selectedTeacher = teacherData?.GetAllStaff.find((teacher) => teacher.id === formData.teacher_id);
-    doc.text(`Teacher: ${selectedTeacher?.firstName || ''} (${selectedTeacher?.department || ''})`, 10, yPos);
-    yPos += 10;
-
-    // Period
-    doc.text(`Period: ${formData.period}`, 10, yPos);
-
-    // Save the PDF
-    doc.save('timetable_entry.pdf');
-    toast.success('PDF generated successfully!');
-  };
-
-  const handleEdit = (entry) => {
-    setIsEditing(true);
-    setFormData({
-      id: entry.id,
-      class_id: entry.class_id,
-      subject_id: entry.subject_id,
-      teacher_id: entry.teacher_id,
-      period: entry.period,
-    });
-  };
-
-  const handleDelete = async (id) => {
-    try {
-      await deleteTimetableEntry({ variables: { id } });
-      toast.success('Timetable entry deleted successfully!');
-      refetchTimetable();
-    } catch (error) {
-      toast.error(`Error deleting timetable entry: ${error.message}`);
-    }
-  };
-
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-
-    // Validate all fields are filled
-    if (!formData.class_id || !formData.subject_id || !formData.teacher_id || !formData.period) {
-      toast.error('Please fill in all fields.');
+    
+    if (password !== 'khushveer') {
+      toast.error('Invalid authorization password');
       return;
     }
 
-    try {
-      if (isEditing) {
-        // Update existing entry
-        await updateTimetableEntry({
-          variables: {
-            id: formData.id,
-            class_id: formData.class_id,
-            subject_id: formData.subject_id,
-            teacher_id: formData.teacher_id,
-            period: formData.period,
-          },
-        });
-        toast.success('Timetable entry updated successfully!');
-      } else {
-        // Add new entry
-        await addTimetableEntry({
-          variables: formData,
-        });
-        toast.success('Timetable entry added successfully!');
-        // Generate PDF after successful submission
-        generatePDF();
-      }
-
-      // Refetch timetable data and reset form
-      refetchTimetable();
-      setFormData({
-        id: '',
-        class_id: '',
-        subject_id: '',
-        teacher_id: '',
-        period: '',
-      });
-      setIsEditing(false);
-    } catch (error) {
-      toast.error(`Error ${isEditing ? 'updating' : 'adding'} timetable entry: ${error.message}`);
+    if (!selectedClass || selectedTeachers.length === 0) {
+      toast.error('Please select class and teachers');
+      return;
     }
+
+    // Here you would typically make your mutation call
+    toast.success(`Teachers assigned to ${selectedClass} successfully!`);
   };
 
-  // Create a mapping from teacher_id to teacher_name
-  const teacherMap = {};
-  if (teacherData?.GetAllStaff) {
-    teacherData.GetAllStaff.forEach((teacher) => {
-      teacherMap[teacher.id] = `${teacher.firstName} ${teacher.lastName} (${teacher.department})`;
-    });
-  }
+  // if (loading) return (
+  //   <div className="min-h-screen flex items-center justify-center">
+  //     <div className="loading loading-spinner loading-lg text-primary"></div>
+  //   </div>
+  // );
 
-  // Create a mapping from subject_id to subject_name
-  const subjectMap = {};
-  if (subjectData?.getAllSubjects) {
-    subjectData.getAllSubjects.forEach((subject) => {
-      subjectMap[subject.id] = subject.subject_name;
-    });
-  }
-
-  if (teacherLoading || subjectLoading) {
-    return <div>Loading...</div>;
-  }
-
-  if (!classData || !subjectData || !teacherData || !timetableData) {
-    return <div>Loading...</div>;
-  }
+  // if (error) return (
+  //   <div className="alert alert-error shadow-lg">
+  //     <span>Error loading staff data!</span>
+  //   </div>
+  // );
 
   return (
-    <div className="container mx-auto p-4">
-      <h2 className="text-2xl font-bold mb-4">Timetable Management</h2>
+    <div className="container mx-auto p-4 max-w-4xl">
+      <div className="card bg-base-100 shadow-xl">
+        <div className="card-body">
+          <h2 className="card-title flex items-center gap-2">
+            <School className="w-6 h-6" />
+            Class Teacher Assignment
+          </h2>
 
-      {/* Form */}
-      <form onSubmit={handleSubmit} className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
-        {/* Class Dropdown */}
-        <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-bold mb-2">
-            Class
-            <select
-              name="class_id"
-              value={formData.class_id}
-              onChange={handleInputChange}
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700"
-            >
-              <option value="">Select Class</option>
-              {classData.getAllClasses.map((cls) => (
-                <option key={cls.id} value={cls.id}>
-                  {cls.class_name} {cls.section}
-                </option>
-              ))}
-            </select>
-          </label>
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Class Selection */}
+            <div className="form-control w-full">
+              <label className="label">
+                <span className="label-text">Select Class</span>
+              </label>
+              <select 
+                className="select select-bordered w-full" 
+                value={selectedClass}
+                onChange={(e) => setSelectedClass(e.target.value)}
+              >
+                <option value="">Select a class</option>
+                {classes.map((cls) => (
+                  <option key={cls} value={cls}>{cls}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Teacher Selection */}
+            <div className="form-control w-full">
+              <label className="label">
+                <span className="label-text flex items-center gap-2">
+                  <Users className="w-5 h-5" />
+                  Select Teachers
+                </span>
+              </label>
+              {/* <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {data?.GetAllStaff.map((staff) => (
+                  <div key={staff.id} className="form-control">
+                    <label className="label cursor-pointer justify-start gap-2">
+                      <input
+                        type="checkbox"
+                        className="checkbox checkbox-primary"
+                        checked={selectedTeachers.includes(staff.id)}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setSelectedTeachers([...selectedTeachers, staff.id]);
+                          } else {
+                            setSelectedTeachers(
+                              selectedTeachers.filter((id) => id !== staff.id)
+                            );
+                          }
+                        }}
+                      />
+                      <div>
+                        <div className="font-medium">{staff.firstName}</div>
+                        <div className="text-sm text-gray-500">{staff.department}</div>
+                      </div>
+                    </label>
+                  </div>
+                ))}
+              </div> */}
+            </div>
+
+            {/* Authorization Password */}
+            <div className="form-control w-full max-w-md">
+              <label className="label">
+                <span className="label-text flex items-center gap-2">
+                  <Lock className="w-5 h-5" />
+                  Authorization Password
+                </span>
+              </label>
+              <input
+                type="password"
+                placeholder="Enter password"
+                className="input input-bordered w-full"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </div>
+
+            {/* Submit Button */}
+            <div className="card-actions justify-end">
+              <button 
+                type="submit" 
+                className="btn btn-primary gap-2"
+              >
+                <Save className="w-5 h-5" />
+                Save Assignment
+              </button>
+            </div>
+          </form>
         </div>
-
-        {/* Subject Dropdown */}
-        <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-bold mb-2">
-            Subject
-            <select
-              name="subject_id"
-              value={formData.subject_id}
-              onChange={handleInputChange}
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700"
-            >
-              <option value="">Select Subject</option>
-              {subjectData.getAllSubjects.map((subject) => (
-                <option key={subject.id} value={subject.id}>
-                  {subject.subject_name}
-                </option>
-              ))}
-            </select>
-          </label>
-        </div>
-
-        {/* Teacher Dropdown */}
-        <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-bold mb-2">
-            Teacher
-            <select
-              name="teacher_id"
-              value={formData.teacher_id}
-              onChange={handleInputChange}
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700"
-            >
-              <option value="">Select Teacher</option>
-              {teacherData.GetAllStaff.map((teacher) => (
-                <option key={teacher.id} value={teacher.id}>
-                  {teacher.firstName} ({teacher.department})
-                </option>
-              ))}
-            </select>
-          </label>
-        </div>
-
-        {/* Period Dropdown */}
-        <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-bold mb-2">
-            Period
-            <select
-              name="period"
-              value={formData.period}
-              onChange={handleInputChange}
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700"
-            >
-              <option value="">Select Period</option>
-              {[1, 2, 3, 4, 5, 6, 7, 8].map((period) => (
-                <option key={period} value={period.toString()}>
-                  Period {period}
-                </option>
-              ))}
-            </select>
-          </label>
-        </div>
-
-        {/* Submit Button */}
-        <div className="flex items-center justify-between">
-          <button
-            type="submit"
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-          >
-            {isEditing ? 'Update Timetable Entry' : 'Add Timetable Entry'}
-          </button>
-          {isEditing && (
-            <button
-              type="button"
-              onClick={() => {
-                setIsEditing(false);
-                setFormData({
-                  id: '',
-                  class_id: '',
-                  subject_id: '',
-                  teacher_id: '',
-                  period: '',
-                });
-              }}
-              className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-            >
-              Cancel
-            </button>
-          )}
-        </div>
-      </form>
-
-      {/* Timetable Entries List */}
-      <div className="bg-white shadow-md rounded">
-        <table className="min-w-full">
-          <thead>
-            <tr>
-              <th className="px-6 py-3 border-b-2 border-gray-300 text-left leading-4 text-blue-500 tracking-wider">Class</th>
-              <th className="px-6 py-3 border-b-2 border-gray-300 text-left leading-4 text-blue-500 tracking-wider">Subject</th>
-              <th className="px-6 py-3 border-b-2 border-gray-300 text-left leading-4 text-blue-500 tracking-wider">Teacher</th>
-              <th className="px-6 py-3 border-b-2 border-gray-300 text-left leading-4 text-blue-500 tracking-wider">Period</th>
-              <th className="px-6 py-3 border-b-2 border-gray-300 text-left leading-4 text-blue-500 tracking-wider">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {timetableData.getTimetableEntries.map((entry) => (
-              <tr key={entry.id} className="border-b border-gray-200">
-                <td className="px-6 py-4 whitespace-no-wrap">{entry.class_id}</td>
-                <td className="px-6 py-4 whitespace-no-wrap">{subjectMap[entry.subject_id]}</td>
-                <td className="px-6 py-4 whitespace-no-wrap">{teacherMap[entry.teacher_id]}</td>
-                <td className="px-6 py-4 whitespace-no-wrap">Period {entry.period}</td>
-                <td className="px-6 py-4 whitespace-no-wrap">
-                  <button
-                    onClick={() => handleEdit(entry)}
-                    className="text-blue-600 hover:text-blue-900 mr-2"
-                  >
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => handleDelete(entry.id)}
-                    className="text-red-600 hover:text-red-900"
-                  >
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
       </div>
-
-      {/* Toast Notifications */}
-      <ToastContainer position="top-right" autoClose={3000} />
     </div>
   );
 };
 
-export default TimetableManagement;
+export default Setting;

@@ -13,6 +13,7 @@ import {
       ResultID: { type: GraphQLInt },
       StudentID: { type: GraphQLString },
       ExamTypeID: { type: GraphQLInt },
+      ExamType: { type: GraphQLString }, // Add ExamType field
       SubjectName: { type: GraphQLString },
       MarksObtained: { type: GraphQLFloat },
       MaxMarks: { type: GraphQLInt },
@@ -38,20 +39,39 @@ import {
   // resolvers/studentResults.js
 
   
-   const getStudentResults = {
+  const getStudentResults = {
     type: new GraphQLList(StudentResultType),
     args: {
       StudentID: { type: GraphQLString },
-
+      ExamType: { type: GraphQLString }
     },
     resolve: async (parent, args) => {
-      const result = await sql.query`
-        SELECT * FROM StudentResults 
-        WHERE StudentID = ${args.StudentID}
-      `;
-      return result.recordset;
+      try {
+        // Create a new request with parameterized query
+        const request = new sql.Request();
+        
+        let query = `
+          SELECT * FROM StudentResults 
+          WHERE StudentID = @StudentID
+        `;
+        
+        // Add parameters
+        request.input('StudentID', sql.VarChar, args.StudentID);
+        
+        if (args.ExamType) {
+          query += ` AND ExamType = @ExamType`;
+          request.input('ExamType', sql.VarChar, args.ExamType);
+        }
+        
+        const result = await request.query(query);
+        return result.recordset;
+      } catch (error) {
+        console.error('Database error:', error);
+        throw new Error('Failed to fetch student results');
+      }
     }
   };
+  
   
   const getClassRankings = {
     type: new GraphQLList(TopPerformerType),
@@ -74,11 +94,12 @@ import {
       return result.recordset;
     }
   };
-   const addStudentResult = {
+  const addStudentResult = {
     type: StudentResultType,
     args: {
       StudentID: { type: GraphQLString },
       ExamTypeID: { type: GraphQLInt },
+      ExamType: { type: GraphQLString }, // Add ExamType argument
       SubjectName: { type: GraphQLString },
       MarksObtained: { type: GraphQLFloat },
       MaxMarks: { type: GraphQLInt },
@@ -99,13 +120,13 @@ import {
   
       const result = await sql.query`
         INSERT INTO StudentResults (
-          StudentID, ExamTypeID, SubjectName, MarksObtained, 
+          StudentID, ExamTypeID, ExamType, SubjectName, MarksObtained, 
           MaxMarks, ExamDate, Semester, AcademicYear, 
           Grade, Remarks
         )
         OUTPUT INSERTED.*
         VALUES (
-          ${args.StudentID}, ${args.ExamTypeID}, ${args.SubjectName},
+          ${args.StudentID}, ${args.ExamTypeID}, ${args.ExamType}, ${args.SubjectName},
           ${args.MarksObtained}, ${args.MaxMarks}, ${args.ExamDate},
           ${args.Semester}, ${args.AcademicYear}, ${grade},
           ${args.Remarks}

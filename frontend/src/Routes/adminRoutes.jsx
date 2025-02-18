@@ -7,7 +7,7 @@ import Academics from '../Component/admin/Administrative/Academics';
 import Finance from '../Component/admin/Administrative/Finance';
 import Students from "../Component/admin/Administrative/Students";
 import Reports from '../Component/admin/Administrative/Reports';
-import TimetableManagement from '../Component/admin/Administrative/Settings';
+import TimetableManagement from '../Component/admin/Administrative/TimetableManagement';
 import Facilities from '../Component/admin/Administrative/Facilities';
 import Addstaff from '../Component/admin/Administrative/componenet/Staff/Addstaff';
 import AddStudent from '../Component/admin/Administrative/componenet/Student/Addstudent.jsx';
@@ -17,6 +17,7 @@ import StudentFeeDetails from '../Component/admin/Administrative/componenet/Fina
 import EditStudent from '../Component/admin/Administrative/componenet/Student/EditStudent.jsx';
 import Notification from '../Component/admin/Administrative/Notification.jsx';
 import ExpenseManagement from "../Component/admin/Administrative/ExpenseManagement.jsx"
+import Setting from '../Component/admin/Administrative/Settings';
 export default function AdminRoutes() {
   return (
     <Routes>
@@ -37,7 +38,8 @@ export default function AdminRoutes() {
         <Route path="facilities" element={<Facilities />} />
         <Route path="reports" element={<Reports />} />
         <Route path="Notification" element={<Notification />} />
-        <Route path="settings" element={<TimetableManagement />} />
+        <Route path="TimeTable" element={<TimetableManagement />} />
+        <Route path="Setting" element={<Setting />} />
       </Route>
     </Routes>
   );
