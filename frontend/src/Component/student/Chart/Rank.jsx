@@ -15,9 +15,7 @@ const GET_TOP_PERFORMERS = gql`
   }
 `;
 
-const TopPerformersCard = ({ student }) => {
-
-  
+export const TopPerformersCard = ({ student }) => {
   const { loading, error, data } = useQuery(GET_TOP_PERFORMERS, {
     variables: { 
       class: student.Class,
@@ -25,11 +23,18 @@ const TopPerformersCard = ({ student }) => {
     pollInterval: 300000,
   });
 
-  // Log query state changes
+  useEffect(() => {
 
-
-  // Log when data changes
-
+    if (loading) {
+      console.log('Loading rankings...');
+    }
+    if (error) {
+      console.error('Error loading rankings:', error);
+    }
+    if (data) {
+      console.log('Rankings data:', data);
+    }
+  }, [loading, error, data]);
 
   return (
     <div className="card bg-base-100 shadow-xl">
@@ -58,7 +63,7 @@ const TopPerformersCard = ({ student }) => {
                 </tr>
               </thead>
               <tbody>
-                {data?.getClassRankings?.map((performer) => ( // Changed from topPerformers to getClassRankings
+                {data?.getClassRankings?.map((performer) => (
                   <tr 
                     key={performer.StudentID} 
                     className={performer.Rank <= 3 ? 'font-semibold' : ''}
@@ -98,4 +103,42 @@ const TopPerformersCard = ({ student }) => {
   );
 };
 
-export default TopPerformersCard;
+export const RankingCelebration = ({ student, rankingsData }) => {
+  const topRank = rankingsData?.getClassRankings.find((ranking)=>ranking.StudentID ===student.StudentID)?.Rank;
+useEffect(()=>{
+  console.log(topRank)
+})
+  if (topRank > 3) {
+    return null;
+  }
+
+  return (
+    <div className="bg-gradient-to-r from-blue-500 to-purple-600 text-white p-4 text-center">
+      <div className="flex items-center justify-center gap-2">
+        <Trophy className="h-6 w-6 text-yellow-300" />
+        <p className="text-lg font-bold">
+          Congratulations, {student.FirstName}! You are ranked #{topRank} in your class!
+        </p>
+      </div>
+    </div>
+  );
+};
+
+const Rank = ({ student }) => {
+  const { loading, error, data } = useQuery(GET_TOP_PERFORMERS, {
+    variables: { 
+      class: student.Class,
+    },
+    pollInterval: 300000,
+  });
+
+  return (
+    <div>
+     
+      {data && <RankingCelebration student={student} rankingsData={data} />}
+      <TopPerformersCard student={student} />
+    </div>
+  );
+};
+
+export default Rank;

@@ -14,7 +14,7 @@ const LOGIN_QUERY = gql`
   }
 `;
 
-export default function Login() {
+export default function FacLogin() {
   // State management
   const [credentials, setCredentials] = useState({
     Username: "",
@@ -53,7 +53,7 @@ export default function Login() {
       });
       
       // Redirect to admin panel
-      setTimeout(() => navigate('/admin/adminPanel', { 
+      setTimeout(() => navigate('/admin/FacilityAuth/Facility', { 
         state: { Username: queryData.FacultyLogin.Username } 
       }), 2000);
     }
@@ -115,7 +115,7 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-school bg-center bg-cover p-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
       <Toaster position="top-right" />
       
       <div className="w-full max-w-md relative">
@@ -211,9 +211,9 @@ export default function Login() {
                     Remember me
                   </label>
                 </div>
-                {/* <a href="#" className="text-indigo-600 hover:text-indigo-500 dark:text-indigo-400">
+                <a href="#" className="text-indigo-600 hover:text-indigo-500 dark:text-indigo-400">
                   Forgot password?
-                </a> */}
+                </a>
               </div>
               
               {/* Login Button */}
@@ -234,7 +234,7 @@ export default function Login() {
               
               {/* Faculty Help */}
               <div className="text-center text-sm text-gray-600 dark:text-gray-400 mt-4">
-                <p>Need technical assistance? <a href="#" className="text-indigo-600 hover:underline">Contact To School </a></p>
+                <p>Need technical assistance? <a href="#" className="text-indigo-600 hover:underline">Contact IT Support</a></p>
               </div>
             </div>
           </form>

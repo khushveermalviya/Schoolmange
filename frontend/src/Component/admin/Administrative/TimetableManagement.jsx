@@ -154,7 +154,7 @@ const TimetableManagement = () => {
     doc.text(`Subject: ${selectedSubject?.subject_name || ''}`, 10, yPos);
     yPos += 10;
 
-    // Teacher details
+    // Teacher details  
     const selectedTeacher = teacherData?.GetAllStaff.find((teacher) => teacher.id === formData.teacher_id);
     doc.text(`Teacher: ${selectedTeacher?.firstName || ''} (${selectedTeacher?.department || ''})`, 10, yPos);
     yPos += 10;
@@ -261,7 +261,8 @@ const TimetableManagement = () => {
 
   return (
     <div className="container mx-auto p-4">
-      <h2 className="text-2xl font-bold mb-4">Timetable Management</h2>
+          
+      <h2 className="text-2xl font-bold mb-4 items-center centet">Timetable Management</h2>
 
       {/* Form */}
       <form onSubmit={handleSubmit} className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">

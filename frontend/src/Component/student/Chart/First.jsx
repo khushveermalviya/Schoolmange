@@ -5,6 +5,8 @@ import { Moon, Sun, Book, Calendar, Bell, CheckCircle, Bookmark, Trophy } from '
 import useUserStore from '../../../app/useUserStore';
 import TopPerformersCard from './Rank';
 import RankingCelebration from './Rankingcelebration';
+import SubjectProgressChart from './jj';
+
 const GET_NOTIFICATIONS = gql`
   query Notifications($studentId: ID!) {
     notifications(StudentId: $studentId) {
@@ -389,7 +391,7 @@ export default function Dashboard() {
           {/* Middle Column */}
           <div className="space-y-6">
             {/* Progress Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {subjectProgress.map((subject, index) => (
                 <div key={index} className="card bg-base-100 shadow-xl">
                   <div className="card-body">
@@ -403,7 +405,9 @@ export default function Dashboard() {
                   </div>
                 </div>
               ))}
-            </div>
+            </div> */}
+            {/* Replace the old progress cards with this new chart */}
+<SubjectProgressChart subjectProgress={subjectProgress} />
 
             {/* Attendance Chart */}
             <div className="card bg-base-100 shadow-xl">
@@ -413,6 +417,8 @@ export default function Dashboard() {
 
           {/* Right Column */}
           <div className="space-y-6">
+                  {/* Top Performers */}
+                  <TopPerformersCard student={student} />
             {/* Notifications */}
             <div className="card bg-base-100 shadow-xl">
               <div className="card-body">
@@ -485,8 +491,7 @@ export default function Dashboard() {
               </div>
             </div>
 
-            {/* Top Performers */}
-            <TopPerformersCard student={student} />
+      
 
             {/* Todo List */}
             <div className="card bg-base-100 shadow-xl">

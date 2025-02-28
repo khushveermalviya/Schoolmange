@@ -16,6 +16,7 @@ export default function Administrative({ Username }) {
     { icon: <BarChart3 className="w-5 h-5" />, title: "Dashboard", path: "" },
     { icon: <Users className="w-5 h-5" />, title: "Staff Management", path: "staff" },
     { icon: <GraduationCap className="w-5 h-5" />, title: "Students", path: "students" },
+    { icon: <GraduationCap className="w-5 h-5" />, title: "Promote", path: "Promote" },
     { icon: <DollarSign className="w-5 h-5" />, title: "Finance", path: "finance" },
     { icon: <DollarSign className="w-5 h-5" />, title: "ExpenseManagement", path: "ExpenseManagement" },
     { icon: <BookOpen className="w-5 h-5" />, title: "Academics", path: "academics" },

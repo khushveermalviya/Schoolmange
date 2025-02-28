@@ -24,4 +24,16 @@
 --     ('Repairs', 'Maintenance and repair costs'),
 --     ('Utilities', 'Regular utility expenses'),
 --     ('Miscellaneous', 'Other expenses');
-SELECT * FROM Expenses;
+-- INSERT INTO [dbo].[StudentClassHistory] 
+--     ([StudentID], [Class], [AcademicYear], [StartDate], [SchoolName])
+-- SELECT 
+--     [StudentID], 
+--     [Class], 
+--     NULL,               -- Replace with logic for AcademicYear if needed (see below)
+--     [JoinDate], 
+--     [SchoolName]
+-- FROM 
+--     [dbo].[Students]
+-- WHERE 
+--     [Class] IS NOT NULL; -- Only include students with a class assigned
+SELECT * FROM StudentClassHistory

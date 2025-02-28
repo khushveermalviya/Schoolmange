@@ -11,7 +11,7 @@ const GET_STUDENTS = gql`
       LastName
       Class
     }
-  }
+  }   
 `;
 
 const SAVE_ATTENDANCE = gql`
@@ -168,7 +168,11 @@ const Attendance = () => {
   });
 
   // Available classes
-  const classes = Array.from({ length: 12 }, (_, i) => ({
+  const classes = 
+  
+  
+  
+  Array.from({ length: 12 }, (_, i) => ({
     id: i + 1,
     name: `Class ${i + 1}`
   }));

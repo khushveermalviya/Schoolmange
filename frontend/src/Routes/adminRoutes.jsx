@@ -18,6 +18,9 @@ import EditStudent from '../Component/admin/Administrative/componenet/Student/Ed
 import Notification from '../Component/admin/Administrative/Notification.jsx';
 import ExpenseManagement from "../Component/admin/Administrative/ExpenseManagement.jsx"
 import Setting from '../Component/admin/Administrative/Settings';
+import Promote from '../Component/admin/Administrative/Promot.jsx';
+import AdminLogin from '../Component/admin/Administrative/AdminLogin.jsx';
+
 export default function AdminRoutes() {
   return (
     <Routes>
@@ -27,6 +30,7 @@ export default function AdminRoutes() {
         <Route path="staff/addstaff" element={<Addstaff />} />
         <Route path="staff/:id" element={<StaffDetails />} /> {/* Add route for StaffDetails */}
         <Route path="academics" element={<Academics />} />
+        <Route path="Promote" element={<Promote />} />
         <Route path="finance" element={<Finance />} />
         
         <Route path="ExpenseManagement" element={<ExpenseManagement />} />

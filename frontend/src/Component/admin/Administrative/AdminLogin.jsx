@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useLazyQuery, gql } from '@apollo/client';
 import { useNavigate } from 'react-router-dom';
-import { Eye, EyeOff, BookOpen, User, Lock, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
+import { Eye, EyeOff, Shield, User, Lock, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
 import { toast, Toaster } from 'react-hot-toast';
 
-// GraphQL query for faculty authentication
+// GraphQL query for admin authentication
 const LOGIN_QUERY = gql`
   query FacultyLogin($Username: String!, $Password: String!) {
     FacultyLogin(Username: $Username, Password: $Password) {
@@ -14,7 +14,7 @@ const LOGIN_QUERY = gql`
   }
 `;
 
-export default function Login() {
+export default function AdminLogin() {
   // State management
   const [credentials, setCredentials] = useState({
     Username: "",
@@ -35,13 +35,13 @@ export default function Login() {
       
       // If remember me is checked, store username
       if (rememberMe) {
-        localStorage.setItem('facultyUsername', credentials.Username);
+        localStorage.setItem('adminUsername', credentials.Username);
       } else {
-        localStorage.removeItem('facultyUsername');
+        localStorage.removeItem('adminUsername');
       }
       
       // Show success notification
-      toast.success('Login successful! Welcome to Faculty Portal', {
+      toast.success('Login successful! Welcome to Admin Dashboard', {
         icon: <CheckCircle className="text-green-500" />,
         duration: 2000,
         style: {
@@ -53,7 +53,7 @@ export default function Login() {
       });
       
       // Redirect to admin panel
-      setTimeout(() => navigate('/admin/adminPanel', { 
+      setTimeout(() => navigate('/admin/AdministrativeAuth/Administrative', { 
         state: { Username: queryData.FacultyLogin.Username } 
       }), 2000);
     }
@@ -77,7 +77,7 @@ export default function Login() {
 
   // Check for stored username on component mount
   useEffect(() => {
-    const savedUsername = localStorage.getItem('facultyUsername');
+    const savedUsername = localStorage.getItem('adminUsername');
     if (savedUsername) {
       setCredentials(prev => ({
         ...prev,
@@ -115,30 +115,21 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-school bg-center bg-cover p-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 p-4">
       <Toaster position="top-right" />
       
-      <div className="w-full max-w-md relative">
-        {/* Decorative elements */}
-        <div className="absolute -top-12 -left-12 w-24 h-24 bg-indigo-500/10 rounded-full blur-xl animate-pulse"></div>
-        <div className="absolute -bottom-12 -right-12 w-32 h-32 bg-blue-500/20 rounded-full blur-xl animate-pulse"></div>
-        
-        <div className="relative bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden">
-          {/* Header with animation */}
-          <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-6 text-white relative overflow-hidden">
-            <div className="absolute top-0 left-0 w-full h-full opacity-20">
-              <div className="absolute top-4 left-4 w-12 h-12 rounded-full border-4 border-white/30 animate-ping"></div>
-              <div className="absolute bottom-4 right-10 w-8 h-8 rounded-full border-4 border-white/20 animate-ping"></div>
-              <div className="absolute top-10 right-4 w-6 h-6 rounded-full border-4 border-white/10 animate-ping"></div>
-            </div>
-            
-            <div className="flex items-center justify-center mb-2">
-              <div className="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center mb-4 shadow-lg">
-                <BookOpen className="w-8 h-8 text-white" />
+      <div className="w-full max-w-md">
+        {/* Card container */}
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl overflow-hidden">
+          {/* Header */}
+          <div className="bg-gradient-to-r from-purple-600 to-indigo-700 p-6 text-white">
+            <div className="flex justify-center">
+              <div className="w-20 h-20 rounded-full bg-white/20 flex items-center justify-center mb-4 shadow-lg">
+                <Shield className="w-10 h-10 text-white" />
               </div>
             </div>
-            <h1 className="text-2xl font-bold text-center">Faculty Login Portal</h1>
-            <p className="text-center text-blue-100 mt-2">Access your teaching dashboard</p>
+            <h1 className="text-2xl font-bold text-center">Admin Control Panel</h1>
+            <p className="text-center text-purple-100 mt-2">Secure administrative access</p>
           </div>
           
           {/* Login Form */}
@@ -147,7 +138,7 @@ export default function Login() {
               {/* Username Input */}
               <div className="space-y-2">
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Username
+                  Admin Username
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
@@ -158,8 +149,8 @@ export default function Login() {
                     name="Username"
                     value={credentials.Username}
                     onChange={handleChange}
-                    className="input input-bordered w-full pl-10 bg-gray-50 dark:bg-gray-700 border-gray-300 dark:border-gray-600 focus:ring-indigo-500 focus:border-indigo-500"
-                    placeholder="faculty_username"
+                    className="w-full pl-10 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    placeholder="admin_username"
                     required
                   />
                 </div>
@@ -179,7 +170,7 @@ export default function Login() {
                     name="Password"
                     value={credentials.Password}
                     onChange={handleChange}
-                    className="input input-bordered w-full pl-10 pr-10 bg-gray-50 dark:bg-gray-700 border-gray-300 dark:border-gray-600 focus:ring-indigo-500 focus:border-indigo-500"
+                    className="w-full pl-10 pr-10 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                     placeholder="••••••••"
                     required
                   />
@@ -197,13 +188,13 @@ export default function Login() {
                 </div>
               </div>
               
-              {/* Remember Me and Forgot Password */}
+              {/* Remember Me and Security */}
               <div className="flex items-center justify-between text-sm">
                 <div className="flex items-center">
                   <input
                     id="remember-me"
                     type="checkbox"
-                    className="checkbox checkbox-primary h-4 w-4"
+                    className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
                     checked={rememberMe}
                     onChange={() => setRememberMe(!rememberMe)}
                   />
@@ -211,9 +202,9 @@ export default function Login() {
                     Remember me
                   </label>
                 </div>
-                {/* <a href="#" className="text-indigo-600 hover:text-indigo-500 dark:text-indigo-400">
-                  Forgot password?
-                </a> */}
+                <a href="#" className="text-purple-600 hover:text-purple-500 dark:text-purple-400">
+                  Security policy
+                </a>
               </div>
               
               {/* Login Button */}
@@ -221,36 +212,30 @@ export default function Login() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="btn btn-primary w-full"
+                  className="w-full py-3 px-4 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-lg shadow-md hover:shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
                 >
                   {loading ? (
                     <div className="flex items-center justify-center">
                       <Loader2 className="animate-spin h-5 w-5 mr-2" />
-                      Logging in...
+                      Authenticating...
                     </div>
-                  ) : 'Sign in to Dashboard'}
+                  ) : 'Sign in to Admin Dashboard'}
                 </button>
               </div>
               
-              {/* Faculty Help */}
-              <div className="text-center text-sm text-gray-600 dark:text-gray-400 mt-4">
-                <p>Need technical assistance? <a href="#" className="text-indigo-600 hover:underline">Contact To School </a></p>
+              {/* Security Note */}
+              <div className="text-center text-sm text-gray-600 dark:text-gray-400 mt-4 flex items-center justify-center">
+                <Lock className="w-4 h-4 mr-1" />
+                <p>This is a secured authentication system</p>
               </div>
             </div>
           </form>
-          
-          {/* Faculty-related decorative illustration */}
-          <div className="absolute -z-10 opacity-5 right-0 top-1/3">
-            <svg width="180" height="180" viewBox="0 0 24 24" fill="currentColor" className="text-indigo-900">
-              <path d="M12,3L1,9L12,15L21,10.09V17H23V9M5,13.18V17.18L12,21L19,17.18V13.18L12,17L5,13.18Z" />
-            </svg>
-          </div>
         </div>
         
         {/* Footer note */}
-        <div className="text-center mt-6 text-gray-600 dark:text-gray-400 text-xs">
+        <div className="text-center mt-6 text-gray-400 text-xs">
           <p>© 2025 Educational Institute Management System</p>
-          <p className="mt-1">Secure faculty access portal • All rights reserved</p>
+          <p className="mt-1">Administrative access only • All actions are logged</p>
         </div>
       </div>
     </div>

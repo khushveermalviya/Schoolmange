@@ -33,7 +33,7 @@ import AiMutation from './AIGuru/AiMutation.js';
 import { AddStaff } from './Administrative/Addstaff.js';
 import {  Expenses,ExpenseMutation} from './Administrative/Expenses.js';
 import {addStudentResult,getStudentResults,getClassRankings} from "./Administrative/Result.js"
-import {ClassTeacherQuery} from "./Administrative/ClassTeacher.js"
+import {ClassTeacherQuery,ClassMutation} from "./Administrative/ClassTeacher.js"
 
 // Additional Types
 const ChatType = new GraphQLObjectType({
@@ -152,6 +152,7 @@ const RootMutation = new GraphQLObjectType({
     ...groupMutations,
     ...ExpenseMutation,
     addStudentResult,
+    ClassMutation,
 
 
 

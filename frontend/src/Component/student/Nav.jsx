@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState,useRef ,useEffect } from 'react';
 import useUserStore from '../../app/useUserStore.jsx';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { 
@@ -74,8 +74,14 @@ const items = [
   { title: 'Attendance', to: 'Attendence', icon: <ClipboardList className="w-full h-full" /> },
   { title: 'Result', to: 'result', icon: <BookOpen className="w-full h-full" /> },
   { title: 'Complain', to: 'complain', icon: <AlertCircle className="w-full h-full" /> },
+
+]
+const dropdown=[
+  { title: 'Quiz', to: 'Quiz', icon: <Brain className="w-full h-full" /> },
+  { title: 'Fees', to: 'Fees', icon: <Brain className="w-full h-full" /> },
   { title: 'Guru', to: 'Aiguru', icon: <Brain className="w-full h-full" /> }
 ];
+
 
 export default function Nav() {
   const[isActive,SetisActive]=useState("Home")
@@ -127,7 +133,7 @@ export default function Nav() {
             <div className="flex items-center gap-4 w-40">
               <div className="avatar">
                 <div className="w-10 rounded-full">
-                  <img src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp" />
+                  <img src="/face.jpg" />
                 </div>
               </div>
               <span className="text-xl font-bold">
@@ -180,47 +186,131 @@ export default function Nav() {
   );
 
   // Mobile Header with glass effect
-  const MobileHeader = () => (
-    <nav className="md:hidden fixed top-0 left-0 right-0 z-50 backdrop-blur-md bg-white/80 dark:bg-gray-800/80 border-b border-gray-200 dark:border-gray-700">
-      <div className="flex justify-between items-center h-14 px-4">
-        {isGroupChatRoute ? (
-          <button 
-            onClick={() => navigate('/')} 
-            className="relative w-8 h-8 flex items-center justify-center text-gray-600"
-          >
-            <X className="w-6 h-6" />
-          </button>
-        ) : (
-          <NavLink to="groupchat">
-            <button className="relative w-8 h-8 flex items-center justify-center text-gray-600">
-              <MessageCircle className="w-6 h-6" />
-              {messageCount > 0 && (
-                <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
-                  {messageCount}
-                </div>
+  const MobileHeader = () => {
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const menuRef = useRef(null);
+  
+    // Close menu when clicking outside
+    useEffect(() => {
+      const handleClickOutside = (event) => {
+        if (menuRef.current && !menuRef.current.contains(event.target)) {
+          setIsMenuOpen(false);
+        }
+      };
+  
+      document.addEventListener("mousedown", handleClickOutside);
+      return () => {
+        document.removeEventListener("mousedown", handleClickOutside);
+      };
+    }, []);
+  
+    // Handle menu click
+    const toggleMenu = () => {
+      setIsMenuOpen(!isMenuOpen);
+    };
+  
+    return (
+      <nav className="md:hidden fixed top-0 left-0 right-0 z-50 backdrop-blur-md bg-white/80 dark:bg-gray-800/80 border-b border-gray-200 dark:border-gray-700">
+        <div className="flex justify-between items-center h-14 px-4">
+          {isGroupChatRoute ? (
+            <button
+              onClick={() => navigate('/')}
+              className="relative w-8 h-8 flex items-center justify-center text-gray-600"
+            >
+              <X className="w-6 h-6" />
+            </button>
+          ) : (
+            <NavLink to="groupchat">
+              <button className="relative w-8 h-8 flex items-center justify-center text-gray-600">
+                <MessageCircle className="w-6 h-6" />
+                {messageCount > 0 && (
+                  <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
+                    {messageCount}
+                  </div>
+                )}
+              </button>
+            </NavLink>
+          )}
+  
+          <div className="flex items-center justify-center">
+            <img src="/vite.svg" alt="Logo" className="h-8 w-auto" />
+          </div>
+  
+          <div className="relative" ref={menuRef}>
+            <button
+              onClick={toggleMenu}
+              className={`
+                w-8 h-8 flex items-center justify-center rounded-full
+                ${isMenuOpen ? 'bg-purple-100 text-purple-600' : 'text-gray-600'}
+                hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-300
+              `}
+            >
+              {isMenuOpen ? (
+                <X className="w-5 h-5" />
+              ) : (
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="3" y1="6" x2="21" y2="6" />
+                  <line x1="3" y1="12" x2="21" y2="12" />
+                  <line x1="3" y1="18" x2="21" y2="18" />
+                </svg>
               )}
             </button>
-          </NavLink>
-        )}
-        
-        <div className="flex items-center justify-center">
-          <img src="/vite.svg" alt="Logo" className="h-8 w-auto" />
+  
+            {/* Dropdown Menu */}
+            <div 
+              className={`
+                absolute right-0 mt-2 w-56 origin-top-right
+                bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700
+                transition-all duration-300 ease-in-out transform
+                ${isMenuOpen ? 'scale-100 opacity-100' : 'scale-95 opacity-0 pointer-events-none'}
+              `}
+              style={{ maxHeight: isMenuOpen ? '500px' : '0px', overflow: 'hidden' }}
+            >
+              <div className="p-2 space-y-1">
+                {dropdown.map((item) => (
+                  <NavLink
+                    key={item.title}
+                    to={item.to}
+                    onClick={() => setIsMenuOpen(false)}
+                    className={({ isActive }) => `
+                      flex items-center space-x-3 px-3 py-2 rounded-md
+                      ${isActive 
+                        ? 'bg-gradient-to-r from-purple-50 to-indigo-50 text-purple-600 dark:text-purple-400 dark:bg-gray-700' 
+                        : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'}
+                      transition-colors duration-200
+                    `}
+                  >
+                    <div className="w-5 h-5 flex-shrink-0">{item.icon}</div>
+                    <span className="font-medium">{item.title}</span>
+                  </NavLink>
+                ))}
+                
+                <div className="my-2 border-t border-gray-200 dark:border-gray-700"></div>
+                
+                <button
+                  onClick={() => {
+                    setIsMenuOpen(false);
+                    handleLogoutClick();
+                  }}
+                  disabled={isLoggingOut}
+                  className={`
+                    w-full flex items-center space-x-3 px-3 py-2 rounded-md
+                    ${isLoggingOut 
+                      ? 'opacity-50 cursor-not-allowed' 
+                      : 'text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20'}
+                    transition-all duration-300
+                  `}
+                >
+                  <LogOut className="w-5 h-5 flex-shrink-0" />
+                  <span className="font-medium">Logout</span>
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
-        
-        <button
-          onClick={handleLogoutClick}
-          disabled={isLoggingOut}
-          className={`
-            w-8 h-8 flex items-center justify-center
-            ${isLoggingOut ? 'opacity-50' : 'text-gray-600 hover:text-red-600'}
-            transition-all duration-300
-          `}
-        >
-          <LogOut className="w-5 h-5" />
-        </button>
-      </div>
-    </nav>
-  );
+      </nav>
+    );
+  };
 
   // Mobile Bottom Navigation with glass effect
   const MobileNav = () => {
