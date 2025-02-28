@@ -28,7 +28,7 @@ export default function Administrative({ Username }) {
   ];
   const handleLogout = () => {
     localStorage.removeItem('tokenss');
-    navigate('/admin');
+    navigate('/AdministrativeAuth');
   };
 
   return (
