@@ -13,7 +13,7 @@
   import Attendence from './Component/student/Attendence.jsx';
   import Layout from './Routes/Layout.jsx';
   import Faculty from './Component/admin/Facuity/Faculty.jsx';
-  import S1 from './Component/admin/Students/S1.jsx';
+ 
   import Adminlayout from './Routes/Adminlayout.jsx';
   import Classes from './Component/admin/Students/Classes.jsx';
   import ClassesLayout from './Routes/ClassesLayout.jsx';
