@@ -20,7 +20,7 @@ const expectedRole = "student"
 
       try {
      
-        const response = await fetch('http://localhost:5000/api/verify-token', {
+        const response = await fetch('https://center-gefucegncpf7akcc.centralindia-01.azurewebsites.net/api/verify-token', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -34,6 +34,7 @@ const expectedRole = "student"
         if (response.ok && data.valid && data.role === expectedRole) {
         
           setIsValid(true); // Token is valid and role matches
+          setIsVerified(true);
         } else {
         
           // Clear the invalid token
