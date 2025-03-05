@@ -1,35 +1,24 @@
-import jwt from 'jsonwebtoken';
-import sql from 'mssql';
-import dotenv from 'dotenv';
+import validateToken from './validateToken.js';
 
-dotenv.config();
-
-const authMiddleware = async (req, res, next) => {
+const authMiddleware = (expectedRole) => async (req, res, next) => {
   const token = req.headers.authorization?.split(' ')[1];
-  const SECRET_KEY = process.env.SECRET_KEY;
+  // console.log('Authorization Header:', req.headers.authorization);
 
   if (!token) {
-    req.student = null;
+    req.user = null;
     return next();
   }
 
-  try {
-    const decoded = jwt.verify(token, SECRET_KEY);
+  const validationResult = await validateToken(token, expectedRole);
 
-    const result = await sql.query`
-      SELECT StudentID, FirstName, LastName, Class
-      FROM Students
-      WHERE StudentID = ${decoded.StudentID}
-    `;
-
-    if (result.recordset.length > 0) {
-      req.student = result.recordset[0];
-    } else {
-      req.student = null;
-    }
-  } catch (error) {
-    req.student = null;
+  if (!validationResult.valid) {
+    req.user = null;
+    req.tokenExpired = validationResult.message === 'Token expired';
+    return next();
   }
+
+  req.user = validationResult.user;
+  req.tokenExpired = false;
   next();
 };
 

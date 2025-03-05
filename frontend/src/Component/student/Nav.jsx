@@ -74,6 +74,16 @@ const items = [
   { title: 'Attendance', to: 'Attendence', icon: <ClipboardList className="w-full h-full" /> },
   { title: 'Result', to: 'result', icon: <BookOpen className="w-full h-full" /> },
   { title: 'Complain', to: 'complain', icon: <AlertCircle className="w-full h-full" /> },
+  { title: 'Quiz', to: 'Quiz', icon: <Brain className="w-full h-full" /> },
+  { title: 'Fees', to: 'Fees', icon: <Brain className="w-full h-full" /> },
+  { title: 'Guru', to: 'Aiguru', icon: <Brain className="w-full h-full" /> }
+
+]
+const itemss = [
+  { title: 'Home', to: 'Home', icon: <Home className="w-full h-full" /> },
+  { title: 'Attendance', to: 'Attendence', icon: <ClipboardList className="w-full h-full" /> },
+  { title: 'Result', to: 'result', icon: <BookOpen className="w-full h-full" /> },
+  { title: 'Complain', to: 'complain', icon: <AlertCircle className="w-full h-full" /> }
 
 ]
 const dropdown=[
@@ -327,7 +337,7 @@ export default function Nav() {
           backdrop-blur-lg bg-white/90 dark:bg-gray-800/90
           shadow-lg rounded-2xl mx-auto
         `}>
-          {items.map((item) => (
+          {itemss.map((item) => (
             <NavLink
               key={item.title}
               to={item.to}

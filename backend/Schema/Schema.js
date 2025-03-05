@@ -34,6 +34,7 @@ import { AddStaff } from './Administrative/Addstaff.js';
 import {  Expenses,ExpenseMutation} from './Administrative/Expenses.js';
 import {addStudentResult,getStudentResults,getClassRankings} from "./Administrative/Result.js"
 import {ClassTeacherQuery,ClassMutation} from "./Administrative/ClassTeacher.js"
+import { UpdateStaff,GetStaffByUsername } from './Administrative/UpdateStaff.js';
 
 // Additional Types
 const ChatType = new GraphQLObjectType({
@@ -94,6 +95,7 @@ const RootQuery = new GraphQLObjectType({
     ...Expenses,
     getStudentResults,getClassRankings,
     ClassTeacherQuery,
+    GetStaffByUsername,
     // New Fetch Resolvers
     getStudentChats: {
       type: new GraphQLList(ChatType),
@@ -153,6 +155,7 @@ const RootMutation = new GraphQLObjectType({
     ...ExpenseMutation,
     addStudentResult,
     ClassMutation,
+    UpdateStaff,
 
 
 
