@@ -1,16 +1,7 @@
-import React, { useState,useRef ,useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import useUserStore from '../../app/useUserStore.jsx';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
-import { 
-  Home, 
-  BookOpen, 
-  ClipboardList, 
-  AlertCircle, 
-  Brain, 
-  LogOut, 
-  MessageCircle, 
-  X 
-} from 'lucide-react';
+import { Home, BookOpen, ClipboardList, AlertCircle, Brain, LogOut, MessageCircle, X } from 'lucide-react';
 import { Toaster, toast } from 'react-hot-toast';
 
 // Logout Confirmation Modal Component
@@ -77,24 +68,21 @@ const items = [
   { title: 'Quiz', to: 'Quiz', icon: <Brain className="w-full h-full" /> },
   { title: 'Fees', to: 'Fees', icon: <Brain className="w-full h-full" /> },
   { title: 'Guru', to: 'Aiguru', icon: <Brain className="w-full h-full" /> }
-
-]
+];
 const itemss = [
   { title: 'Home', to: 'Home', icon: <Home className="w-full h-full" /> },
   { title: 'Attendance', to: 'Attendence', icon: <ClipboardList className="w-full h-full" /> },
   { title: 'Result', to: 'result', icon: <BookOpen className="w-full h-full" /> },
   { title: 'Complain', to: 'complain', icon: <AlertCircle className="w-full h-full" /> }
-
-]
-const dropdown=[
+];
+const dropdown = [
   { title: 'Quiz', to: 'Quiz', icon: <Brain className="w-full h-full" /> },
   { title: 'Fees', to: 'Fees', icon: <Brain className="w-full h-full" /> },
   { title: 'Guru', to: 'Aiguru', icon: <Brain className="w-full h-full" /> }
 ];
 
-
 export default function Nav() {
-  const[isActive,SetisActive]=useState("Home")
+  const [isActive, SetisActive] = useState("Home");
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [messageCount, setMessageCount] = useState(3);
@@ -123,11 +111,13 @@ export default function Nav() {
 
     setIsLoggingOut(true);
     setIsLogoutModalOpen(false);
-    setTimeout(() => {
-      localStorage.removeItem('token');
-      localStorage.removeItem('userType');
-      navigate('/');
-    }, 2000);
+    
+    // Clear all authentication-related local storage
+    localStorage.clear(); // This removes ALL local storage items
+
+    // Use multiple methods to ensure redirect
+    window.location.href = '/';  // Force full page reload
+    navigate('/');  // React Router navigation
   };
 
   const handleLogoutCancel = () => {
@@ -199,7 +189,7 @@ export default function Nav() {
   const MobileHeader = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const menuRef = useRef(null);
-  
+
     // Close menu when clicking outside
     useEffect(() => {
       const handleClickOutside = (event) => {
@@ -207,18 +197,18 @@ export default function Nav() {
           setIsMenuOpen(false);
         }
       };
-  
+
       document.addEventListener("mousedown", handleClickOutside);
       return () => {
         document.removeEventListener("mousedown", handleClickOutside);
       };
     }, []);
-  
+
     // Handle menu click
     const toggleMenu = () => {
       setIsMenuOpen(!isMenuOpen);
     };
-  
+
     return (
       <nav className="md:hidden fixed top-0 left-0 right-0 z-50 backdrop-blur-md bg-white/80 dark:bg-gray-800/80 border-b border-gray-200 dark:border-gray-700">
         <div className="flex justify-between items-center h-14 px-4">

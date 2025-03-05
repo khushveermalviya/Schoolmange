@@ -1,25 +1,26 @@
 import React, { useEffect, useState } from 'react';
-import { Navigate, useLocation } from 'react-router-dom';
+import { Navigate, useLocation,useNavigate } from 'react-router-dom';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { TailSpin } from 'react-loader-spinner'; // Import the loader component
 
 const Protect = ({ children }) => {
   const token = localStorage.getItem('token'); // Check if token exists
   const location = useLocation();
+  const navigate = useNavigate(); // Add useNavigate hook
   const [isValid, setIsValid] = useState(null); // State to track token validity
   const [isVerified, setIsVerified] = useState(false); // State to track if token has been verified
-const expectedRole = "student"
+  const expectedRole = "student";
+
   useEffect(() => {
-    // Function to verify the token with the server
     const verifyTokenWithServer = async () => {
       if (!token) {
-       
-        setIsValid(false); // No token means invalid
+        setIsValid(false);
+        setIsVerified(true);
         return;
       }
 
       try {
-     
         const response = await fetch('https://center-gefucegncpf7akcc.centralindia-01.azurewebsites.net/api/verify-token', {
           method: 'POST',
           headers: {
@@ -29,50 +30,43 @@ const expectedRole = "student"
         });
 
         const data = await response.json();
-       
-
         if (response.ok && data.valid && data.role === expectedRole) {
-        
-          setIsValid(true); // Token is valid and role matches
-          setIsVerified(true);
+          setIsValid(true);
         } else {
-        
-          // Clear the invalid token
           localStorage.removeItem('token');
-          toast.error('Your session has expired . Please Login Again.', {
+          localStorage.removeItem('userType'); // Ensure complete logout
+          toast.error('Your session has expired. Please Login Again.', {
             autoClose: 5000,
           });
-          setIsValid(false); // Token is invalid, expired, or role does not match
+          setIsValid(false);
+          navigate('/'); // Programmatically navigate to login
         }
       } catch (error) {
         console.error('Error verifying token:', error);
-        setIsValid(false); // Treat network errors as invalid tokens
+        setIsValid(false);
       } finally {
-        setIsVerified(true); // Mark token as verified
+        setIsVerified(true);
       }
     };
 
     if (!isVerified) {
       verifyTokenWithServer();
     }
-  }, [token, isVerified]);
+  }, [token, isVerified, navigate]);
 
   // While waiting for the server response, show a loading state
   if (isValid === null) {
-    return <div>Loading...</div>;
+    return  <div className="flex items-center justify-center min-h-screen">
+    <TailSpin height="50" width="50" color="blue" ariaLabel="loading" />
+    <span className="ml-4">Loading...</span>
+  </div>;
   }
 
   // If no valid token and trying to access protected routes, show toast and redirect after 5 seconds
   if (!isValid && location.pathname !== '/') {
-    setTimeout(() => {
+  
       window.location.href = '/';
-    }, 5000);
-    return (
-      <>
-        <ToastContainer />
-        <div>Redirecting to login page...</div>
-      </>
-    );
+
   }
 
   // If we're on the root path and have a valid token, redirect to the appropriate portal
